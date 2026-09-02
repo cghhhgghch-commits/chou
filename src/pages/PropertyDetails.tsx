@@ -32,6 +32,8 @@ export default function PropertyDetails() {
           .from("listings")
           .select("*")
           .eq("id", id)
+          .eq("status", "active")
+          .eq("is_verified", true)
           .single();
 
         if (error || !data) {

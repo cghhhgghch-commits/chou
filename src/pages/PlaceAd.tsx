@@ -8,6 +8,7 @@ import {
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import { useNotifications } from "../lib/NotificationsContext";
+import { useAdmin } from "../lib/AdminContext";
 import { 
   APP_CONFIG, 
   SYRIAN_CITIES,
@@ -25,6 +26,7 @@ export default function PlaceAd() {
   const [searchParams] = useSearchParams();
   const editingId = searchParams.get("id");
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const { addNotification } = useNotifications();
   
   // Basic Category & Deal
@@ -505,8 +507,8 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         advertiser_name: advertiserName,
         phone,
         whatsapp: whatsapp || phone,
-        status: "active",
-        is_verified: true,
+        status: isAdmin ? "active" : "pending",
+        is_verified: isAdmin,
         images: finalImageUrls,
         videos: [],
         updated_at: new Date().toISOString(),

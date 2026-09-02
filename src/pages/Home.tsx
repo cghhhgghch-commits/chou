@@ -21,6 +21,8 @@ export default function Home() {
         const { data, error } = await supabase
           .from("listings")
           .select("*")
+          .eq("status", "active")
+          .eq("is_verified", true)
           .order("created_at", { ascending: false })
           .limit(4);
 

@@ -30,6 +30,7 @@ interface PropertyListing {
   images?: string[];
   videos?: string[];
   description?: string;
+  status?: "active" | "pending" | "approved" | "rejected";
   createdAt?: any;
   userEmail?: string;
 }
@@ -54,7 +55,7 @@ const normalizeListing = (row: any): PropertyListing => ({
 interface WhatsAppLead {
   id: string;
   message: string;
-  status: "pending" | "approved" | "rejected";
+  status: "active" | "pending" | "approved" | "rejected";
   createdAt?: any;
   parsedData?: {
     title?: string;
@@ -320,6 +321,23 @@ export default function AdminDashboard2() {
     } catch (error) {
       console.error("خطأ في الحذف:", error);
       alert("❌ فشل حذف الإعلان");
+    }
+  };
+
+  const handleModerate = async (id: string, approved: boolean) => {
+    try {
+      const { error } = await supabase.from("listings").update({
+        status: approved ? "active" : "rejected",
+        is_verified: approved,
+      }).eq("id", id);
+      if (error) throw error;
+      setListings((current) => current.map((item) => (
+        item.id === id ? { ...item, status: approved ? "active" : "rejected" } : item
+      )));
+      alert(approved ? "✅ تمت الموافقة على الإعلان" : "✅ تم رفض الإعلان");
+    } catch (error) {
+      console.error("Failed to moderate listing:", error);
+      alert("❌ تعذرت معالجة الإعلان");
     }
   };
 
@@ -907,6 +925,24 @@ export default function AdminDashboard2() {
 
                     {/* الأزرار */}
                     <div className="flex gap-3 mt-4 pt-4 border-t border-slate-200">
+                      {item.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleModerate(item.id, true)}
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                          >
+                            <Check className="w-4 h-4" />
+                            موافقة
+                          </button>
+                          <button
+                            onClick={() => handleModerate(item.id, false)}
+                            className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                            رفض
+                          </button>
+                        </>
+                      )}
                       <button
                         onClick={() => handleEdit(item)}
                         className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
