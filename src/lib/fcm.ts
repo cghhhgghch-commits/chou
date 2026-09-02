@@ -16,6 +16,16 @@ export interface FcmTokenPayload {
 const STORAGE_KEY = 'laqta.fcm.device_id';
 const REMINDER_NOTIFICATION_ID = 1001;
 
+const reminderMessages = [
+  { title: 'لقطة اليوم بانتظارك', body: 'قد يكون العقار المناسب لك نُشر اليوم. اكتشف أحدث العروض.' },
+  { title: 'لا تفوّت فرصتك', body: 'تصفح العقارات الجديدة واعثر على عرض يستحق اهتمامك.' },
+  { title: 'جولتك العقارية تبدأ الآن', body: 'استكشف البيوت والاستوديوهات والشاليهات المضافة حديثًا.' },
+  { title: 'عرض جديد قد يناسبك', body: 'افتح لقطة وشاهد ما أضيف بالقرب منك اليوم.' },
+  { title: 'وقت اللقطة العقارية', body: 'حدّث بحثك الآن، فالعروض الجيدة لا تنتظر طويلًا.' },
+  { title: 'بيتك القادم أقرب مما تتخيل', body: 'اكتشف خيارات جديدة واستلهم خطوتك القادمة مع لقطة.' },
+  { title: 'ماذا أضافت لقطة اليوم؟', body: 'دقائق قليلة قد تقودك إلى عقارك القادم. تصفح الآن.' },
+];
+
 export const scheduleAppReminder = async () => {
   if (!Capacitor.isNativePlatform()) return false;
 
@@ -31,11 +41,13 @@ export const scheduleAppReminder = async () => {
       reminderDate.setDate(reminderDate.getDate() + 1);
     }
 
+    const reminder = reminderMessages[reminderDate.getDay()];
+
     await LocalNotifications.schedule({
       notifications: [{
         id: REMINDER_NOTIFICATION_ID,
-        title: 'لقطة',
-        body: 'تفقّد أحدث العقارات والإعلانات الجديدة.',
+        title: reminder.title,
+        body: reminder.body,
         schedule: { at: reminderDate, repeats: true, every: 'day' },
         extra: { type: 'app_reminder' },
       }],
