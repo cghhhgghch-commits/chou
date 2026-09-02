@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "726058413198",
+    "firebase_url": "https://laqt-b61a2-default-rtdb.firebaseio.com",
+    "project_id": "laqt-b61a2",
+    "storage_bucket": "laqt-b61a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726058413198:android:0942701d71f508e4fcaddf",
+        "android_client_info": {
+          "package_name": "com.laqta.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Cpbrb_3n_owq5w19Rz29wLk5coj90c4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

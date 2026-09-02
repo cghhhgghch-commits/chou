@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">لقطة</string>
+    <string name="title_activity_main">لقطة</string>
+    <string name="package_name">com.laqta.app</string>
+    <string name="custom_url_scheme">com.laqta.app</string>
+</resources>

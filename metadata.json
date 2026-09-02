@@ -1,0 +1,6 @@
+{
+  "name": "لقطة LAQTA",
+  "description": "منصة عقارية متخصصة لبيع وإيجار العقارات، البيوت، الشقق، الفلل، المحلات، والأراضي.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
