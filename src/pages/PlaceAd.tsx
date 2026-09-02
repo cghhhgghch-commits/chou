@@ -469,16 +469,14 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         price_period: dealType === 'rent' ? pricePeriod : null,
         type: dealType,
         category: selectedCategory,
-        category_type: selectedCategory,
         property_type: selectedCategory,
         city_id: cityId,
         area_id: areaName,
         ownership_type: ownershipType,
         finishing,
-        direction,
         floor,
         total_floors: totalFloors,
-        bedrooms: bedrooms || "3",
+        bedrooms: Number.parseInt(bedrooms, 10) || 0,
         bathrooms: Number(bathrooms) || 1,
         salons,
         area: area ? Number(area) : 0,
@@ -488,9 +486,6 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         has_elevator: selectedAmenities.includes("مصعد حديث شغال"),
         has_generator: selectedAmenities.includes("مولدة كهرباء / خط أمبير"),
         amenities: selectedAmenities,
-        category_specific_text: categoryDetailText,
-        category_specific_numeric: categoryNumericDetail,
-        category_specific_extra: categoryExtraDetail,
         description: description.trim(),
         advertiser_type: advertiserType,
         advertiser_name: advertiserName,
@@ -499,6 +494,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         status: "active",
         is_verified: true,
         images: finalImageUrls,
+        videos: [],
         updated_at: new Date().toISOString(),
         ...(editingId ? {} : { created_at: new Date().toISOString() })
       };
@@ -514,6 +510,25 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         createdId = data?.id || null;
       }
 
+      const whatsappMessage = buildWhatsAppMessage();
+      try {
+        const { error: leadError } = await supabase.from("whatsapp_leads").insert({
+          message: whatsappMessage,
+          status: "pending",
+          parsed_data: {
+            title: title.trim(),
+            city: cityId,
+            price,
+            area,
+            category: selectedCategory,
+            description: description.trim(),
+          },
+        });
+        if (leadError) console.warn("Could not save admin notification:", leadError);
+      } catch (leadError) {
+        console.warn("Admin notification table is unavailable:", leadError);
+      }
+
       addNotification({
         title: editingId ? `🔄 تم تحديث إعلانك (${title})` : `📢 تم إضافة عقار جديد (${title})`,
         message: editingId ? `تم تحديث تفاصيل العقار في ${cityId} بنجاح.` : `تم إضافة عقار جديد في ${cityId} وهو الآن متاح للمستخدمين في المنصة.`,
@@ -526,8 +541,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
       });
 
       // Construct WhatsApp link
-      const waMsg = buildWhatsAppMessage();
-      const waUrl = getWhatsAppUrl(waMsg);
+      const waUrl = getWhatsAppUrl(whatsappMessage);
       setGeneratedWhatsAppUrl(waUrl);
       setShowSuccessModal(true);
 

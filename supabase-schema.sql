@@ -83,6 +83,15 @@ create table if not exists public.conversation_messages (
   created_at timestamptz default now()
 );
 
+-- Pending listing submissions for the admin review queue
+create table if not exists public.whatsapp_leads (
+  id uuid primary key default gen_random_uuid(),
+  message text not null,
+  status text default 'pending',
+  parsed_data jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
 -- Admins table
 create table if not exists public.admins (
   id uuid primary key default gen_random_uuid(),
@@ -118,6 +127,7 @@ alter table public.conversations enable row level security;
 alter table public.conversation_messages enable row level security;
 alter table public.admins enable row level security;
 alter table public.fcm_tokens enable row level security;
+alter table public.whatsapp_leads enable row level security;
 
 create policy "profiles_select_own" on public.profiles
 for select using (auth.uid() = id);
