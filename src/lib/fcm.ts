@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { supabase } from './supabase';
 
@@ -13,6 +14,39 @@ export interface FcmTokenPayload {
 }
 
 const STORAGE_KEY = 'laqta.fcm.device_id';
+const REMINDER_NOTIFICATION_ID = 1001;
+
+export const scheduleAppReminder = async () => {
+  if (!Capacitor.isNativePlatform()) return false;
+
+  try {
+    const permission = await LocalNotifications.requestPermissions();
+    if (permission.display !== 'granted') return false;
+
+    await LocalNotifications.cancel({ notifications: [{ id: REMINDER_NOTIFICATION_ID }] });
+
+    const reminderDate = new Date();
+    reminderDate.setHours(19, 0, 0, 0);
+    if (reminderDate.getTime() <= Date.now()) {
+      reminderDate.setDate(reminderDate.getDate() + 1);
+    }
+
+    await LocalNotifications.schedule({
+      notifications: [{
+        id: REMINDER_NOTIFICATION_ID,
+        title: 'لقطة',
+        body: 'تفقّد أحدث العقارات والإعلانات الجديدة.',
+        schedule: { at: reminderDate, repeats: true, every: 'day' },
+        extra: { type: 'app_reminder' },
+      }],
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to schedule app reminder:', error);
+    return false;
+  }
+};
 
 const getOrCreateDeviceId = () => {
   if (typeof window === 'undefined') return 'web-device';
