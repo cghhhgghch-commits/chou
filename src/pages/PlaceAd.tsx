@@ -106,23 +106,23 @@ export default function PlaceAd() {
 
         setSelectedCategory(data.category || "houses");
         setDealType((data.type as "sale" | "rent" | "offplan") || "sale");
-        setAdvertiserType((data.advertiserType as "owner" | "agent" | "agency") || "owner");
+        setAdvertiserType((data.advertiser_type as "owner" | "agent" | "agency") || "owner");
         setTitle(data.title || "");
         setPrice(data.price ? String(data.price) : "");
-        setPriceInUSD(data.priceInUSD ? String(data.priceInUSD) : "");
-        setPricePeriod(data.pricePeriod || "شهرياً");
+        setPriceInUSD(data.price_in_usd ? String(data.price_in_usd) : "");
+        setPricePeriod(data.price_period || "شهرياً");
         setCityId(data.city_id || "حلب");
         setAreaName(data.area_id || "");
-        setOwnershipType(data.ownershipType || OWNERSHIP_TYPES[0]);
+        setOwnershipType(data.ownership_type || OWNERSHIP_TYPES[0]);
         setFinishing(data.finishing || FINISHING_TYPES[0]);
         setDirection(data.direction || "قبلي غربي (مشمس)");
         setFloor(data.floor || "الطابق الثاني");
-        setTotalFloors(data.totalFloors || "4 طوابق");
-        setBedrooms(data.bedrooms ? String(data.bedrooms) : "3 غرف نوم");
+        setTotalFloors(data.total_floors || "4 طوابق");
+        setBedrooms(data.bedrooms != null ? String(data.bedrooms) : "3");
         setBathrooms(Number(data.bathrooms || 2));
         setSalons(data.salons || "صالون كبير وموزع");
         setArea(data.area ? String(data.area) : "");
-        setLandArea(data.landArea ? String(data.landArea) : "");
+        setLandArea(data.land_area ? String(data.land_area) : "");
         setFurnishing(data.furnishing || "غير مفروش");
         setSelectedAmenities(Array.isArray(data.amenities) && data.amenities.length > 0 ? data.amenities : [
           "منظومة طاقة شمسية وإنفيرتر",
@@ -134,7 +134,7 @@ export default function PlaceAd() {
         setCategoryNumericDetail(data.categorySpecificNumeric || "");
         setCategoryExtraDetail(data.categorySpecificExtra || "");
         setDescription(data.description || "");
-        setAdvertiserName(data.advertiserName || user?.displayName || "معلن عقاري");
+        setAdvertiserName(data.advertiser_name || user?.displayName || "معلن عقاري");
         setPhone(data.phone || user?.phoneNumber || "+963");
         setWhatsapp(data.whatsapp || data.phone || APP_CONFIG.adminPhone);
         setPreviewUrls(Array.isArray(data.images) && data.images.length > 0 ? data.images : []);
@@ -192,8 +192,13 @@ export default function PlaceAd() {
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    const removedUrl = previewUrls[index];
+    if (removedUrl?.startsWith("blob:")) {
+      const fileIndex = previewUrls.slice(0, index).filter((url) => url.startsWith("blob:")).length;
+      setImages((prev) => prev.filter((_, i) => i !== fileIndex));
+      URL.revokeObjectURL(removedUrl);
+    }
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const toggleAmenity = (amenity: string) => {
@@ -449,11 +454,20 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         return;
       }
 
-      let finalImageUrls = [...previewUrls.filter(u => u.startsWith("http"))];
+      let finalImageUrls = [...previewUrls.filter((u) => u.startsWith("http"))];
 
-      if (previewUrls.length > 0) {
-        finalImageUrls = [...new Set([...previewUrls.filter((u) => u.startsWith("http") || u.startsWith("blob:")), ...finalImageUrls])];
+      for (const imageFile of images) {
+        const filePath = `${user.id}/${crypto.randomUUID()}-${imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const { error: uploadError } = await supabase.storage
+          .from("listing-media")
+          .upload(filePath, imageFile, { upsert: false, contentType: imageFile.type });
+        if (uploadError) throw new Error(`تعذر رفع الصورة: ${uploadError.message}`);
+
+        const { data: publicUrl } = supabase.storage.from("listing-media").getPublicUrl(filePath);
+        finalImageUrls.push(publicUrl.publicUrl);
       }
+
+      finalImageUrls = [...new Set(finalImageUrls)];
 
       if (finalImageUrls.length === 0) {
         finalImageUrls = [

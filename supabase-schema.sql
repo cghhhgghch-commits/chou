@@ -92,6 +92,10 @@ create table if not exists public.whatsapp_leads (
   created_at timestamptz default now()
 );
 
+insert into storage.buckets (id, name, public)
+values ('listing-media', 'listing-media', true)
+on conflict (id) do update set public = true;
+
 -- Admins table
 create table if not exists public.admins (
   id uuid primary key default gen_random_uuid(),
@@ -196,6 +200,23 @@ on public.whatsapp_leads
 for update
 using (true)
 with check (true);
+
+create policy "listing_media_upload_authenticated"
+on storage.objects
+for insert
+to authenticated
+with check (bucket_id = 'listing-media' and (storage.foldername(name))[1] = (select auth.uid()::text));
+
+create policy "listing_media_public_read"
+on storage.objects
+for select
+using (bucket_id = 'listing-media');
+
+create policy "listing_media_delete_owner"
+on storage.objects
+for delete
+to authenticated
+using (bucket_id = 'listing-media' and owner_id = (select auth.uid()::text));
 
 -- Helpful indexes
 create index if not exists listings_created_at_idx on public.listings(created_at desc);
