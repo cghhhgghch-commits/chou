@@ -159,6 +159,7 @@ export default function Login() {
           redirectTo: Capacitor.isNativePlatform()
             ? "com.laqta.app://auth/callback"
             : `${window.location.origin}/`,
+            ...(Capacitor.isNativePlatform() ? { skipBrowserRedirect: true } : {}),
           queryParams: {
             access_type: "offline",
             prompt: "consent",

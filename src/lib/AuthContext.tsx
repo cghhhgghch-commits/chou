@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 import { syncNativePushToken } from "./fcm";
 import { App } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 
 export interface UserProfile {
   id: string;
@@ -125,11 +126,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));
           const accessToken = hashParams.get("access_token");
           const refreshToken = hashParams.get("refresh_token");
+          const code = callbackUrl.searchParams.get("code");
 
           if (accessToken && refreshToken) {
             await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          } else if (code) {
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            if (error) throw error;
           }
 
+          await Browser.close();
           window.history.replaceState({}, document.title, "/");
         })
       : null;
