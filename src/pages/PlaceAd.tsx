@@ -450,7 +450,10 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
     setError("");
 
     try {
-      if (!user) {
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      const authenticatedUser = authData.user;
+
+      if (authError || !authenticatedUser) {
         setError("يجب تسجيل الدخول أولاً قبل إضافة الإعلان.");
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
@@ -459,7 +462,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
       let finalImageUrls = [...previewUrls.filter((u) => u.startsWith("http"))];
 
       for (const imageFile of images) {
-        const filePath = `${user.id}/${crypto.randomUUID()}-${imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const filePath = `${authenticatedUser.id}/${crypto.randomUUID()}-${imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
         const { error: uploadError } = await supabase.storage
           .from("listing-media")
           .upload(filePath, imageFile, { upsert: false, contentType: imageFile.type });
@@ -478,7 +481,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
       }
 
       const listingData = {
-        user_id: user.id,
+        user_id: authenticatedUser.id,
         title: title.trim(),
         price: Number(price),
         price_in_usd: priceInUSD ? Number(priceInUSD) : null,

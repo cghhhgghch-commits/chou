@@ -173,11 +173,12 @@ for insert with check (auth.uid() = id);
 create policy "listings_select_public" on public.listings
 for select using (true);
 create policy "listings_insert_own" on public.listings
-for insert with check (auth.uid() = user_id);
+for insert to authenticated with check ((select auth.uid()) = user_id);
 create policy "listings_update_own" on public.listings
-for update using (auth.uid() = user_id);
+for update to authenticated using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 create policy "listings_delete_own" on public.listings
-for delete using (auth.uid() = user_id);
+for delete to authenticated using ((select auth.uid()) = user_id);
 
 create policy "favorites_select_own" on public.favorites
 for select using (auth.uid() = user_id);
