@@ -426,8 +426,8 @@ export default function AdminDashboard2() {
         setListings((prev) => [...prev, normalizeListing(data)]);
 
         const propertyMessage = {
-          title: `🏠 تم إضافة عقار جديد (${formData.title})`,
-          message: `تم إضافة ${formData.title} في ${formData.city} بنجاح، والآن يمكن للمستخدمين رؤيته في القائمة العامة.`,
+          title: `🏠 لقطة | تم إضافة عقار جديد`,
+          message: `${formData.title} متاح الآن. افتح التطبيق وشاهد التفاصيل والصور.`,
           type: "new_property" as const,
           propertyId: data.id,
           propertyTitle: formData.title,
@@ -440,6 +440,16 @@ export default function AdminDashboard2() {
           const notificationEvent = new CustomEvent("laqta:notification", { detail: propertyMessage });
           window.dispatchEvent(notificationEvent);
         }
+
+        const { error: broadcastError } = await supabase.functions.invoke("send-push-notification", {
+          body: {
+            broadcast: true,
+            title: "🏠 لقطة | تم إضافة عقار جديد",
+            body: `${formData.title} متاح الآن. افتح التطبيق وشاهد التفاصيل والصور.`,
+            data: { type: "new_property", propertyId: data.id },
+          },
+        });
+        if (broadcastError) console.warn("Listing saved but notification failed:", broadcastError);
 
         alert("✅ تم إنشاء الإعلان بنجاح");
       }

@@ -14,20 +14,20 @@ export interface FcmTokenPayload {
 }
 
 const STORAGE_KEY = 'laqta.fcm.device_id';
-const REMINDER_NOTIFICATION_ID = 1001;
-
-const reminderMessages = [
-  { title: 'لقطة | تمّت إضافة عقار جديد', body: 'اكتشف أحدث العقارات والعروض المميزة قبل أن تفوتك.' },
-  { title: 'لقطة | عرض جديد بانتظارك', body: 'قد يكون هذا هو العقار المناسب لك. تصفّح الآن.' },
-  { title: 'لقطة | جديد العقارات اليوم', body: 'بيوت وفلل وأراضٍ جديدة بانتظار اكتشافك.' },
-  { title: 'لقطة | لا تفوّت الفرصة', body: 'شاهد آخر الإعلانات المضافة واختر ما يناسبك.' },
-  { title: 'لقطة | عقارك القادم أقرب', body: 'جولة سريعة داخل لقطة قد تقودك إلى اختيارك الأفضل.' },
-  { title: 'لقطة | اختيارات جديدة', body: 'اكتشف عقارات مميزة أضيفت حديثًا إلى المنصة.' },
-  { title: 'لقطة | ماذا أُضيف اليوم؟', body: 'افتح التطبيق وتعرّف على أحدث فرص البيع والإيجار.' },
-];
-
 export const setupPushNotificationListeners = async () => {
   if (!Capacitor.isNativePlatform()) return;
+
+  const permission = await LocalNotifications.requestPermissions();
+  if (permission.display !== 'granted') return;
+
+  await LocalNotifications.createChannel({
+    id: 'laqta_default',
+    name: 'إشعارات لقطة',
+    description: 'إعلانات وتنبيهات تطبيق لقطة',
+    importance: 4,
+    visibility: 1,
+    sound: 'default',
+  });
 
   await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
     await LocalNotifications.schedule({
@@ -42,61 +42,6 @@ export const setupPushNotificationListeners = async () => {
       }],
     });
   });
-};
-
-export const scheduleAppReminder = async () => {
-  if (!Capacitor.isNativePlatform()) return false;
-
-  try {
-    const permission = await LocalNotifications.requestPermissions();
-    if (permission.display !== 'granted') return false;
-
-    await LocalNotifications.createChannel({
-      id: 'app-reminders',
-      name: 'تذكيرات لقطة',
-      description: 'تذكيرات يومية بالعقارات والعروض الجديدة',
-      importance: 4,
-      visibility: 1,
-      sound: 'default',
-    });
-    await LocalNotifications.createChannel({
-      id: 'laqta_default',
-      name: 'إشعارات لقطة',
-      description: 'إعلانات وتنبيهات تطبيق لقطة',
-      importance: 4,
-      visibility: 1,
-      sound: 'default',
-    });
-
-    await LocalNotifications.cancel({ notifications: [{ id: REMINDER_NOTIFICATION_ID }] });
-
-    const reminderDate = new Date();
-    reminderDate.setHours(19, 0, 0, 0);
-    if (reminderDate.getTime() <= Date.now()) {
-      reminderDate.setDate(reminderDate.getDate() + 1);
-    }
-
-    const reminder = reminderMessages[reminderDate.getDay()];
-
-    await LocalNotifications.schedule({
-      notifications: [{
-        id: REMINDER_NOTIFICATION_ID,
-        title: reminder.title,
-        body: reminder.body,
-        channelId: 'app-reminders',
-        largeIcon: 'ic_launcher',
-        summaryText: 'إشعارات تطبيق لقطة',
-        sound: 'default',
-        schedule: { at: reminderDate, repeats: true, every: 'day' },
-        extra: { type: 'app_reminder' },
-      }],
-    });
-
-    return true;
-  } catch (error) {
-    console.error('Failed to schedule app reminder:', error);
-    return false;
-  }
 };
 
 const getOrCreateDeviceId = () => {
