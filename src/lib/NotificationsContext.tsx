@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { AppNotification } from "../types";
 
 interface NotificationsContextType {
@@ -15,26 +15,58 @@ interface NotificationsContextType {
 }
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+const NOTIFICATIONS_STORAGE_KEY = "laqta.notifications";
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+    try {
+      const saved = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const unreadCount = 0;
+  const unreadCount = notifications.filter((notification) => !notification.isRead).length;
 
-  const openNotifications = () => setIsModalOpen(false);
+  useEffect(() => {
+    localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
+  }, [notifications]);
+
+  useEffect(() => {
+    const handleNotification = (event: Event) => {
+      const detail = (event as CustomEvent<Omit<AppNotification, "id" | "timestamp" | "isRead">>).detail;
+      if (!detail?.title || !detail.message) return;
+
+      setNotifications((current) => [
+        { ...detail, id: crypto.randomUUID(), timestamp: new Date().toISOString(), isRead: false },
+        ...current,
+      ].slice(0, 50));
+    };
+
+    window.addEventListener("laqta:notification", handleNotification);
+    return () => window.removeEventListener("laqta:notification", handleNotification);
+  }, []);
+
+  const openNotifications = () => setIsModalOpen(true);
   const closeNotifications = () => setIsModalOpen(false);
 
-  const addNotification = () => {
-    // Temporarily disabled: notifications are hidden until re-enabled later.
+  const addNotification = (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
+    setNotifications((current) => [
+      { ...notification, id: crypto.randomUUID(), timestamp: new Date().toISOString(), isRead: false },
+      ...current,
+    ].slice(0, 50));
   };
 
-  const markAsRead = () => {
-    // Temporarily disabled.
+  const markAsRead = (id: string) => {
+    setNotifications((current) => current.map((notification) => (
+      notification.id === id ? { ...notification, isRead: true } : notification
+    )));
   };
 
   const markAllAsRead = () => {
-    setNotifications([]);
+    setNotifications((current) => current.map((notification) => ({ ...notification, isRead: true })));
   };
 
   const clearNotifications = () => {

@@ -40,6 +40,7 @@ create table if not exists public.listings (
   has_generator boolean default false,
   amenities jsonb default '[]'::jsonb,
   images jsonb default '[]'::jsonb,
+  videos jsonb default '[]'::jsonb,
   is_verified boolean default false,
   is_featured boolean default false,
   status text default 'active',
