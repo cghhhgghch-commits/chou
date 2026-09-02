@@ -123,6 +123,36 @@ create table if not exists public.fcm_tokens (
   unique (user_id, device_id)
 );
 
+create or replace function public.admin_delete_listing(
+  p_listing_id uuid,
+  p_admin_email text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  deleted boolean;
+  deleted_count integer;
+begin
+  if not exists (
+    select 1 from public.admins
+    where lower(email) = lower(p_admin_email)
+    and is_admin = true
+  ) then
+    raise exception 'admin permission denied';
+  end if;
+
+  delete from public.listings where id = p_listing_id;
+  get diagnostics deleted_count = row_count;
+  deleted := deleted_count > 0;
+  return deleted;
+end;
+$$;
+
+grant execute on function public.admin_delete_listing(uuid, text) to anon, authenticated;
+
 -- RLS policies
 alter table public.profiles enable row level security;
 alter table public.listings enable row level security;

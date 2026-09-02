@@ -314,8 +314,12 @@ export default function AdminDashboard2() {
     if (!confirm("هل تريد حذف هذا الإعلان؟")) return;
 
     try {
-      const { error } = await supabase.from("listings").delete().eq("id", id);
+      const { data: deleted, error } = await supabase.rpc("admin_delete_listing", {
+        p_listing_id: id,
+        p_admin_email: adminEmail,
+      });
       if (error) throw error;
+      if (!deleted) throw new Error("لم يتم العثور على الإعلان أو لا تملك صلاحية حذفه");
       setListings((prev) => prev.filter((item) => item.id !== id));
       alert("✅ تم حذف الإعلان بنجاح");
     } catch (error) {
