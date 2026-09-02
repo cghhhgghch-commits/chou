@@ -33,6 +33,15 @@ export const scheduleAppReminder = async () => {
     const permission = await LocalNotifications.requestPermissions();
     if (permission.display !== 'granted') return false;
 
+    await LocalNotifications.createChannel({
+      id: 'app-reminders',
+      name: 'تذكيرات لقطة',
+      description: 'تذكيرات يومية بالعقارات والعروض الجديدة',
+      importance: 4,
+      visibility: 1,
+      sound: 'default',
+    });
+
     await LocalNotifications.cancel({ notifications: [{ id: REMINDER_NOTIFICATION_ID }] });
 
     const reminderDate = new Date();
@@ -48,6 +57,8 @@ export const scheduleAppReminder = async () => {
         id: REMINDER_NOTIFICATION_ID,
         title: reminder.title,
         body: reminder.body,
+        channelId: 'app-reminders',
+        sound: 'default',
         schedule: { at: reminderDate, repeats: true, every: 'day' },
         extra: { type: 'app_reminder' },
       }],
