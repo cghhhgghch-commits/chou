@@ -17,13 +17,13 @@ const STORAGE_KEY = 'laqta.fcm.device_id';
 const REMINDER_NOTIFICATION_ID = 1001;
 
 const reminderMessages = [
-  { title: 'لقطة اليوم بانتظارك', body: 'قد يكون العقار المناسب لك نُشر اليوم. اكتشف أحدث العروض.' },
-  { title: 'لا تفوّت فرصتك', body: 'تصفح العقارات الجديدة واعثر على عرض يستحق اهتمامك.' },
-  { title: 'جولتك العقارية تبدأ الآن', body: 'استكشف البيوت والاستوديوهات والشاليهات المضافة حديثًا.' },
-  { title: 'عرض جديد قد يناسبك', body: 'افتح لقطة وشاهد ما أضيف بالقرب منك اليوم.' },
-  { title: 'وقت اللقطة العقارية', body: 'حدّث بحثك الآن، فالعروض الجيدة لا تنتظر طويلًا.' },
-  { title: 'بيتك القادم أقرب مما تتخيل', body: 'اكتشف خيارات جديدة واستلهم خطوتك القادمة مع لقطة.' },
-  { title: 'ماذا أضافت لقطة اليوم؟', body: 'دقائق قليلة قد تقودك إلى عقارك القادم. تصفح الآن.' },
+  { title: 'لقطة | تمّت إضافة عقار جديد', body: 'اكتشف أحدث العقارات والعروض المميزة قبل أن تفوتك.' },
+  { title: 'لقطة | عرض جديد بانتظارك', body: 'قد يكون هذا هو العقار المناسب لك. تصفّح الآن.' },
+  { title: 'لقطة | جديد العقارات اليوم', body: 'بيوت وفلل وأراضٍ جديدة بانتظار اكتشافك.' },
+  { title: 'لقطة | لا تفوّت الفرصة', body: 'شاهد آخر الإعلانات المضافة واختر ما يناسبك.' },
+  { title: 'لقطة | عقارك القادم أقرب', body: 'جولة سريعة داخل لقطة قد تقودك إلى اختيارك الأفضل.' },
+  { title: 'لقطة | اختيارات جديدة', body: 'اكتشف عقارات مميزة أضيفت حديثًا إلى المنصة.' },
+  { title: 'لقطة | ماذا أُضيف اليوم؟', body: 'افتح التطبيق وتعرّف على أحدث فرص البيع والإيجار.' },
 ];
 
 export const setupPushNotificationListeners = async () => {
@@ -36,6 +36,8 @@ export const setupPushNotificationListeners = async () => {
         title: notification.title || 'لقطة',
         body: notification.body || 'لديك تنبيه جديد من لقطة.',
         channelId: 'laqta_default',
+        largeIcon: 'ic_launcher',
+        summaryText: 'إشعارات تطبيق لقطة',
         sound: 'default',
       }],
     });
@@ -82,6 +84,8 @@ export const scheduleAppReminder = async () => {
         title: reminder.title,
         body: reminder.body,
         channelId: 'app-reminders',
+        largeIcon: 'ic_launcher',
+        summaryText: 'إشعارات تطبيق لقطة',
         sound: 'default',
         schedule: { at: reminderDate, repeats: true, every: 'day' },
         extra: { type: 'app_reminder' },

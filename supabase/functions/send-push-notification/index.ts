@@ -50,6 +50,7 @@ serve(async (req) => {
         notification: {
           title,
           body,
+          ...(data.image ? { image: data.image } : {}),
         },
         data: {
           ...data,

@@ -102,6 +102,7 @@ export default function AdminDashboard2() {
   const [pendingLeads, setPendingLeads] = useState<WhatsAppLead[]>([]);
   const [broadcastTitle, setBroadcastTitle] = useState("");
   const [broadcastBody, setBroadcastBody] = useState("");
+  const [broadcastImage, setBroadcastImage] = useState("");
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -363,13 +364,17 @@ export default function AdminDashboard2() {
           broadcast: true,
           title: broadcastTitle.trim(),
           body: broadcastBody.trim(),
-          data: { type: "broadcast" },
+          data: {
+            type: "broadcast",
+            image: broadcastImage.trim() || undefined,
+          },
         },
       });
       if (error) throw error;
       alert(`✅ تم إرسال الإعلان إلى ${data?.sent ?? 0} جهاز`);
       setBroadcastTitle("");
       setBroadcastBody("");
+      setBroadcastImage("");
     } catch (error) {
       console.error("Failed to send broadcast:", error);
       alert("❌ تعذر إرسال الإعلان الجماعي. تأكد من نشر Edge Function وإعداد Firebase.");
@@ -888,6 +893,12 @@ export default function AdminDashboard2() {
               placeholder="اكتب رسالة قصيرة وجذابة للمستخدمين"
               rows={2}
               className="rounded-lg px-3 py-2 text-slate-900 resize-none"
+            />
+            <input
+              value={broadcastImage}
+              onChange={(event) => setBroadcastImage(event.target.value)}
+              placeholder="رابط صورة اختيارية للإشعار"
+              className="rounded-lg px-3 py-2 text-slate-900 md:col-span-2"
             />
             <button
               onClick={sendBroadcast}
