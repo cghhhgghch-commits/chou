@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAdmin } from "../lib/AdminContext";
 import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, ShieldCheck } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 
 export default function Login() {
   const location = useLocation();
@@ -151,10 +153,12 @@ export default function Login() {
     setSocialLoading("google");
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: Capacitor.isNativePlatform()
+            ? "com.laqta.app://auth/callback"
+            : `${window.location.origin}/`,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
@@ -163,6 +167,9 @@ export default function Login() {
       });
 
       if (error) throw error;
+      if (Capacitor.isNativePlatform()) {
+        if (data.url) await Browser.open({ url: data.url });
+      }
     } catch (err: any) {
       console.error("Google Auth error:", err);
       const message = err?.message || "";

@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "./supabase";
 import { syncNativePushToken } from "./fcm";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 
 export interface UserProfile {
   id: string;
@@ -115,6 +117,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
+    const urlListener = Capacitor.isNativePlatform()
+      ? App.addListener("appUrlOpen", async ({ url }) => {
+          if (!url.startsWith("com.laqta.app://auth/callback")) return;
+
+          const callbackUrl = new URL(url);
+          const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));
+          const accessToken = hashParams.get("access_token");
+          const refreshToken = hashParams.get("refresh_token");
+
+          if (accessToken && refreshToken) {
+            await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          }
+
+          window.history.replaceState({}, document.title, "/");
+        })
+      : null;
+
     const syncSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
@@ -172,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
       authListener.subscription.unsubscribe();
+      urlListener?.then((listener) => listener.remove());
     };
   }, []);
 
