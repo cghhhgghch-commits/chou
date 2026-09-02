@@ -180,6 +180,23 @@ for all
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
+create policy "whatsapp_leads_insert_authenticated"
+on public.whatsapp_leads
+for insert
+to authenticated
+with check (true);
+
+create policy "whatsapp_leads_admin_read"
+on public.whatsapp_leads
+for select
+using (true);
+
+create policy "whatsapp_leads_admin_update"
+on public.whatsapp_leads
+for update
+using (true)
+with check (true);
+
 -- Helpful indexes
 create index if not exists listings_created_at_idx on public.listings(created_at desc);
 create index if not exists listings_city_idx on public.listings(city_id);
