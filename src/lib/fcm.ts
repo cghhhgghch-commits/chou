@@ -26,6 +26,22 @@ const reminderMessages = [
   { title: 'ماذا أضافت لقطة اليوم؟', body: 'دقائق قليلة قد تقودك إلى عقارك القادم. تصفح الآن.' },
 ];
 
+export const setupPushNotificationListeners = async () => {
+  if (!Capacitor.isNativePlatform()) return;
+
+  await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
+    await LocalNotifications.schedule({
+      notifications: [{
+        id: Date.now() % 2147483647,
+        title: notification.title || 'لقطة',
+        body: notification.body || 'لديك تنبيه جديد من لقطة.',
+        channelId: 'laqta_default',
+        sound: 'default',
+      }],
+    });
+  });
+};
+
 export const scheduleAppReminder = async () => {
   if (!Capacitor.isNativePlatform()) return false;
 
@@ -37,6 +53,14 @@ export const scheduleAppReminder = async () => {
       id: 'app-reminders',
       name: 'تذكيرات لقطة',
       description: 'تذكيرات يومية بالعقارات والعروض الجديدة',
+      importance: 4,
+      visibility: 1,
+      sound: 'default',
+    });
+    await LocalNotifications.createChannel({
+      id: 'laqta_default',
+      name: 'إشعارات لقطة',
+      description: 'إعلانات وتنبيهات تطبيق لقطة',
       importance: 4,
       visibility: 1,
       sound: 'default',
@@ -131,19 +155,22 @@ export const syncNativePushToken = async (userId?: string) => {
       return null;
     }
 
-    let tokenValue: string | null = null;
-
-    const listener = await PushNotifications.addListener('registration', ({ value }) => {
-      tokenValue = value;
+    let registrationListener: { remove: () => Promise<void> } | null = null;
+    let registrationErrorListener: { remove: () => Promise<void> } | null = null;
+    const tokenPromise = new Promise<string>((resolve, reject) => {
+      const timeout = window.setTimeout(() => reject(new Error('FCM registration timeout')), 15000);
+      void PushNotifications.addListener('registration', ({ value }) => {
+        window.clearTimeout(timeout);
+        resolve(value);
+      }).then((listener) => { registrationListener = listener; });
+      void PushNotifications.addListener('registrationError', (error) => {
+        window.clearTimeout(timeout);
+        reject(new Error(error.error || 'FCM registration failed'));
+      }).then((listener) => { registrationErrorListener = listener; });
     });
 
     await PushNotifications.register();
-
-    if (!tokenValue) {
-      console.warn('Push registration completed but no token was returned yet.');
-      listener.remove();
-      return null;
-    }
+    const tokenValue = await tokenPromise;
 
     const result = await registerFcmToken({
       token: tokenValue,
@@ -153,7 +180,8 @@ export const syncNativePushToken = async (userId?: string) => {
       user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'android-capacitor',
     });
 
-    listener.remove();
+    await registrationListener?.remove();
+    await registrationErrorListener?.remove();
     return result;
   } catch (error) {
     console.error('Failed to sync native push token:', error);

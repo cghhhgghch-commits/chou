@@ -10,16 +10,19 @@ if (!supabaseUrl || !serviceRoleKey || !fcmServerKey) {
 
 serve(async (req) => {
   try {
-    const { user_id, title, body, data = {} } = await req.json();
+    const { user_id, broadcast, title, body, data = {} } = await req.json();
 
-    if (!user_id || !title || !body) {
+    if ((!user_id && !broadcast) || !title || !body) {
       return new Response(JSON.stringify({ error: 'Missing required payload' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const tokenResponse = await fetch(`${supabaseUrl}/rest/v1/fcm_tokens?select=token&user_id=eq.${user_id}&is_active=eq.true`, {
+    const tokenQuery = broadcast
+      ? 'select=token&is_active=eq.true'
+      : `select=token&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true`;
+    const tokenResponse = await fetch(`${supabaseUrl}/rest/v1/fcm_tokens?${tokenQuery}`, {
       headers: {
         apikey: serviceRoleKey,
         Authorization: `Bearer ${serviceRoleKey}`,

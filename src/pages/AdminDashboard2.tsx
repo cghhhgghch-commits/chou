@@ -14,6 +14,8 @@ import {
   Building2,
   Check,
   X,
+  Bell,
+  Send,
 } from "lucide-react";
 import { SYRIAN_CITIES } from "../lib/constants";
 
@@ -98,6 +100,9 @@ export default function AdminDashboard2() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("");
   const [pendingLeads, setPendingLeads] = useState<WhatsAppLead[]>([]);
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastBody, setBroadcastBody] = useState("");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -342,6 +347,34 @@ export default function AdminDashboard2() {
     } catch (error) {
       console.error("Failed to moderate listing:", error);
       alert("❌ تعذرت معالجة الإعلان");
+    }
+  };
+
+  const sendBroadcast = async () => {
+    if (!broadcastTitle.trim() || !broadcastBody.trim()) {
+      alert("⚠️ اكتب عنوان الإعلان ونصه أولًا");
+      return;
+    }
+
+    setIsBroadcasting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-push-notification", {
+        body: {
+          broadcast: true,
+          title: broadcastTitle.trim(),
+          body: broadcastBody.trim(),
+          data: { type: "broadcast" },
+        },
+      });
+      if (error) throw error;
+      alert(`✅ تم إرسال الإعلان إلى ${data?.sent ?? 0} جهاز`);
+      setBroadcastTitle("");
+      setBroadcastBody("");
+    } catch (error) {
+      console.error("Failed to send broadcast:", error);
+      alert("❌ تعذر إرسال الإعلان الجماعي. تأكد من نشر Edge Function وإعداد Firebase.");
+    } finally {
+      setIsBroadcasting(false);
     }
   };
 
@@ -834,6 +867,36 @@ export default function AdminDashboard2() {
                 إعلان جديد
               </button>
             )}
+          </div>
+        </div>
+
+        <div className="bg-slate-900 rounded-xl shadow-md p-6 mb-8 text-white">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="w-5 h-5 text-amber-300" />
+            <h2 className="font-black">إعلان جماعي للمستخدمين</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+            <input
+              value={broadcastTitle}
+              onChange={(event) => setBroadcastTitle(event.target.value)}
+              placeholder="عنوان الإشعار"
+              className="rounded-lg px-3 py-2 text-slate-900"
+            />
+            <textarea
+              value={broadcastBody}
+              onChange={(event) => setBroadcastBody(event.target.value)}
+              placeholder="اكتب رسالة قصيرة وجذابة للمستخدمين"
+              rows={2}
+              className="rounded-lg px-3 py-2 text-slate-900 resize-none"
+            />
+            <button
+              onClick={sendBroadcast}
+              disabled={isBroadcasting}
+              className="bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-900 font-black rounded-lg px-5 py-2 flex items-center justify-center gap-2"
+            >
+              <Send className="w-4 h-4" />
+              {isBroadcasting ? "جاري الإرسال..." : "إرسال للكل"}
+            </button>
           </div>
         </div>
 
