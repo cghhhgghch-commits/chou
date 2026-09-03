@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
-import { useNotifications } from "../lib/NotificationsContext";
 import { useAdmin } from "../lib/AdminContext";
 import { 
   APP_CONFIG, 
@@ -27,7 +26,6 @@ export default function PlaceAd() {
   const editingId = searchParams.get("id");
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
-  const { addNotification } = useNotifications();
   
   // Basic Category & Deal
   const [selectedCategory, setSelectedCategory] = useState("houses");
@@ -180,11 +178,18 @@ export default function PlaceAd() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setImages(prev => [...prev, ...filesArray]);
-      const newUrls = filesArray.map(file => URL.createObjectURL(file));
+      const filesArray = Array.from(e.target.files).filter((file) => file.type.startsWith("image/") && file.size <= 8 * 1024 * 1024);
+      const remainingSlots = Math.max(0, 8 - previewUrls.length);
+      const selectedFiles = filesArray.slice(0, remainingSlots);
+      if (filesArray.length !== selectedFiles.length) {
+        setError("يمكنك إضافة 8 صور كحد أقصى، وحجم كل صورة يجب ألا يتجاوز 8 ميغابايت.");
+      }
+      if (!selectedFiles.length) return;
+      setImages(prev => [...prev, ...selectedFiles]);
+      const newUrls = selectedFiles.map(file => URL.createObjectURL(file));
       setPreviewUrls(prev => [...prev, ...newUrls]);
     }
+    e.target.value = "";
   };
 
   const handleAddImageUrl = () => {
@@ -548,24 +553,10 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         console.warn("Admin notification table is unavailable:", leadError);
       }
 
-      addNotification({
-        title: editingId ? `🔄 تم تحديث إعلانك (${title})` : `📢 تم إضافة عقار جديد (${title})`,
-        message: editingId ? `تم تحديث تفاصيل العقار في ${cityId} بنجاح.` : `تم إضافة عقار جديد في ${cityId} وهو الآن متاح للمستخدمين في المنصة.`,
-        type: editingId ? "ad_approved" : "new_property",
-        propertyId: createdId || undefined,
-        propertyTitle: title.trim(),
-        cityName: cityId,
-        iconType: editingId ? "check" : "building",
-        link: createdId ? `/property/${createdId}` : "/properties"
-      });
-
       // Construct WhatsApp link
       const waUrl = getWhatsAppUrl(whatsappMessage);
       setGeneratedWhatsAppUrl(waUrl);
       setShowSuccessModal(true);
-
-      // Trigger WhatsApp open
-      window.open(waUrl, "_blank");
 
     } catch (err: any) {
       console.error("Submission error:", err);
@@ -783,6 +774,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
                   type="file" 
                   multiple 
                   accept="image/*"
+                  capture="environment"
                   onChange={handleImageChange}
                   className="hidden"
                 />
@@ -1270,9 +1262,9 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
             </div>
 
             <div>
-              <h3 className="text-lg font-black text-slate-900 mb-1">تم توثيق وإرسال إعلانك بنجاح!</h3>
+              <h3 className="text-lg font-black text-slate-900 mb-1">تم حفظ إعلانك بنجاح!</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                تم حفظ كافة بيانات العقار وإعداد رسالة مفصلة لإرسالها عبر واتساب إلى مشرف المنصة للاعتماد والنشر الفوري.
+                تم حفظ كافة بيانات العقار. اضغط الزر التالي لإرسال التفاصيل إلى مشرف المنصة عبر واتساب.
               </p>
             </div>
 

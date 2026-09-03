@@ -10,58 +10,21 @@ interface AdminContextType {
   registerAdmin: (email: string, password: string) => Promise<void>;
   logoutAdmin: () => Promise<void>;
   checkAdmin: (user: any) => Promise<boolean>;
+  activateAdminSession: (user: any) => Promise<void>;
 }
 
-const ADMIN_SESSION_KEY = "adminUser";
-const LEGACY_ADMIN_SESSION_KEY = "adminSession";
-// جعل الجلسة صالحة لمدة 30 يوم (يمكن تعديلها إلى قيمة أكبر)
-const ADMIN_SESSION_TTL = 1000 * 60 * 60 * 24 * 30; // 30 days
-const DEFAULT_ADMIN_EMAIL = (import.meta.env.VITE_DEFAULT_ADMIN_EMAIL || "vexismarkets@gmail.com").trim().toLowerCase();
-const DEFAULT_ADMIN_PASSWORD = String(import.meta.env.VITE_DEFAULT_ADMIN_PASSWORD || "ChuChu21@12");
-
 const clearAdminSessions = () => {
-  localStorage.removeItem(ADMIN_SESSION_KEY);
-  localStorage.removeItem(LEGACY_ADMIN_SESSION_KEY);
+  localStorage.removeItem("adminUser");
+  localStorage.removeItem("adminSession");
 };
 
-const persistAdminSession = (email: string, uid: string) => {
-  const sessionData = {
-    email,
-    uid,
-    isAdmin: true,
-    loginTime: new Date().toISOString(),
-    expiresAt: Date.now() + ADMIN_SESSION_TTL,
-  };
-
-  localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(sessionData));
-};
-
-const getAdminCollection = async () => {
-  const { data, error } = await supabase.from("admins").select("*");
-  if (error) throw error;
-  return data || [];
-};
-
-const ensureDefaultAdmin = async () => {
-  const adminList = await getAdminCollection();
-  const existingDefaultAdmin = adminList.find((item) => item.email === DEFAULT_ADMIN_EMAIL);
-
-  if (existingDefaultAdmin) {
-    return existingDefaultAdmin;
-  }
-
+const getAdminForUser = async (userId: string) => {
   const { data, error } = await supabase
     .from("admins")
-    .insert({
-      email: DEFAULT_ADMIN_EMAIL,
-      password: DEFAULT_ADMIN_PASSWORD,
-      role: "super_admin",
-      is_admin: true,
-      permissions: ["read", "write", "delete", "approve", "moderate"],
-    })
-    .select()
-    .single();
-
+    .select("id, user_id, email, role, is_admin, permissions")
+    .eq("user_id", userId)
+    .eq("is_admin", true)
+    .maybeSingle();
   if (error) throw error;
   return data;
 };
@@ -77,31 +40,23 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const registerAdmin = async (email: string, password: string) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const adminList = await getAdminCollection();
-      const adminExists = adminList.some((item) => item.email === cleanEmail);
-
-      if (adminExists) {
-        throw new Error("هذا الحساب مدير موجود بالفعل في النظام.");
-      }
-
       if (!cleanEmail || !password || password.length < 6) {
         throw new Error("يجب إدخال بريد إلكتروني صحيح وكلمة مرور لا تقل عن 6 أحرف.");
       }
 
-      const { data, error } = await supabase.from("admins").insert({
-        email: cleanEmail,
-        password,
-        role: "super_admin",
-        is_admin: true,
-        permissions: ["read", "write", "delete", "approve", "moderate"],
-      }).select().single();
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({ email: cleanEmail, password });
+      if (signUpError) throw signUpError;
+      if (!authData.user || !authData.session) {
+        throw new Error("تم إنشاء الحساب، لكن يجب تأكيد البريد الإلكتروني قبل تفعيل المدير.");
+      }
 
+      const { data, error } = await supabase.rpc("bootstrap_first_admin", {
+        p_user_id: authData.user.id,
+        p_email: cleanEmail,
+      });
       if (error) throw error;
-
-      setAdminEmail(cleanEmail);
-      setIsAdmin(true);
-      setAdminUser({ uid: data.id, email: cleanEmail });
-      persistAdminSession(cleanEmail, data.id);
+      if (!data) throw new Error("يوجد مدير مسجل مسبقاً في النظام.");
+      await loadAdminSession(authData.user);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "تعذّر إنشاء حساب المدير");
     }
@@ -110,40 +65,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const loginAdmin = async (email: string, password: string) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const adminList = await getAdminCollection();
-
-      if (!adminList.length && cleanEmail === DEFAULT_ADMIN_EMAIL && password === DEFAULT_ADMIN_PASSWORD) {
-        await ensureDefaultAdmin();
-      }
-
-      const refreshedAdminList = await getAdminCollection();
-
-      if (!refreshedAdminList.length) {
-        throw new Error("لا يوجد حساب مدير في قاعدة البيانات بعد. أنشئ أول مدير من شاشة الإعداد.");
-      }
-
-      const admin = refreshedAdminList.find((item) => item.email === cleanEmail && item.password === password);
-
-      if (!admin) {
-        if (cleanEmail === DEFAULT_ADMIN_EMAIL && password === DEFAULT_ADMIN_PASSWORD) {
-          await ensureDefaultAdmin();
-          const fallbackAdmin = (await getAdminCollection()).find((item) => item.email === DEFAULT_ADMIN_EMAIL);
-          if (!fallbackAdmin) {
-            throw new Error("تعذّر إنشاء حساب المدير الافتراضي.");
-          }
-          setAdminEmail(cleanEmail);
-          setIsAdmin(true);
-          setAdminUser({ uid: fallbackAdmin.id, email: cleanEmail });
-          persistAdminSession(cleanEmail, fallbackAdmin.id);
-          return;
-        }
-        throw new Error("بيانات المسؤول غير صحيحة أو الحساب غير موجود في قاعدة البيانات");
-      }
-
-      setAdminEmail(cleanEmail);
-      setIsAdmin(true);
-      setAdminUser({ uid: admin.id, email: cleanEmail });
-      persistAdminSession(cleanEmail, admin.id);
+      const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+      if (error) throw error;
+      await loadAdminSession(data.user);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : "خطأ في تسجيل الدخول");
     }
@@ -154,38 +78,47 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     setAdminEmail(null);
     setIsAdmin(false);
     clearAdminSessions();
+    await supabase.auth.signOut();
   };
 
   const checkAdmin = async (user: any): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.from("admins").select("*").eq("email", user.email).single();
-      return !error && !!data && data.is_admin === true;
+      const data = await getAdminForUser(user.id);
+      return !!data;
     } catch {
       return false;
     }
   };
 
-  useEffect(() => {
-    const savedSession = localStorage.getItem(ADMIN_SESSION_KEY);
-    if (savedSession) {
-      try {
-        const session = JSON.parse(savedSession);
-        const expiresAt = Number(session.expiresAt || 0);
+  const activateAdminSession = async (user: any) => {
+    await loadAdminSession(user);
+  };
 
-        if (expiresAt && Date.now() > expiresAt) {
-          clearAdminSessions();
-        } else if (session.isAdmin && session.email) {
-          setAdminEmail(session.email);
-          setIsAdmin(true);
-          setAdminUser({ uid: session.uid, email: session.email });
-        }
-      } catch (error) {
-        console.warn("Failed to restore admin session:", error);
+  useEffect(() => {
+    let active = true;
+    const restore = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (active && data.user) await loadAdminSession(data.user);
+      } catch {
         clearAdminSessions();
+        setAdminUser(null);
+        setAdminEmail(null);
+        setIsAdmin(false);
       }
-    }
-    setIsLoading(false);
+      if (active) setIsLoading(false);
+    };
+    void restore();
+    return () => { active = false; };
   }, []);
+
+  const loadAdminSession = async (user: any) => {
+    const admin = await getAdminForUser(user.id);
+    if (!admin) throw new Error("هذا الحساب ليس مديراً.");
+    setAdminEmail(user.email ?? admin.email);
+    setIsAdmin(true);
+    setAdminUser({ uid: user.id, email: user.email ?? admin.email, adminId: admin.id });
+  };
 
   return (
     <AdminContext.Provider
@@ -198,6 +131,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         registerAdmin,
         logoutAdmin,
         checkAdmin,
+        activateAdminSession,
       }}
     >
       {children}

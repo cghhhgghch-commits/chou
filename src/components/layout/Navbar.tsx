@@ -49,7 +49,6 @@ export default function Navbar() {
 
         {/* Actions (Responsive & Uncluttered) */}
         <div className="flex items-center gap-2 md:gap-3">
-          
           {user ? (
             <div className="flex items-center gap-2">
               <Link 

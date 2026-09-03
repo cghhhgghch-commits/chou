@@ -72,7 +72,7 @@ export default function Home() {
     { 
       id: 'houses', 
       label: 'بيوت', 
-      sublabel: 'شقق سكنية، بيوت عربية، دوبلكس',
+      sublabel: 'شقق سكنية وبيوت عربية ودوبلكس',
       tag: 'بيوت وشقق',
       tagBg: 'bg-blue-600 text-white',
       icon: HomeIcon,
@@ -84,7 +84,7 @@ export default function Home() {
     { 
       id: 'buildings', 
       label: 'بنايات', 
-      sublabel: 'أبراج وعمارات سكنية واستثمارية',
+      sublabel: 'أبنية سكنية وعمارات استثمارية',
       tag: 'عمارات وأبراج',
       tagBg: 'bg-slate-800 text-white',
       icon: Building2,
@@ -96,7 +96,7 @@ export default function Home() {
     { 
       id: 'farms', 
       label: 'مزارع', 
-      sublabel: 'استراحات ريفية، بساتين ومسابح',
+      sublabel: 'بساتين زيتون واستراحات ريفية',
       tag: 'مزارع واستراحات',
       tagBg: 'bg-emerald-700 text-white',
       icon: Trees,
@@ -108,7 +108,7 @@ export default function Home() {
     { 
       id: 'lands', 
       label: 'أراضي', 
-      sublabel: 'مقاسم عمار وتنظيم وأراضي زراعية',
+      sublabel: 'مقاسم سكنية وأراض زراعية',
       tag: 'مقاسم وأراضي',
       tagBg: 'bg-stone-700 text-white',
       icon: MapPin,
@@ -120,7 +120,7 @@ export default function Home() {
     { 
       id: 'shops', 
       label: 'محلات', 
-      sublabel: 'محلات تجارية، فروغ وصالات عرض',
+      sublabel: 'محلات وفروغ وصالات تجارية',
       tag: 'تجاري وفروغ',
       tagBg: 'bg-purple-700 text-white',
       icon: Store,
@@ -132,7 +132,7 @@ export default function Home() {
     { 
       id: 'villas', 
       label: 'فلل', 
-      sublabel: 'فلل مودرن مستقلة وقصور راقية',
+      sublabel: 'فلل مستقلة وبيوت ريفية',
       tag: 'فلل فاخرة',
       tagBg: 'bg-amber-600 text-white',
       icon: Sparkles,
@@ -144,7 +144,7 @@ export default function Home() {
     { 
       id: 'factories', 
       label: 'مصانع', 
-      sublabel: 'منشآت صناعية، هناغر ومستودعات',
+      sublabel: 'هناغر ومستودعات ومنشآت صناعية',
       tag: 'صناعي ومستودعات',
       tagBg: 'bg-orange-700 text-white',
       icon: Factory,

@@ -35,42 +35,32 @@ export const getWhatsAppUrl = (message: string, customPhone?: string) => {
 };
 
 export const SYRIAN_CITIES = [
-  "حلب القديمة",
-  "حلب الجديدة",
-  "القدم",
-  "الميدان",
-  "الشيخ سعد",
-  "الفرقان",
-  "الأعظمية",
-  "الشرقية",
-  "الزهراء",
-  "الحمدانية",
-  "البيضاء",
-  "الكرامة",
-  "السليمانية",
-  "الجميلية",
-  "الرصافة",
-  "الكلاسة",
-  "المزة",
-  "باب النيرب",
-  "باب شرقي",
-  "اليرموك",
-  "الرازي",
-  "بستان القصر",
-  "الملك",
-  "مطار حلب"
+  "دمشق",
+  "ريف دمشق",
+  "حلب",
+  "حمص",
+  "حماة",
+  "اللاذقية",
+  "طرطوس",
+  "إدلب",
+  "الرقة",
+  "دير الزور",
+  "الحسكة",
+  "درعا",
+  "السويداء",
+  "القنيطرة"
 ];
 
 // 8 Core Categories
 export const SYRIAN_CATEGORIES = [
-  { id: "houses", label: "بيوت", subtitle: "شقق سكنية، عربي، دوبلكس", icon: "🏠" },
-  { id: "buildings", label: "بنايات", subtitle: "أبراج وعمارات سكنية", icon: "🏢" },
-  { id: "farms", label: "مزارع", subtitle: "استراحات ريفية وبساتين", icon: "🌾" },
-  { id: "lands", label: "أراضي", subtitle: "مقاسم عمار وتنظيم وزراعية", icon: "🗺️" },
-  { id: "shops", label: "محلات", subtitle: "تجاري، حق فروغ، صالات", icon: "🏬" },
-  { id: "villas", label: "فلل", subtitle: "فلل مستقلة وقصور راقية", icon: "🏰" },
-  { id: "factories", label: "مصانع", subtitle: "منشآت، هناغر ومستودعات", icon: "🏭" },
-  { id: "other", label: "أخرى", subtitle: "شاليهات، استوديوهات، طلاب", icon: "✨" },
+  { id: "houses", label: "بيوت", subtitle: "شقق سكنية وبيوت عربية ودوبلكس", icon: "🏠" },
+  { id: "buildings", label: "بنايات", subtitle: "أبنية سكنية وعمارات استثمارية", icon: "🏢" },
+  { id: "farms", label: "مزارع", subtitle: "بساتين زيتون واستراحات ريفية", icon: "🌾" },
+  { id: "lands", label: "أراضي", subtitle: "مقاسم سكنية وأراض زراعية", icon: "🗺️" },
+  { id: "shops", label: "محلات", subtitle: "محلات وفروغ وصالات تجارية", icon: "🏬" },
+  { id: "villas", label: "فلل", subtitle: "فلل مستقلة وبيوت ريفية", icon: "🏰" },
+  { id: "factories", label: "مصانع", subtitle: "هناغر ومستودعات ومنشآت صناعية", icon: "🏭" },
+  { id: "other", label: "أخرى", subtitle: "شاليهات واستوديوهات وسكن طلاب", icon: "✨" },
 ];
 
 export const OWNERSHIP_TYPES = [

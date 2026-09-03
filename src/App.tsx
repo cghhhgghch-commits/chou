@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import AdminLogin from "./pages/AdminLogin";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
@@ -56,7 +55,6 @@ export default function App() {
                 </Route>
 
                 <Route path="/admin" element={<AdminDashboard2 />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard2 />} />
 
                 <Route path="/login" element={<Login />} />

@@ -1,32 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useAdmin } from "../lib/AdminContext";
-import { supabase } from "../lib/supabase";
-import { Mail, Lock, AlertCircle, Loader, ShieldCheck, Eye, EyeOff, UserPlus, ArrowRight } from "lucide-react";
+import { Mail, Lock, AlertCircle, Loader, ShieldCheck, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { loginAdmin, registerAdmin } = useAdmin();
+  const { loginAdmin } = useAdmin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isFirstAdminSetup, setIsFirstAdminSetup] = useState(false);
-
-  useEffect(() => {
-    const loadAdminState = async () => {
-      try {
-        const { data, error } = await supabase.from("admins").select("id").limit(1);
-        setIsFirstAdminSetup(!error && (!data || data.length === 0));
-      } catch {
-        setIsFirstAdminSetup(true);
-      }
-    };
-
-    loadAdminState();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +18,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      if (isFirstAdminSetup) {
-        if (password !== confirmPassword) {
-          throw new Error("كلمتا المرور غير متطابقتين");
-        }
-        await registerAdmin(email, password);
-      } else {
-        await loginAdmin(email, password);
-      }
+      await loginAdmin(email, password);
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطأ في العملية");
@@ -63,9 +40,9 @@ export default function AdminLogin() {
 
         <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl p-8 space-y-6 border border-slate-100">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-700">{isFirstAdminSetup ? "إنشاء مدير أول" : "بيانات الدخول"}</span>
+            <span className="text-sm font-bold text-slate-700">بيانات دخول المدير</span>
             <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-1 rounded-full border border-emerald-200">
-              {isFirstAdminSetup ? "Setup" : "Admin Access"}
+              Admin Access
             </span>
           </div>
 
@@ -94,7 +71,7 @@ export default function AdminLogin() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={isFirstAdminSetup ? "أدخل كلمة مرور قوية" : "أدخل كلمة المرور"}
+                placeholder="أدخل كلمة المرور"
                 className="w-full px-11 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-right"
                 required
               />
@@ -108,23 +85,6 @@ export default function AdminLogin() {
               </button>
             </div>
           </div>
-
-          {isFirstAdminSetup && (
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-blue-600" />
-                تأكيد كلمة المرور
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="كرر كلمة المرور"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-right"
-                required
-              />
-            </div>
-          )}
 
           {error && (
             <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
@@ -141,21 +101,19 @@ export default function AdminLogin() {
             {loading ? (
               <>
                 <Loader className="w-4 h-4 animate-spin" />
-                {isFirstAdminSetup ? "جارٍ إنشاء المدير..." : "جارٍ التحقق..."}
+                جارٍ التحقق...
               </>
             ) : (
               <>
-                {isFirstAdminSetup ? <UserPlus className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-                {isFirstAdminSetup ? "إنشاء مدير جديد" : "دخول لوحة الإدارة"}
+                <ArrowRight className="w-4 h-4" />
+                دخول لوحة الإدارة
               </>
             )}
           </button>
 
           <div className="pt-4 text-center">
-            <p className="text-xs text-slate-600 mb-2">🔒 الدخول يتم فقط عبر حساب مدير مسجل في Firestore</p>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              {isFirstAdminSetup ? "لا يوجد مدير حتى الآن. قم بإنشاء الحساب الأول بشكل فعلي." : "تسجيل الدخول لحساب مدير موجود بالفعل في النظام."}
-            </p>
+            <p className="text-xs text-slate-600 mb-2">🔒 الدخول يتم فقط عبر حساب مدير موثق في Supabase Auth</p>
+            <p className="text-[11px] text-slate-500 leading-relaxed">تسجيل الدخول لحساب مدير موجود في Supabase Auth.</p>
           </div>
         </form>
       </div>

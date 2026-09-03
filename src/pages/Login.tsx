@@ -18,7 +18,7 @@ export default function Login() {
   const [socialLoading, setSocialLoading] = useState<"google" | null>(null);
   const [showGoogleConfirm, setShowGoogleConfirm] = useState(false);
   const [error, setError] = useState("");
-  const { loginAdmin } = useAdmin();
+  const { checkAdmin, activateAdminSession } = useAdmin();
 
   const googleAuthEnabled = import.meta.env.VITE_ENABLE_GOOGLE_AUTH !== "false";
   const navigate = useNavigate();
@@ -49,17 +49,6 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // First, try to check if this is an admin account
-      const { data: adminData } = await supabase.from("admins").select("*").eq("email", safeEmail).single();
-      
-      if (adminData && adminData.password === safePassword) {
-        // This is an admin account, log in as admin
-        await loginAdmin(safeEmail, safePassword);
-        navigate("/admin/dashboard");
-        return;
-      }
-
-      // Not an admin, try regular user login
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: safeEmail,
         password: safePassword,
@@ -69,8 +58,16 @@ export default function Login() {
         throw signInError;
       }
 
-      clearAdminSession();
-      navigate("/");
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
+      if (userData.user && await checkAdmin(userData.user)) {
+        await activateAdminSession(userData.user);
+        navigate("/admin/dashboard");
+      } else {
+        clearAdminSession();
+        navigate("/");
+      }
     } catch (err: any) {
       if (err?.message?.includes("Invalid login credentials")) {
         setError("البريد أو كلمة المرور غير صحيحة.");

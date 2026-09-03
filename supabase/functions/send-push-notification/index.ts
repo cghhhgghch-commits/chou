@@ -10,18 +10,38 @@ if (!supabaseUrl || !serviceRoleKey || !fcmServerKey) {
 
 serve(async (req) => {
   try {
-    const { user_id, broadcast, title, body, data = {} } = await req.json();
+    const { user_id, daily } = await req.json();
+    const authorization = req.headers.get('Authorization');
 
-    if ((!user_id && !broadcast) || !title || !body) {
-      return new Response(JSON.stringify({ error: 'Missing required payload' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    if (!authorization?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), { status: 401 });
     }
 
-    const tokenQuery = broadcast
-      ? 'select=token&is_active=eq.true'
-      : `select=token&user_id=eq.${encodeURIComponent(user_id)}&is_active=eq.true`;
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: serviceRoleKey, Authorization: authorization },
+    });
+    if (!userResponse.ok) {
+      return new Response(JSON.stringify({ error: 'Invalid session' }), { status: 401 });
+    }
+    const authenticatedUser = await userResponse.json();
+    const adminResponse = await fetch(
+      `${supabaseUrl}/rest/v1/admins?select=id&user_id=eq.${encodeURIComponent(authenticatedUser.id)}&is_admin=eq.true`,
+      { headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` } },
+    );
+    const admins = await adminResponse.json();
+    if (!Array.isArray(admins) || admins.length === 0) {
+      return new Response(JSON.stringify({ error: 'Admin permission required' }), { status: 403 });
+    }
+
+    if (!daily || user_id) {
+      return new Response(JSON.stringify({ error: 'Only the daily recommendation is supported' }), { status: 400 });
+    }
+
+    const title = 'عرض جديد قد يناسبك';
+    const body = 'افتح لقطة وشاهد ما أضيف بالقرب منك اليوم.';
+    const data = { type: 'daily_recommendation' };
+
+    const tokenQuery = 'select=token&is_active=eq.true';
     const tokenResponse = await fetch(`${supabaseUrl}/rest/v1/fcm_tokens?${tokenQuery}`, {
       headers: {
         apikey: serviceRoleKey,

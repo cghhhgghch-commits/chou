@@ -14,6 +14,23 @@ export interface FcmTokenPayload {
 }
 
 const STORAGE_KEY = 'laqta.fcm.device_id';
+const DAILY_NOTIFICATION_ID = 7001;
+const DAILY_NOTIFICATION_TITLE = 'عرض جديد قد يناسبك';
+const DAILY_NOTIFICATION_BODY = 'افتح لقطة وشاهد ما أضيف بالقرب منك اليوم.';
+
+const scheduleDailyRecommendation = async () => {
+  await LocalNotifications.schedule({
+    notifications: [{
+      id: DAILY_NOTIFICATION_ID,
+      title: DAILY_NOTIFICATION_TITLE,
+      body: DAILY_NOTIFICATION_BODY,
+      channelId: 'laqta_default',
+      schedule: { every: 'day' },
+      sound: 'default',
+    }],
+  });
+};
+
 export const setupPushNotificationListeners = async () => {
   if (!Capacitor.isNativePlatform()) return;
 
@@ -28,6 +45,7 @@ export const setupPushNotificationListeners = async () => {
     visibility: 1,
     sound: 'default',
   });
+  await scheduleDailyRecommendation();
 
   await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
     await LocalNotifications.schedule({

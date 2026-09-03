@@ -14,8 +14,13 @@ import {
   Building2,
   Check,
   X,
-  Bell,
-  Send,
+  RefreshCw,
+  LayoutDashboard,
+  ClipboardList,
+  Clock3,
+  CheckCircle2,
+  XCircle,
+  TrendingUp,
 } from "lucide-react";
 import { SYRIAN_CITIES } from "../lib/constants";
 
@@ -77,6 +82,7 @@ const CATEGORIES = [
   { id: "farms", label: "🌾 مزارع" },
   { id: "lands", label: "🗺️ أراضي" },
   { id: "factories", label: "🏭 مصانع" },
+  { id: "other", label: "✨ أخرى" },
 ];
 
 const DEAL_TYPES = [
@@ -92,18 +98,18 @@ export default function AdminDashboard2() {
   const [listings, setListings] = useState<PropertyListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<PropertyListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "active" | "rejected">("all");
+  const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads">("overview");
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("");
   const [pendingLeads, setPendingLeads] = useState<WhatsAppLead[]>([]);
-  const [broadcastTitle, setBroadcastTitle] = useState("");
-  const [broadcastBody, setBroadcastBody] = useState("");
-  const [broadcastImage, setBroadcastImage] = useState("");
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -251,7 +257,7 @@ export default function AdminDashboard2() {
     if (isLoading) return;
 
     if (!isAdmin) {
-      navigate("/admin/login");
+      navigate("/login");
       return;
     }
 
@@ -261,6 +267,7 @@ export default function AdminDashboard2() {
   // جلب الإعلانات
   const fetchListings = async () => {
     setLoading(true);
+    setLoadError("");
     try {
       const { data: listingRows, error: listingError } = await supabase.from("listings").select("*");
       if (listingError) throw listingError;
@@ -291,10 +298,17 @@ export default function AdminDashboard2() {
       }
     } catch (error) {
       console.error("خطأ في جلب الإعلانات:", error);
+      setLoadError("تعذر تحميل بيانات لوحة الإدارة. تحقق من اتصال Supabase ثم أعد المحاولة.");
       alert("فشل في جلب الإعلانات. تأكد من أن جداول Supabase تم إنشاؤها بشكل صحيح.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshDashboard = async () => {
+    setRefreshing(true);
+    await fetchListings();
+    setRefreshing(false);
   };
 
   // تصفية الإعلانات
@@ -312,18 +326,23 @@ export default function AdminDashboard2() {
       filtered = filtered.filter((item) => item.category === categoryFilter);
     }
 
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((item) => item.status === statusFilter);
+    }
+
     setFilteredListings(filtered);
-  }, [searchTerm, categoryFilter, listings]);
+  }, [searchTerm, categoryFilter, statusFilter, listings]);
+
+  const pendingListingsCount = listings.filter((item) => item.status === "pending").length;
+  const activeListingsCount = listings.filter((item) => item.status === "active" || item.status === "approved").length;
+  const rejectedListingsCount = listings.filter((item) => item.status === "rejected").length;
 
   // حذف إعلان
   const handleDelete = async (id: string) => {
     if (!confirm("هل تريد حذف هذا الإعلان؟")) return;
 
     try {
-      const { data: deleted, error } = await supabase.rpc("admin_delete_listing", {
-        p_listing_id: id,
-        p_admin_email: adminEmail,
-      });
+      const { data: deleted, error } = await supabase.rpc("admin_delete_listing", { p_listing_id: id });
       if (error) throw error;
       if (!deleted) throw new Error("لم يتم العثور على الإعلان أو لا تملك صلاحية حذفه");
       setListings((prev) => prev.filter((item) => item.id !== id));
@@ -348,38 +367,6 @@ export default function AdminDashboard2() {
     } catch (error) {
       console.error("Failed to moderate listing:", error);
       alert("❌ تعذرت معالجة الإعلان");
-    }
-  };
-
-  const sendBroadcast = async () => {
-    if (!broadcastTitle.trim() || !broadcastBody.trim()) {
-      alert("⚠️ اكتب عنوان الإعلان ونصه أولًا");
-      return;
-    }
-
-    setIsBroadcasting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("send-push-notification", {
-        body: {
-          broadcast: true,
-          title: broadcastTitle.trim(),
-          body: broadcastBody.trim(),
-          data: {
-            type: "broadcast",
-            image: broadcastImage.trim() || undefined,
-          },
-        },
-      });
-      if (error) throw error;
-      alert(`✅ تم إرسال الإعلان إلى ${data?.sent ?? 0} جهاز`);
-      setBroadcastTitle("");
-      setBroadcastBody("");
-      setBroadcastImage("");
-    } catch (error) {
-      console.error("Failed to send broadcast:", error);
-      alert("❌ تعذر إرسال الإعلان الجماعي. تأكد من نشر Edge Function وإعداد Firebase.");
-    } finally {
-      setIsBroadcasting(false);
     }
   };
 
@@ -425,32 +412,6 @@ export default function AdminDashboard2() {
         if (error) throw error;
         setListings((prev) => [...prev, normalizeListing(data)]);
 
-        const propertyMessage = {
-          title: `🏠 لقطة | تم إضافة عقار جديد`,
-          message: `${formData.title} متاح الآن. افتح التطبيق وشاهد التفاصيل والصور.`,
-          type: "new_property" as const,
-          propertyId: data.id,
-          propertyTitle: formData.title,
-          cityName: formData.city,
-          iconType: "building" as const,
-          link: `/property/${data.id}`,
-        };
-
-        if (typeof window !== "undefined") {
-          const notificationEvent = new CustomEvent("laqta:notification", { detail: propertyMessage });
-          window.dispatchEvent(notificationEvent);
-        }
-
-        const { error: broadcastError } = await supabase.functions.invoke("send-push-notification", {
-          body: {
-            broadcast: true,
-            title: "🏠 لقطة | تم إضافة عقار جديد",
-            body: `${formData.title} متاح الآن. افتح التطبيق وشاهد التفاصيل والصور.`,
-            data: { type: "new_property", propertyId: data.id },
-          },
-        });
-        if (broadcastError) console.warn("Listing saved but notification failed:", broadcastError);
-
         alert("✅ تم إنشاء الإعلان بنجاح");
       }
 
@@ -494,6 +455,7 @@ export default function AdminDashboard2() {
       videos: item.videos || [""],
     });
     setEditingId(item.id);
+    setActiveSection("listings");
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -520,31 +482,40 @@ export default function AdminDashboard2() {
 
   const handleLogout = async () => {
     await logoutAdmin();
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-lg border-b border-blue-900">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-4">
-            <div className="bg-white rounded-2xl p-3 shadow-md">
-              <Building2 className="w-8 h-8 text-blue-600" />
+            <div className="bg-white rounded-2xl p-2.5 sm:p-3 shadow-md shrink-0">
+              <LayoutDashboard className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white">لقطة</h1>
-              <p className="text-sm text-blue-100">لوحة إدارة العقارات الاحترافية</p>
-              <p className="text-[11px] text-blue-100 mt-1">صلاحيات المدير: إضافة، تعديل، حذف، وإدارة جميع الأقسام</p>
+              <h1 className="text-2xl sm:text-4xl font-black text-white">لوحة المدير</h1>
+              <p className="text-xs sm:text-sm text-blue-100">إدارة الإعلانات والمراجعة اليومية</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-          >
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={refreshDashboard}
+              disabled={refreshing}
+              className="p-2.5 bg-white/15 hover:bg-white/25 disabled:opacity-60 text-white rounded-xl transition-colors"
+              title="تحديث البيانات"
+            >
+              <RefreshCw className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">تسجيل الخروج</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -558,6 +529,70 @@ export default function AdminDashboard2() {
             {adminEmail || adminUser?.email || "مدير مسجل"}
           </div>
         </div>
+
+        {loadError && (
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+            <div className="flex items-center gap-2 text-xs font-bold">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{loadError}</span>
+            </div>
+            <button onClick={refreshDashboard} className="rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white">إعادة المحاولة</button>
+          </div>
+        )}
+
+        <nav className="mb-6 grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="أقسام لوحة المدير">
+          {[
+            { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
+            { id: "listings", label: "الإعلانات", icon: ClipboardList },
+            { id: "leads", label: "طلبات المراجعة", icon: Clock3 },
+          ].map((section) => {
+            const Icon = section.icon;
+            const selected = activeSection === section.id;
+            return (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id as typeof activeSection)}
+                className={`flex items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-xs sm:text-sm font-black transition-colors ${selected ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{section.label}</span>
+                {section.id === "leads" && pendingLeads.length > 0 && <span className={`min-w-5 rounded-full px-1.5 text-[10px] ${selected ? "bg-white text-blue-700" : "bg-amber-100 text-amber-700"}`}>{pendingLeads.length}</span>}
+              </button>
+            );
+          })}
+        </nav>
+
+        {activeSection === "overview" && (
+          <section className="mb-8">
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-slate-900">ملخص المنصة</h2>
+                <p className="mt-1 text-xs text-slate-500">صورة سريعة عن الإعلانات التي تحتاج متابعة</p>
+              </div>
+              <button onClick={() => setActiveSection("listings")} className="text-xs font-black text-blue-600 hover:text-blue-700">إدارة الإعلانات</button>
+            </div>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {[
+                { label: "إجمالي الإعلانات", value: listings.length, icon: Building2, color: "text-blue-600", bg: "bg-blue-50" },
+                { label: "بانتظار المراجعة", value: pendingListingsCount, icon: Clock3, color: "text-amber-600", bg: "bg-amber-50" },
+                { label: "منشورة وموثقة", value: activeListingsCount, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+                { label: "مرفوضة", value: rejectedListingsCount, icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
+              ].map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.bg}`}><Icon className={`h-5 w-5 ${stat.color}`} /></div>
+                      <TrendingUp className="h-4 w-4 text-slate-300" />
+                    </div>
+                    <p className="mt-4 text-[11px] font-bold text-slate-500">{stat.label}</p>
+                    <p className={`mt-1 text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* نموذج الإنشاء/التعديل */}
         {showForm && (
@@ -805,7 +840,7 @@ export default function AdminDashboard2() {
           </div>
         )}
 
-        {pendingLeads.length > 0 && (
+        {activeSection === "leads" && (
           <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -816,7 +851,12 @@ export default function AdminDashboard2() {
             </div>
 
             <div className="space-y-3">
-              {pendingLeads.map((lead) => (
+              {pendingLeads.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                  <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" />
+                  <p className="mt-2 text-sm font-black text-slate-700">لا توجد طلبات بانتظار المراجعة</p>
+                </div>
+              ) : pendingLeads.map((lead) => (
                 <div key={lead.id} className="border border-amber-200 bg-amber-50 rounded-2xl p-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex-1">
@@ -847,7 +887,7 @@ export default function AdminDashboard2() {
         )}
 
         {/* البحث والتصفية */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-slate-200">
+        {activeSection === "listings" && <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8 border border-slate-200">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -873,9 +913,21 @@ export default function AdminDashboard2() {
               ))}
             </select>
 
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              className="w-full md:w-auto px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="فلترة حالة الإعلان"
+            >
+              <option value="all">كل الحالات</option>
+              <option value="pending">بانتظار المراجعة</option>
+              <option value="active">منشور وموثق</option>
+              <option value="rejected">مرفوض</option>
+            </select>
+
             {!showForm && (
               <button
-                onClick={() => setShowForm(true)}
+                onClick={() => { setActiveSection("listings"); setShowForm(true); }}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
@@ -883,46 +935,14 @@ export default function AdminDashboard2() {
               </button>
             )}
           </div>
-        </div>
-
-        <div className="bg-slate-900 rounded-xl shadow-md p-6 mb-8 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <Bell className="w-5 h-5 text-amber-300" />
-            <h2 className="font-black">إعلان جماعي للمستخدمين</h2>
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-slate-500">
+            <span>المعروض الآن: {filteredListings.length}</span>
+            <button onClick={() => { setSearchTerm(""); setCategoryFilter("all"); setStatusFilter("all"); }} className="text-blue-600 hover:underline">مسح الفلاتر</button>
           </div>
-          <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
-            <input
-              value={broadcastTitle}
-              onChange={(event) => setBroadcastTitle(event.target.value)}
-              placeholder="عنوان الإشعار"
-              className="rounded-lg px-3 py-2 text-slate-900"
-            />
-            <textarea
-              value={broadcastBody}
-              onChange={(event) => setBroadcastBody(event.target.value)}
-              placeholder="اكتب رسالة قصيرة وجذابة للمستخدمين"
-              rows={2}
-              className="rounded-lg px-3 py-2 text-slate-900 resize-none"
-            />
-            <input
-              value={broadcastImage}
-              onChange={(event) => setBroadcastImage(event.target.value)}
-              placeholder="رابط صورة اختيارية للإشعار"
-              className="rounded-lg px-3 py-2 text-slate-900 md:col-span-2"
-            />
-            <button
-              onClick={sendBroadcast}
-              disabled={isBroadcasting}
-              className="bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-slate-900 font-black rounded-lg px-5 py-2 flex items-center justify-center gap-2"
-            >
-              <Send className="w-4 h-4" />
-              {isBroadcasting ? "جاري الإرسال..." : "إرسال للكل"}
-            </button>
-          </div>
-        </div>
+        </div>}
 
         {/* قائمة الإعلانات */}
-        {loading ? (
+        {activeSection === "listings" && (loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader className="w-8 h-8 animate-spin text-blue-500" />
           </div>
@@ -1051,33 +1071,8 @@ export default function AdminDashboard2() {
               </div>
             ))}
           </div>
-        )}
+        ))}
 
-        {/* إحصائيات */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 text-center">
-            <p className="text-slate-500 text-sm font-bold mb-2">إجمالي الإعلانات</p>
-            <p className="text-3xl font-black text-blue-600">{listings.length}</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 text-center">
-            <p className="text-slate-500 text-sm font-bold mb-2">للبيع</p>
-            <p className="text-3xl font-black text-green-600">
-              {listings.filter((l) => l.type === "sale").length}
-            </p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 text-center">
-            <p className="text-slate-500 text-sm font-bold mb-2">للإيجار</p>
-            <p className="text-3xl font-black text-orange-600">
-              {listings.filter((l) => l.type === "rent").length}
-            </p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200 text-center">
-            <p className="text-slate-500 text-sm font-bold mb-2">على العظم</p>
-            <p className="text-3xl font-black text-purple-600">
-              {listings.filter((l) => l.type === "offplan").length}
-            </p>
-          </div>
-        </div>
       </main>
     </div>
   );

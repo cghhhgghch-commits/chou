@@ -39,7 +39,7 @@ export default function AdminDashboard() {
   // التحقق من صلاحيات الوصول
   useEffect(() => {
     if (!isAdmin) {
-      navigate("/admin/login");
+      navigate("/login");
     }
   }, [isAdmin, navigate]);
 
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
           <button
             onClick={async () => {
               await logoutAdmin();
-              navigate("/admin/login");
+              navigate("/login");
             }}
             className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl transition-colors"
           >
