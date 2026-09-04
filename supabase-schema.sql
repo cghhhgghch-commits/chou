@@ -124,7 +124,8 @@ declare
 begin
   select id into target_user_id
   from auth.users
-  where lower(email) = lower(target_email)
+  where id = '4cce4eb7-f096-4dd4-92b8-6bc235da4169'::uuid
+    and lower(email) = lower(target_email)
   limit 1;
 
   if target_user_id is not null then
