@@ -112,7 +112,7 @@ export default function PlaceAd() {
           return;
         }
 
-        if (user && data.user_id && data.user_id !== user.id) {
+        if (user && !isAdmin && data.user_id && data.user_id !== user.id) {
           setNotOwner(true);
           return;
         }
@@ -160,7 +160,7 @@ export default function PlaceAd() {
     };
 
     fetchListing();
-  }, [editingId, user]);
+  }, [editingId, user, isAdmin]);
 
   const handleCategoryChange = (catId: string) => {
     setSelectedCategory(catId);
@@ -595,7 +595,11 @@ ${imageSection}
   };
 
   const formTitle = editingId ? "تعديل الإعلان" : "أضف إعلان عقار جديد";
-  const formDescription = editingId ? "تحديث تفاصيل العقار الحالي" : "نموذج شامل بكافة تفاصيل دوبيزل مع إرسال فوري لواتساب الإدارة";
+  const formDescription = editingId
+    ? "تحديث تفاصيل العقار الحالي ونشر التعديلات مباشرة"
+    : isAdmin
+      ? "إضافة إعلان احترافي ونشره مباشرة على المنصة"
+      : "نموذج شامل لإرسال طلب الإعلان إلى إدارة المنصة";
 
   if (loadingExisting) {
     return (
@@ -655,12 +659,14 @@ ${imageSection}
         {/* Real Estate Listing Banner */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 sm:p-5 rounded-3xl shadow-sm flex items-start gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 shadow-xs">
-            <MessageSquare className="w-6 h-6 text-white" />
+            <Building2 className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <h3 className="text-xs sm:text-sm font-black mb-1">إضافة عقار جديد في لقطة</h3>
             <p className="text-[11px] sm:text-xs text-emerald-50 leading-relaxed">
-              اكتب تفاصيل العقار بدقة ووضوح، ثم أرسلها مباشرة إلى الإدارة عبر الواتساب لتقييمها ومراجعتها قبل النشر في القائمة العامة.
+              {isAdmin
+                ? "أدخل بيانات العقار وصوره بدقة، ثم احفظه ليظهر مباشرة ضمن الإعلانات المنشورة."
+                : "اكتب تفاصيل العقار بدقة ووضوح، ثم أرسلها إلى الإدارة للمراجعة قبل النشر في القائمة العامة."}
             </p>
           </div>
         </div>
@@ -714,7 +720,7 @@ ${imageSection}
 
             {/* Deal Type & Advertiser Role */}
             <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
+              {!isAdmin && <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">نوع العملية / الصفقة:</label>
                 <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
                   {[
@@ -736,7 +742,7 @@ ${imageSection}
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>}
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">صفة المعلن:</label>
@@ -1242,17 +1248,19 @@ ${imageSection}
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">رقم واتساب للتواصل المباشر</label>
-                <input 
-                  type="text" 
-                  value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                  placeholder="971585193270" 
-                  dir="ltr"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none" 
-                />
-              </div>
+              {!isAdmin && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">رقم واتساب للتواصل المباشر</label>
+                  <input 
+                    type="text" 
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="971585193270" 
+                    dir="ltr"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none" 
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -1265,12 +1273,12 @@ ${imageSection}
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>{editingId ? "جاري حفظ التعديلات..." : "جاري حفظ الإعلان وإرساله للواتساب..."}</span>
+                <span>{editingId ? "جاري حفظ التعديلات..." : isAdmin ? "جاري نشر الإعلان..." : "جاري حفظ الإعلان..."}</span>
               </>
             ) : (
               <>
-                <MessageSquare className="w-5 h-5" />
-                <span>{editingId ? "حفظ التعديلات" : "نشر العقار وإرسال التفاصيل لواتساب الإدارة فوراً"}</span>
+                {isAdmin ? <CheckCircle2 className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+                <span>{editingId ? "حفظ التعديلات" : isAdmin ? "نشر العقار مباشرة" : "حفظ وإرسال الطلب للإدارة"}</span>
               </>
             )}
           </button>
