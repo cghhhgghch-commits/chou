@@ -225,19 +225,18 @@ export default function AdminDashboard2() {
 
   const openLeadAsDraft = (lead: WhatsAppLead) => {
     const parsed = lead.parsedData || {};
-    setWhatsappMessage(lead.message);
-    setFormData((prev) => ({
-      ...prev,
-      title: parsed.title || prev.title || "",
-      city: parsed.city || prev.city || "دمشق",
-      price: parsed.price || prev.price || "",
-      area: parsed.area || prev.area || "",
-      category: parsed.category || prev.category || "houses",
-      description: parsed.description || lead.message || prev.description || "",
-    }));
-    setEditingId(null);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    navigate("/place-ad", {
+      state: {
+        draft: {
+          title: parsed.title || "",
+          city: parsed.city || "دمشق",
+          price: parsed.price || "",
+          area: parsed.area || "",
+          category: parsed.category || "houses",
+          description: parsed.description || lead.message || "",
+        },
+      },
+    });
   };
 
   const rejectLead = async (leadId: string) => {
@@ -441,23 +440,7 @@ export default function AdminDashboard2() {
 
   // تحرير إعلان
   const handleEdit = (item: PropertyListing) => {
-    setFormData({
-      title: item.title,
-      category: item.category,
-      type: item.type,
-      city: item.city,
-      price: item.price,
-      area: item.area,
-      bedrooms: item.bedrooms || "3",
-      bathrooms: item.bathrooms || "2",
-      description: item.description || "",
-      images: item.images || ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
-      videos: item.videos || [""],
-    });
-    setEditingId(item.id);
-    setActiveSection("listings");
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    navigate(`/place-ad?id=${encodeURIComponent(item.id)}`);
   };
 
   // إلغاء التحرير

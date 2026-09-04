@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { 
   ArrowRight, Camera, MapPin, Tag, CheckCircle2, Loader2, 
   Sun, Building2, Sparkles, X, Plus,
@@ -22,6 +22,7 @@ import {
 
 export default function PlaceAd() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const editingId = searchParams.get("id");
   const { user } = useAuth();
@@ -83,6 +84,18 @@ export default function PlaceAd() {
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [generatedWhatsAppUrl, setGeneratedWhatsAppUrl] = useState("");
+
+  useEffect(() => {
+    const draft = location.state?.draft;
+    if (!draft || editingId) return;
+    setTitle(draft.title || "");
+    setCityId(draft.city || "حلب");
+    setPrice(draft.price || "");
+    setArea(draft.area || "");
+    setSelectedCategory(draft.category || "houses");
+    setDescription(draft.description || "");
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [editingId, location.state]);
 
   useEffect(() => {
     if (!editingId) return;
@@ -538,6 +551,13 @@ ${imageSection}
         const { data, error } = await supabase.from("listings").insert(listingData).select("id").single();
         if (error) throw error;
         createdId = data?.id || null;
+      }
+
+      if (isAdmin) {
+        setShowSuccessModal(false);
+        alert(editingId ? "✅ تم تحديث الإعلان ونشره بنجاح" : "✅ تم إضافة الإعلان ونشره بنجاح");
+        navigate("/admin/dashboard");
+        return;
       }
 
       const whatsappMessage = buildWhatsAppMessage(finalImageUrls);
