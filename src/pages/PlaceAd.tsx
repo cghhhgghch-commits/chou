@@ -323,13 +323,17 @@ export default function PlaceAd() {
     }
   };
 
-  const buildWhatsAppMessage = () => {
+  const buildWhatsAppMessage = (imageUrls: string[] = previewUrls.filter((url) => url.startsWith("http"))) => {
     const catObj = SYRIAN_CATEGORIES.find(c => c.id === selectedCategory);
     const catLabel = catObj?.label || selectedCategory;
     const dealLabel = dealType === 'sale' ? 'بيع قطعي' : dealType === 'rent' ? `إيجار (${pricePeriod})` : 'على العظم / استثمار';
     const advRole = advertiserType === 'owner' ? 'المالك المباشر' : advertiserType === 'agency' ? 'مكتب عقاري معتمد' : 'وسيط عقاري';
     const categorySpecificSummary = buildCategorySpecificSummary();
     
+    const imageSection = imageUrls.length > 0
+      ? imageUrls.map((url, index) => `📷 *رابط الصورة ${index + 1}:* ${url}`).join("\n")
+      : "📷 لا توجد صور مرفقة";
+
     return `🇸🇾 *طلب نشر وتوثيق إعلان عقاري جديد على تطبيق لقطة*
 ━━━━━━━━━━━━━━━━━━━━
 🏠 *عنوان الإعلان:* ${title}
@@ -352,8 +356,10 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
 👤 *صفة المعلن:* ${advRole} (${advertiserName})
 📞 *هاتف الاتصال:* ${phone}
 💬 *رقم الواتساب:* ${whatsapp || phone}
+📸 *صور العقار المرفقة:*
+${imageSection}
 ━━━━━━━━━━━━━━━━━━━━
-📸 *ملاحظة:* تم رفع وتوثيق الإعلان في قاعدة بيانات تطبيق لقطة ويُرجى نشر الصور والتفاصيل عبر الواتساب للاعتماد الفوري.`;
+📸 *ملاحظة:* الصور مرفوعة في التخزين ويمكن فتح روابطها مباشرة من واتساب. الإعلان ينتظر مراجعة المدير قبل النشر العام.`;
   };
 
   const handleGenerateDescription = async () => {
@@ -534,7 +540,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
         createdId = data?.id || null;
       }
 
-      const whatsappMessage = buildWhatsAppMessage();
+      const whatsappMessage = buildWhatsAppMessage(finalImageUrls);
       try {
         const { error: leadError } = await supabase.from("whatsapp_leads").insert({
           message: whatsappMessage,
