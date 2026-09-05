@@ -335,32 +335,11 @@ export default function Home() {
 
         {/* Real Estate Highlights / What's New */}
         <section className="mb-8">
-          <h2 className="text-lg font-bold text-slate-900 mb-3.5">خيارات مميزة في المحافظات</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-3.5">الخيارات المميزة</h2>
           <div className="flex gap-4 overflow-x-auto pb-3 hide-scrollbar snap-x">
-            <Link to="/properties?category=damascene_house" className="min-w-[280px] h-[160px] relative rounded-2xl overflow-hidden shadow-sm snap-center group">
-              <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80" alt="Damascene House" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent"></div>
-              <div className="absolute top-3 right-3 bg-rose-600 text-white text-xs font-bold px-2 py-0.5 rounded-md">أصالة ودقة</div>
-              <div className="absolute bottom-3.5 left-3.5 right-3.5">
-                <h3 className="text-white font-bold text-base leading-tight mb-0.5">بيوت عربية وأرض ديار</h3>
-                <p className="text-slate-200 text-xs">تحف معمارية ومواقع استراتيجية</p>
-              </div>
-            </Link>
-
-            <Link to="/properties?category=furnished" className="min-w-[280px] h-[160px] relative rounded-2xl overflow-hidden shadow-sm snap-center group">
-              <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=600&q=80" alt="Furnished" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent"></div>
-              <div className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-md">طاقة 24/7</div>
-              <div className="absolute bottom-3.5 left-3.5 right-3.5">
-                <h3 className="text-white font-bold text-base leading-tight mb-0.5">استوديوهات وشقق مفروشة</h3>
-                <p className="text-slate-200 text-xs">خيارات سريعة ومناسبات للإيجار اليومي والعائلي</p>
-              </div>
-            </Link>
-            
             <Link to="/properties?category=chalet" className="min-w-[280px] h-[160px] relative rounded-2xl overflow-hidden shadow-sm snap-center group">
               <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80" alt="Chalets" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent"></div>
-              <div className="absolute top-3 right-3 bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md">سياحة واصطياف</div>
               <div className="absolute bottom-3.5 left-3.5 right-3.5">
                 <h3 className="text-white font-bold text-base leading-tight mb-0.5">شاليهات ومنازل خارج المدينة</h3>
                 <p className="text-slate-200 text-xs">مواقع هادئة ومناسبة للراحة والاستثمار</p>

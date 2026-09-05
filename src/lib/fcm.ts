@@ -14,63 +14,15 @@ export interface FcmTokenPayload {
 }
 
 const STORAGE_KEY = 'laqta.fcm.device_id';
-const DAILY_NOTIFICATION_ID = 7001;
-const DAILY_NOTIFICATION_TITLE = 'عرض جديد قد يناسبك';
-const DAILY_NOTIFICATION_BODY = 'افتح لقطة وشاهد ما أضيف بالقرب منك اليوم.';
-const SYRIA_TIME_ZONE = 'Asia/Damascus';
-
-const getNextSyriaEleven = () => {
-  const now = new Date();
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: SYRIA_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(now);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, Number(value)]));
-  const targetDay = values.hour >= 11 ? values.day + 1 : values.day;
-  const approximateUtc = Date.UTC(values.year, values.month - 1, targetDay, 11, 0, 0);
-  const formattedTarget = new Intl.DateTimeFormat('en-US', {
-    timeZone: SYRIA_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(new Date(approximateUtc));
-  const targetValues = Object.fromEntries(formattedTarget.map(({ type, value }) => [type, Number(value)]));
-  const displayedUtc = Date.UTC(targetValues.year, targetValues.month - 1, targetValues.day, targetValues.hour, targetValues.minute);
-  const desiredUtc = Date.UTC(values.year, values.month - 1, targetDay, 11, 0);
-  return new Date(approximateUtc + desiredUtc - displayedUtc);
-};
-
-const scheduleDailyRecommendation = async () => {
-  await LocalNotifications.cancel({ notifications: [{ id: DAILY_NOTIFICATION_ID }] });
-  await LocalNotifications.schedule({
-    notifications: [{
-      id: DAILY_NOTIFICATION_ID,
-      title: DAILY_NOTIFICATION_TITLE,
-      body: DAILY_NOTIFICATION_BODY,
-      channelId: 'laqta_default',
-      schedule: {
-        at: getNextSyriaEleven(),
-        every: 'day',
-        allowWhileIdle: true,
-      },
-      sound: 'default',
-    }],
-  });
-};
+const LEGACY_DAILY_NOTIFICATION_ID = 7001;
 
 export const setupPushNotificationListeners = async () => {
   if (!Capacitor.isNativePlatform()) return;
 
   const permission = await LocalNotifications.requestPermissions();
   if (permission.display !== 'granted') return;
+
+  await LocalNotifications.cancel({ notifications: [{ id: LEGACY_DAILY_NOTIFICATION_ID }] });
 
   await LocalNotifications.createChannel({
     id: 'laqta_default',
@@ -80,8 +32,6 @@ export const setupPushNotificationListeners = async () => {
     visibility: 1,
     sound: 'default',
   });
-  await scheduleDailyRecommendation();
-
   await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
     await LocalNotifications.schedule({
       notifications: [{

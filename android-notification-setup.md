@@ -6,7 +6,7 @@ This project is configured around a real push notification flow:
 
 - Supabase stores user profile and auth state
 - Supabase stores active FCM tokens
-- A backend function sends push notifications via Firebase Cloud Messaging
+- A backend function sends push notifications via Firebase Cloud Messaging HTTP v1
 - Android app presents local and system notifications
 
 ## Required real production services
@@ -18,7 +18,7 @@ You must provide the following real services externally:
 3. Android app linked to Firebase
 4. google-services.json placed in android/app/
 5. Supabase project with `fcm_tokens` table
-6. Supabase Edge Function or Cloud Function with `FCM_SERVER_KEY`
+6. Supabase Edge Function with the Firebase service account JSON
 
 ## Required env vars
 
@@ -26,7 +26,7 @@ In Supabase Edge Function environment:
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `FCM_SERVER_KEY`
+- `FIREBASE_SERVICE_ACCOUNT_JSON` (the complete Firebase service-account JSON as one secret)
 
 ## App logic
 

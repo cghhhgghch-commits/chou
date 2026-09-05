@@ -34,6 +34,46 @@ export default function Login() {
     localStorage.removeItem("adminSession");
   };
 
+  const redirectAfterAuth = async (user: any) => {
+    if (!user) return;
+
+    try {
+      const isAdminAccount = await checkAdmin(user);
+      if (isAdminAccount) {
+        await activateAdminSession(user);
+        navigate("/admin/dashboard", { replace: true });
+        return;
+      }
+    } catch (err) {
+      console.error("Admin redirect check failed:", err);
+    }
+
+    clearAdminSession();
+    navigate("/", { replace: true });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const handleSessionRedirect = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!isMounted || error || !data.user) return;
+      await redirectAfterAuth(data.user);
+    };
+
+    void handleSessionRedirect();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted || !session?.user) return;
+      await redirectAfterAuth(session.user);
+    });
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, [checkAdmin, activateAdminSession, navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -61,12 +101,11 @@ export default function Login() {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
-      if (userData.user && await checkAdmin(userData.user)) {
-        await activateAdminSession(userData.user);
-        navigate("/admin/dashboard");
+      if (userData.user) {
+        await redirectAfterAuth(userData.user);
       } else {
         clearAdminSession();
-        navigate("/");
+        navigate("/", { replace: true });
       }
     } catch (err: any) {
       if (err?.message?.includes("Invalid login credentials")) {

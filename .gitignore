@@ -6,3 +6,5 @@ coverage/
 *.log
 .env*
 !.env.example
+android/laqta-upload-key.jks
+android/keystore.properties
