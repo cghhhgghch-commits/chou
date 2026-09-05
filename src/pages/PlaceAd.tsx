@@ -805,7 +805,7 @@ ${imageSection}
                 <input 
                   type="file" 
                   multiple 
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/heic"
                   capture="environment"
                   onChange={handleImageChange}
                   className="hidden"

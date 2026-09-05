@@ -209,7 +209,7 @@ export default function ChatThread() {
             <input
               type="file"
               className="hidden"
-              accept="image/*,.pdf,.doc,.docx,.txt"
+              accept="image/jpeg,image/png,image/webp,image/heic,.pdf,.doc,.docx,.txt"
               onChange={(event) => handleAttachment(event.target.files?.[0])}
             />
           </label>
