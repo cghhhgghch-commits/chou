@@ -80,8 +80,15 @@ create table if not exists public.conversation_messages (
   sender_id uuid references auth.users(id) on delete set null,
   sender_name text,
   text text,
+  attachment_url text,
+  attachment_name text,
+  attachment_type text,
   created_at timestamptz default now()
 );
+
+alter table public.conversation_messages add column if not exists attachment_url text;
+alter table public.conversation_messages add column if not exists attachment_name text;
+alter table public.conversation_messages add column if not exists attachment_type text;
 
 -- Pending listing submissions for the admin review queue
 create table if not exists public.whatsapp_leads (

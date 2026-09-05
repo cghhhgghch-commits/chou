@@ -21,6 +21,8 @@ import {
   CheckCircle2,
   XCircle,
   TrendingUp,
+  Bell,
+  Send,
 } from "lucide-react";
 import { SYRIAN_CITIES } from "../lib/constants";
 
@@ -103,13 +105,16 @@ export default function AdminDashboard2() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "active" | "rejected">("all");
-  const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads">("overview");
+  const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads" | "notifications">("overview");
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("");
   const [pendingLeads, setPendingLeads] = useState<WhatsAppLead[]>([]);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -308,6 +313,42 @@ export default function AdminDashboard2() {
     setRefreshing(true);
     await fetchListings();
     setRefreshing(false);
+  };
+
+  const sendAdminNotification = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const title = notificationTitle.trim();
+    const message = notificationMessage.trim();
+
+    if (!title || !message) {
+      alert("يرجى كتابة عنوان الإشعار ونصه");
+      return;
+    }
+    if (title.length > 80 || message.length > 500) {
+      alert("العنوان يجب ألا يتجاوز 80 حرفاً والنص 500 حرف");
+      return;
+    }
+
+    setIsSendingNotification(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-push-notification", {
+        body: { title, message },
+      });
+      if (error) throw error;
+
+      const sent = Number(data?.sent || 0);
+      setNotificationTitle("");
+      setNotificationMessage("");
+      alert(sent > 0
+        ? `تم إرسال الإشعار بنجاح إلى ${sent} جهاز مسجل`
+        : "تم قبول الإشعار، لكن لا توجد أجهزة مسجلة حالياً لاستلامه");
+    } catch (error) {
+      console.error("Failed to send admin notification:", error);
+      const detail = error instanceof Error ? error.message : "تحقق من إعدادات Firebase وSupabase Edge Function.";
+      alert(`تعذر إرسال الإشعار: ${detail}`);
+    } finally {
+      setIsSendingNotification(false);
+    }
   };
 
   // تصفية الإعلانات
@@ -523,11 +564,12 @@ export default function AdminDashboard2() {
           </div>
         )}
 
-        <nav className="mb-6 grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="أقسام لوحة المدير">
+        <nav className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm sm:grid-cols-4" aria-label="أقسام لوحة المدير">
           {[
             { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
             { id: "listings", label: "الإعلانات", icon: ClipboardList },
             { id: "leads", label: "طلبات المراجعة", icon: Clock3 },
+            { id: "notifications", label: "إرسال إشعار", icon: Bell },
           ].map((section) => {
             const Icon = section.icon;
             const selected = activeSection === section.id;
@@ -544,6 +586,64 @@ export default function AdminDashboard2() {
             );
           })}
         </nav>
+
+        {activeSection === "notifications" && (
+          <section className="mb-8 max-w-3xl rounded-2xl border border-blue-200 bg-white p-5 shadow-sm sm:p-7">
+            <div className="mb-6 flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <Bell className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-900">إرسال إشعار للمستخدمين</h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">اكتب الرسالة وسيتم إرسالها إلى الأجهزة التي فعّلت إشعارات التطبيق.</p>
+              </div>
+            </div>
+
+            <form onSubmit={sendAdminNotification} className="space-y-5">
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <label htmlFor="notification-title" className="text-sm font-bold text-slate-700">عنوان الإشعار</label>
+                  <span className="text-[11px] text-slate-400">{notificationTitle.length}/80</span>
+                </div>
+                <input
+                  id="notification-title"
+                  value={notificationTitle}
+                  onChange={(event) => setNotificationTitle(event.target.value)}
+                  maxLength={80}
+                  placeholder="مثال: إعلان جديد بانتظارك"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <label htmlFor="notification-message" className="text-sm font-bold text-slate-700">نص الإشعار</label>
+                  <span className="text-[11px] text-slate-400">{notificationMessage.length}/500</span>
+                </div>
+                <textarea
+                  id="notification-message"
+                  value={notificationMessage}
+                  onChange={(event) => setNotificationMessage(event.target.value)}
+                  maxLength={500}
+                  rows={5}
+                  placeholder="اكتب تفاصيل الرسالة التي ستصل للمستخدمين..."
+                  className="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 text-sm leading-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSendingNotification || !notificationTitle.trim() || !notificationMessage.trim()}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                {isSendingNotification ? <Loader className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                {isSendingNotification ? "جاري الإرسال..." : "إرسال الإشعار"}
+              </button>
+            </form>
+          </section>
+        )}
 
         {activeSection === "overview" && (
           <section className="mb-8">
