@@ -126,10 +126,10 @@ export const syncNativePushToken = async (userId?: string) => {
 
     const result = await registerFcmToken({
       token: tokenValue,
-      platform: 'android',
-      device_id: userId ? `android-${userId}` : getOrCreateDeviceId(),
+      platform: Capacitor.getPlatform() as FcmPlatform,
+      device_id: userId ? `${Capacitor.getPlatform()}-${userId}` : getOrCreateDeviceId(),
       app_version: '1.0.0',
-      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'android-capacitor',
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : `${Capacitor.getPlatform()}-capacitor`,
     });
 
     await registrationListener?.remove();
