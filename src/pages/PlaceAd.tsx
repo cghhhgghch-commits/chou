@@ -322,7 +322,7 @@ export default function PlaceAd() {
   } as const;
 
   const currentCategoryForm = categoryFormConfig[selectedCategory as keyof typeof categoryFormConfig] || categoryFormConfig.houses;
-  const supportsFinishing = ["houses", "villas", "buildings", "farms", "shops"].includes(selectedCategory);
+  const supportsFinishing = ["houses", "villas", "buildings"].includes(selectedCategory);
   const supportsFurnishing = ["houses", "villas", "farms"].includes(selectedCategory);
 
   const buildCategorySpecificSummary = () => {
