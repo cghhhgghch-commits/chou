@@ -972,7 +972,7 @@ ${imageSection}
                 </select>
               </div>
 
-              {supportsFinishing ? (
+              {supportsFinishing && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">مستوى الكسوة والتشطيب</label>
                   <select
@@ -984,10 +984,6 @@ ${imageSection}
                       <option key={f} value={f}>{f}</option>
                     ))}
                   </select>
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-500">
-                  لا ينطبق التشطيب على {selectedCategory === "factories" ? "المصانع" : "الأراضي"}
                 </div>
               )}
             </div>
