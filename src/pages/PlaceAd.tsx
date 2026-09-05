@@ -167,6 +167,12 @@ export default function PlaceAd() {
     setCategoryDetailText("");
     setCategoryNumericDetail("");
     setCategoryExtraDetail("");
+    setFinishing(FINISHING_TYPES[0]);
+    setFurnishing("غير مفروش");
+    setBedrooms("3 غرف نوم");
+    setBathrooms(2);
+    setFloor("الطابق الثاني");
+    setTotalFloors("4 طوابق");
     
     // Smart architectural presets based on Syrian category
     if (catId === "shops") {
@@ -316,6 +322,8 @@ export default function PlaceAd() {
   } as const;
 
   const currentCategoryForm = categoryFormConfig[selectedCategory as keyof typeof categoryFormConfig] || categoryFormConfig.houses;
+  const supportsFinishing = ["houses", "villas", "buildings", "farms", "shops"].includes(selectedCategory);
+  const supportsFurnishing = ["houses", "villas", "farms"].includes(selectedCategory);
 
   const buildCategorySpecificSummary = () => {
     switch (selectedCategory) {
@@ -899,18 +907,20 @@ ${imageSection}
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">حالة الفرش</label>
-                  <select 
-                    value={furnishing} 
-                    onChange={(e) => setFurnishing(e.target.value)} 
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none"
-                  >
-                    <option value="مفروش">مفروش بالكامل (أثاث ومطبخ وأجهزة)</option>
-                    <option value="غير مفروش">غير مفروش (فارغ جاهز للسكن)</option>
-                    <option value="مفروش جزئياً">مفروش جزئياً (مطبخ وأجهزة فقط)</option>
-                  </select>
-                </div>
+                {supportsFurnishing && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">حالة الفرش</label>
+                    <select
+                      value={furnishing}
+                      onChange={(e) => setFurnishing(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none"
+                    >
+                      <option value="مفروش">مفروش بالكامل (أثاث ومطبخ وأجهزة)</option>
+                      <option value="غير مفروش">غير مفروش (فارغ جاهز للسكن)</option>
+                      <option value="مفروش جزئياً">مفروش جزئياً (مطبخ وأجهزة فقط)</option>
+                    </select>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -962,18 +972,24 @@ ${imageSection}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">مستوى الكسوة والتشطيب</label>
-                <select 
-                  value={finishing} 
-                  onChange={(e) => setFinishing(e.target.value)} 
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none"
-                >
-                  {FINISHING_TYPES.map(f => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
-              </div>
+              {supportsFinishing ? (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">مستوى الكسوة والتشطيب</label>
+                  <select
+                    value={finishing}
+                    onChange={(e) => setFinishing(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none"
+                  >
+                    {FINISHING_TYPES.map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-500">
+                  لا ينطبق التشطيب على {selectedCategory === "factories" ? "المصانع" : "الأراضي"}
+                </div>
+              )}
             </div>
 
             {/* Architectural fields change by property type, but stay in the same form layout */}
@@ -1164,43 +1180,6 @@ ${imageSection}
                     </button>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  {currentCategoryForm.detailLabel}
-                </label>
-                <input
-                  type="text"
-                  value={categoryDetailText}
-                  onChange={(e) => setCategoryDetailText(e.target.value)}
-                  placeholder={currentCategoryForm.detailPlaceholder}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:bg-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">قيمة رقمية</label>
-                <input
-                  type="text"
-                  value={categoryNumericDetail}
-                  onChange={(e) => setCategoryNumericDetail(e.target.value)}
-                  placeholder={selectedCategory === "farms" ? "عمق البئر / م" : selectedCategory === "lands" ? "نسبة البناء" : selectedCategory === "factories" ? "KVA / 400" : selectedCategory === "shops" ? "م² / الواجهة" : selectedCategory === "villas" ? "مساحة المسبح / م" : selectedCategory === "buildings" ? "عدد مواقف السيارات" : "قيمة رقمية"}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:bg-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">معلومة إضافية</label>
-                <input
-                  type="text"
-                  value={categoryExtraDetail}
-                  onChange={(e) => setCategoryExtraDetail(e.target.value)}
-                  placeholder={selectedCategory === "farms" ? "مسبح / خزان / حظيرة" : selectedCategory === "lands" ? "طول الواجهة" : selectedCategory === "factories" ? "ترخيص / ميناء تحميل" : selectedCategory === "shops" ? "مداخل / قبو" : selectedCategory === "villas" ? "سعة الكراج" : selectedCategory === "buildings" ? "محلات أرضية" : "تفاصيل إضافية"}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold focus:bg-white outline-none"
-                />
               </div>
             </div>
 
