@@ -193,7 +193,7 @@ export default function Login() {
         provider: "google",
         options: {
           redirectTo: Capacitor.isNativePlatform()
-            ? "com.laqta.app://auth/callback"
+            ? "com.laqta.syria://auth/callback"
             : `${window.location.origin}/`,
             ...(Capacitor.isNativePlatform() ? { skipBrowserRedirect: true } : {}),
           queryParams: {

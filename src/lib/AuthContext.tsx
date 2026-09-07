@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const urlListener = Capacitor.isNativePlatform()
       ? App.addListener("appUrlOpen", async ({ url }) => {
-          if (!url.startsWith("com.laqta.app://auth/callback")) return;
+          if (!url.startsWith("com.laqta.syria://auth/callback")) return;
 
           const callbackUrl = new URL(url);
           const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));
