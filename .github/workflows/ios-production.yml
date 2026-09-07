@@ -100,10 +100,20 @@ jobs:
             -exportPath "$RUNNER_TEMP/export" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
 
+      - name: Locate exported IPA
+        shell: bash
+        run: |
+          ipa_path=$(find "$RUNNER_TEMP/export" -maxdepth 1 -name "*.ipa" -print -quit)
+          if [ -z "$ipa_path" ]; then
+            echo "No IPA file was produced in $RUNNER_TEMP/export"
+            exit 1
+          fi
+          echo "IPA_PATH=$ipa_path" >> "$GITHUB_ENV"
+
       - name: Upload production IPA to App Store Connect
         uses: apple-actions/upload-testflight-build@v2
         with:
-          app-path: "$RUNNER_TEMP/export/App.ipa"
+          app-path: ${{ env.IPA_PATH }}
           issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           api-private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
