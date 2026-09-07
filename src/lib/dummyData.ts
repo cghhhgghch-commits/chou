@@ -36,7 +36,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب المالكي العقاري",
       phone: "+963988112233",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80",
       isAgency: true
     },
@@ -74,7 +74,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب قاسيون للخدمات العقارية",
       phone: "+963933445566",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T08:00:00Z"
@@ -111,7 +111,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مؤسسة تراث الشام العقارية",
       phone: "+963966554433",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T09:00:00Z"
@@ -148,7 +148,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الشهباء للخدمات العقارية",
       phone: "+963922334455",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-28T11:30:00Z"
   },
@@ -183,7 +183,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الميدان للاستثمار العقاري",
       phone: "+963944332211",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T11:00:00Z"
@@ -214,7 +214,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "شركة البنيان الهندسية",
       phone: "+963955112288",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-28T14:00:00Z"
   },
@@ -252,7 +252,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "يعفور للعقارات والفلل والمزارع",
       phone: "+963999887766",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T10:00:00Z"
@@ -284,7 +284,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الغوطة الزراعي",
       phone: "+963933998877",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-27T16:00:00Z"
   },
@@ -314,7 +314,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب مروج الشام للأراضي",
       phone: "+963955223344",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-27T10:00:00Z"
   },
@@ -342,7 +342,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب قاسيون للتقسيم العقاري",
       phone: "+963944887711",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-26T15:00:00Z"
   },
@@ -374,7 +374,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "الوسيط التجاري السوري",
       phone: "+963988776655",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T09:15:00Z"
@@ -405,7 +405,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الحمراء التجاري",
       phone: "+963955443322",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-28T09:00:00Z"
   },
@@ -443,7 +443,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مجموعة الفلل والقصور السورية",
       phone: "+963999443322",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T11:45:00Z"
@@ -478,7 +478,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب بلودان للمصايف والفلل",
       phone: "+963933776655",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-27T18:00:00Z"
   },
@@ -511,7 +511,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "الوسيط الصناعي السوري",
       phone: "+963966119933",
-      whatsapp: "971585193270",
+      whatsapp: "963934888055",
       isAgency: true
     },
     postedAt: "2026-08-29T12:00:00Z"
@@ -541,7 +541,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الشهباء للمنشآت الصناعية",
       phone: "+963988223311",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-28T13:00:00Z"
   },
@@ -578,7 +578,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "الأجنحة الشامية للضيافة",
       phone: "+963944556677",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-29T11:00:00Z"
   },
@@ -612,7 +612,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مكتب الساحل للمصايف والشاليهات",
       phone: "+963933112244",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-28T16:00:00Z"
   },
@@ -646,7 +646,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "سكن الأوائل الطلابي",
       phone: "+963955667788",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-29T07:30:00Z"
   },
@@ -680,7 +680,7 @@ export const dummyProperties: Property[] = [
     agent: {
       name: "مجموعة دمر العقارية",
       phone: "+963944118899",
-      whatsapp: "971585193270"
+      whatsapp: "963934888055"
     },
     postedAt: "2026-08-27T12:00:00Z"
   }

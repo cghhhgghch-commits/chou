@@ -337,7 +337,7 @@ export default function Profile() {
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <a
-            href="https://wa.me/971585193270?text=مرحباً، أحتاج مساعدة في تطبيق لقطة"
+            href="https://wa.me/963934888055?text=مرحباً، أحتاج مساعدة في تطبيق لقطة"
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
@@ -346,7 +346,7 @@ export default function Profile() {
             <span>واتساب مباشر</span>
           </a>
           <a
-            href="tel:+971585193270"
+            href="tel:+963934888055"
             className="flex-1 md:flex-none bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
           >
             <PhoneCall className="w-4 h-4" />

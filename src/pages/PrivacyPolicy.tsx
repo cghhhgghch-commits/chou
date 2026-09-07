@@ -122,7 +122,7 @@ export default function PrivacyPolicy() {
                 <span className="font-bold text-xs" dir="ltr">info@laqta.sy</span>
               </a>
               <a 
-                href="https://wa.me/971585193270"
+                href="https://wa.me/963934888055"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 text-emerald-800 transition-colors"

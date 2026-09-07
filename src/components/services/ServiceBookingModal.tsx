@@ -231,7 +231,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
             </button>
 
             <a
-              href="tel:+971585193270"
+              href="tel:+963934888055"
               className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs"
             >
               <PhoneCall className="w-3.5 h-3.5 text-brand-600" />

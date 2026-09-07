@@ -73,7 +73,7 @@ export default function Services() {
         </div>
 
         <a 
-          href="https://wa.me/971585193270?text=مرحباً، أريد الاستفسار عن خدمات الصيانة في تطبيق لقطة"
+          href="https://wa.me/963934888055?text=مرحباً، أريد الاستفسار عن خدمات الصيانة في تطبيق لقطة"
           target="_blank" 
           rel="noopener noreferrer"
           className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors"

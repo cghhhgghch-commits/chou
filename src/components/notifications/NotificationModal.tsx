@@ -237,7 +237,7 @@ export default function NotificationModal() {
         {/* Footer with WhatsApp Support */}
         <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
           <a 
-            href="https://wa.me/971585193270?text=مرحباً،%20لدي%20استفسار%20حول%20إعلانات%20وعقارات%20لقطة%20حلب" 
+            href="https://wa.me/963934888055?text=مرحباً،%20لدي%20استفسار%20حول%20إعلانات%20وعقارات%20لقطة%20حلب"
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-emerald-700 font-black hover:underline"

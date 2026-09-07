@@ -110,7 +110,7 @@ export default function AboutUs() {
               <span>أضف إعلانك الآن</span>
             </Link>
             <a
-              href="https://wa.me/971585193270"
+              href="https://wa.me/963934888055"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"

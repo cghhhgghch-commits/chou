@@ -1,10 +1,10 @@
-export const WHATSAPP_NUMBER = "971585193270";
+export const WHATSAPP_NUMBER = "963934888055";
 
 export const APP_CONFIG = {
   name: "لقطة",
   description: "منصة عقارية متخصصة في بيع وإيجار البيوت، البنايات، المزارع، الأراضي، المحلات، الفلل، والمصانع.",
   adminEmail: "laqtasyr1@gmail.com",
-  adminPhone: "+971585193270",
+  adminPhone: "+963934888055",
   adminWhatsApp: WHATSAPP_NUMBER,
   supportEmail: "laqtasyr1@gmail.com",
   currencySymbol: "ل.س",

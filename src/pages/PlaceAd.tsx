@@ -1230,7 +1230,7 @@ ${imageSection}
                     type="text" 
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    placeholder="971585193270" 
+                    placeholder="963934888055"
                     dir="ltr"
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none" 
                   />
