@@ -25,6 +25,7 @@ import { FavoritesProvider } from "./lib/FavoritesContext";
 import NotificationModal from "./components/notifications/NotificationModal";
 import AdminLogin from "./pages/AdminLogin";
 import { AdminProvider } from "./lib/AdminContext";
+import IOSBackButton from "./components/layout/IOSBackButton";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <FavoritesProvider>
             <BrowserRouter>
               <NotificationModal />
+              <IOSBackButton />
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />

@@ -7,6 +7,8 @@ import AppErrorBoundary from './components/AppErrorBoundary';
 
 if (typeof document !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent)) {
   document.documentElement.classList.add('ios-device');
+  const viewport = document.querySelector('meta[name="viewport"]');
+  viewport?.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
 }
 
 void setupPushNotificationListeners().catch((error) => {
