@@ -6,9 +6,14 @@ import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, ShieldChec
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
+const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+const nativeAuthCallbackUrl = Capacitor.getPlatform() === "android"
+  ? "com.laqta.app://auth/callback"
+  : "com.laqta.syria://auth/callback";
+
 export default function Login() {
   const location = useLocation();
-  const initialMode = location.state?.mode === "register" ? "register" : "login";
+  const initialMode = location.state?.mode === "register" || location.pathname === "/register" ? "register" : "login";
   const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,7 +84,7 @@ export default function Login() {
     setError("");
 
     const safeEmail = email.trim().toLowerCase();
-    const safePassword = password.trim();
+    const safePassword = password;
 
     if (!safeEmail || !safePassword) {
       setError("يرجى إدخال البريد الإلكتروني وكلمة المرور.");
@@ -124,12 +129,22 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    const safeEmail = email.trim();
-    const safePassword = password.trim();
+    const safeEmail = email.trim().toLowerCase();
+    const safePassword = password;
     const safeName = name.trim();
 
     if (!safeEmail || !safePassword || !safeName) {
       setError("يرجى إدخال الاسم والبريد الإلكتروني وكلمة المرور.");
+      return;
+    }
+
+    if (!isValidEmail(safeEmail)) {
+      setError("أدخل بريدًا إلكترونيًا صحيحًا مثل name@gmail.com.");
+      return;
+    }
+
+    if (safePassword.length < 6) {
+      setError("كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.");
       return;
     }
 
@@ -140,6 +155,9 @@ export default function Login() {
         email: safeEmail,
         password: safePassword,
         options: {
+          emailRedirectTo: Capacitor.isNativePlatform()
+            ? nativeAuthCallbackUrl
+            : `${window.location.origin}/`,
           data: {
             full_name: safeName,
           },
@@ -148,30 +166,62 @@ export default function Login() {
 
       if (signUpError) throw signUpError;
 
+      // Supabase may hide existing-user errors and return a user without identities.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setError("هذا البريد مسجل بالفعل. انتقل إلى تسجيل الدخول أو استخدم بريدًا آخر.");
+        setMode("login");
+        setEmail(safeEmail);
+        setPassword("");
+        setName("");
+        return;
+      }
+
       if (data.user) {
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          email: safeEmail,
-          display_name: safeName,
-          phone_number: "",
-          avatar_url: "",
-          role: "user",
-          updated_at: new Date().toISOString(),
-        });
+        const { error: profileError } = await supabase.from("profiles").upsert({
+            id: data.user.id,
+            email: safeEmail,
+            display_name: safeName,
+            phone_number: "",
+            avatar_url: "",
+            role: "user",
+            updated_at: new Date().toISOString(),
+          });
+        if (profileError && data.session) {
+          throw profileError;
+        }
+      }
+
+      if (!data.session) {
+        setError("تم إنشاء الحساب بنجاح، ولكن يجب تأكيد البريد الإلكتروني قبل تسجيل الدخول. راجع بريدك الوارد ثم حاول تسجيل الدخول.");
+        setMode("login");
+        setEmail(safeEmail);
+        setPassword("");
+        setName("");
+        return;
       }
 
       clearAdminSession();
       navigate("/");
     } catch (err: any) {
       const message = err?.message || "";
-      if (message.includes("already registered") || message.includes("already exists")) {
-        setError("هذا البريد مسجل بالفعل.");
-      } else if (message.includes("Password") || message.includes("password")) {
+      const normalizedMessage = message.toLowerCase();
+      console.error("Registration failed:", err);
+      if (normalizedMessage.includes("already registered") || normalizedMessage.includes("already exists")) {
+        setError("هذا البريد مسجل بالفعل. انتقل إلى تسجيل الدخول أو استخدم بريدًا آخر.");
+        setMode("login");
+        setEmail(safeEmail);
+        setPassword("");
+        setName("");
+      } else if (normalizedMessage.includes("signups are disabled") || normalizedMessage.includes("sign up is disabled")) {
+        setError("تسجيل الحساب بالبريد غير مفعّل في Supabase حالياً. تواصل مع مدير المشروع أو استخدم تسجيل الدخول عبر Google.");
+      } else if (normalizedMessage.includes("password")) {
         setError("كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.");
-      } else if (message.includes("email")) {
-        setError("صيغة البريد الإلكتروني غير صحيحة.");
+      } else if (normalizedMessage.includes("rate limit") || normalizedMessage.includes("over_email_send_rate_limit")) {
+        setError("تم تجاوز حد إرسال رسائل التأكيد. انتظر قليلًا ثم حاول مرة أخرى.");
+      } else if (normalizedMessage.includes("email") || normalizedMessage.includes("provider")) {
+        setError("رفضت خدمة Supabase التسجيل بهذا البريد. تأكد من تفعيل Email Auth وإعداد مزود البريد في لوحة Supabase.");
       } else {
-        setError("خطأ في التسجيل. حاول مرة أخرى.");
+        setError(message || "تعذر إنشاء الحساب. حاول مرة أخرى.");
       }
     } finally {
       setLoading(false);
@@ -193,7 +243,7 @@ export default function Login() {
         provider: "google",
         options: {
           redirectTo: Capacitor.isNativePlatform()
-            ? "com.laqta.syria://auth/callback"
+            ? nativeAuthCallbackUrl
             : `${window.location.origin}/`,
             ...(Capacitor.isNativePlatform() ? { skipBrowserRedirect: true } : {}),
           queryParams: {
@@ -296,6 +346,8 @@ export default function Login() {
                 </label>
                 <input
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="أدخل بريدك"

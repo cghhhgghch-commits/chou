@@ -18,10 +18,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
-import AdminDashboard2 from "./pages/AdminDashboard2";
+import AdminPanel from "./pages/AdminPanel";
 import { AuthProvider } from "./lib/AuthContext";
 import { NotificationsProvider } from "./lib/NotificationsContext";
 import { FavoritesProvider } from "./lib/FavoritesContext";
+import NotificationModal from "./components/notifications/NotificationModal";
+import AdminLogin from "./pages/AdminLogin";
 import { AdminProvider } from "./lib/AdminContext";
 
 export default function App() {
@@ -31,6 +33,7 @@ export default function App() {
         <NotificationsProvider>
           <FavoritesProvider>
             <BrowserRouter>
+              <NotificationModal />
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
@@ -54,8 +57,9 @@ export default function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
 
-                <Route path="/admin" element={<AdminDashboard2 />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard2 />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminPanel />} />
 
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

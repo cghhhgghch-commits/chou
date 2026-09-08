@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../lib/AuthContext";
-import { supabase } from "../lib/supabase";
+import { db } from "../lib/firebase";
+import {
+  collection,
+  query,
+  getDocs,
+  deleteDoc,
+  doc,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import {
   LayoutDashboard,
   LogOut,
@@ -12,11 +21,6 @@ import {
   Loader,
   Search,
   Home as HomeIcon,
-  MapPin,
-  Building2,
-  CheckCircle2,
-  ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 
 interface PropertyListing {
@@ -33,71 +37,6 @@ interface PropertyListing {
   userEmail?: string;
 }
 
-const ADMIN_AMENITIES = [
-  "منظومة طاقة شمسية وإنفيرتر",
-  "مصعد حديث شغال",
-  "مولدة كهرباء / خط أمبير",
-  "بئر ماء ارتوازي عذب",
-  "خزان ماء إضافي ومضخة",
-  "حديقة خاصة ومشجرة",
-  "مسبح مفلتر خاص",
-  "تدفئة مركزية",
-  "موقف سيارة مسور",
-  "واجهة واسعة وممرات",
-  "كاميرات مراقبة",
-  "بوابة آمنة",
-];
-
-const PROFESSIONAL_PROPERTY_CATEGORIES = [
-  { id: "houses", label: "منازل" },
-  { id: "villas", label: "فلل" },
-  { id: "buildings", label: "بنايات" },
-  { id: "shops", label: "محلات" },
-  { id: "farms", label: "مزارع" },
-  { id: "lands", label: "أراضي" },
-  { id: "factories", label: "مصانع" },
-  { id: "other", label: "أخرى" },
-];
-
-const PROPERTY_TYPES = [
-  { value: "sale", label: "بيع" },
-  { value: "rent", label: "إيجار" },
-  { value: "offplan", label: "على العظم" },
-];
-
-const OWNERSHIP_TYPES = [
-  "طابو أخضر 2400 سهم (سجل عقاري نظامي)",
-  "حكم محكمة مبرم ومكتسب الدرجة القطعية",
-  "وكالة كاتب عدل خاصة غير قابلة للعزل",
-  "طابو زراعي أسهم مشاع",
-  "فروغ تجاري نظامي وسند ملكية",
-  "جمعية سكنية / إسكان رسمي",
-  "عقد بيع قطعي وتنازل فوري",
-];
-
-const FINISHING_TYPES = [
-  "سوبر ديلوكس حديث (تشطيب VIP)",
-  "ديلوكس ممتاز",
-  "إكساء عادي نظيف وجاهز للسكن",
-  "على العظم / الهيكل (قيد الإكساء)",
-  "مفروش بالكامل VIP",
-  "مفروش عادي",
-  "يحتاج صيانة وترميم جزئي",
-];
-
-const SYRIAN_CITIES = [
-  "حلب",
-  "ريف حلب",
-  "منبج",
-  "أعزاز",
-  "الباب",
-  "عفرين",
-  "جرابلس",
-  "السفيرة",
-  "عين العرب",
-  "الدانا",
-];
-
 export default function AdminPanel() {
   const navigate = useNavigate();
   const { signOut, isAdmin, user } = useAuth();
@@ -111,60 +50,46 @@ export default function AdminPanel() {
   const [formData, setFormData] = useState({
     title: "",
     category: "houses",
-    type: "sale",
+    type: "sell",
     city: "دمشق",
-    price: "",
-    priceInUSD: "",
-    area: "",
-    landArea: "",
-    bedrooms: "3",
-    bathrooms: "2",
-    floor: "الطابق الثاني",
-    totalFloors: "4",
-    ownershipType: OWNERSHIP_TYPES[0],
-    finishing: FINISHING_TYPES[0],
-    direction: "قبلي غربي (مشمس)",
-    furnishing: "غير مفروش",
-    neighborhood: "",
-    advertiserName: user?.displayName || "مسؤول العقارات",
-    phone: user?.phoneNumber || "+963",
-    whatsapp: user?.phoneNumber || "+963",
+    price: 0,
+    area: 0,
     description: "",
-    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
   });
 
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([
-    "منظومة طاقة شمسية وإنفيرتر",
-    "خزان ماء إضافي ومضخة",
-    "موقف سيارة مسور",
-  ]);
-
   useEffect(() => {
-    if (!isAdmin) {
-      navigate("/login");
+    const storedAdmin = localStorage.getItem("adminUser") || localStorage.getItem("adminSession");
+
+    let hasValidAdminSession = isAdmin;
+
+    if (storedAdmin) {
+      try {
+        const parsedAdmin = JSON.parse(storedAdmin);
+        const expiresAt = Number(parsedAdmin?.expiresAt || 0);
+        hasValidAdminSession = Boolean(parsedAdmin?.isAdmin === true && parsedAdmin?.email === "vexismarkets@gmail.com") && (!expiresAt || Date.now() < expiresAt);
+      } catch {
+        hasValidAdminSession = false;
+      }
+    }
+
+    if (!hasValidAdminSession) {
+      localStorage.removeItem("adminUser");
+      localStorage.removeItem("adminSession");
+      navigate("/admin/login");
     }
   }, [isAdmin, navigate]);
 
   const fetchListings = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from("listings").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      const rows = (data || []).map((item) => ({
-        id: item.id,
-        title: item.title || "",
-        category: item.category || "houses",
-        type: item.type || "sale",
-        city: item.city_id || item.city || "دمشق",
-        price: Number(item.price || 0),
-        area: Number(item.area || 0),
-        images: Array.isArray(item.images) ? item.images : [],
-        description: item.description || "",
-        createdAt: item.created_at,
-        userEmail: item.user_email || item.userEmail,
+      const q = query(collection(db, "listings"));
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map((docSnapshot) => ({
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
       }) as PropertyListing);
-      setListings(rows);
-      setFilteredListings(rows);
+      setListings(data);
+      setFilteredListings(data);
     } catch (error) {
       console.error("خطأ في جلب الإعلانات:", error);
     } finally {
@@ -199,8 +124,7 @@ export default function AdminPanel() {
   const handleDeleteListing = async (id: string) => {
     if (confirm("هل تريد حذف هذا الإعلان نهائياً؟")) {
       try {
-        const { error } = await supabase.from("listings").delete().eq("id", id);
-        if (error) throw error;
+        await deleteDoc(doc(db, "listings", id));
         setListings((current) => current.filter((item) => item.id !== id));
         alert("تم حذف الإعلان بنجاح");
       } catch (error) {
@@ -218,13 +142,7 @@ export default function AdminPanel() {
         .filter((item) => item.userEmail === "admin@system" || item.title.toLowerCase().includes("demo"))
         .map((item) => item.id);
 
-      if (demoIds.length === 0) {
-        alert("لا توجد إعلانات تجريبية للحذف");
-        return;
-      }
-
-      const { error } = await supabase.from("listings").delete().in("id", demoIds);
-      if (error) throw error;
+      await Promise.all(demoIds.map((id) => deleteDoc(doc(db, "listings", id))));
       setListings((current) => current.filter((item) => !demoIds.includes(item.id)));
       alert(`تم حذف ${demoIds.length} إعلان تجريبي`);
     } catch (error) {
@@ -233,60 +151,24 @@ export default function AdminPanel() {
     }
   };
 
-  const toggleAmenity = (amenity: string) => {
-    setSelectedAmenities((current) =>
-      current.includes(amenity)
-        ? current.filter((item) => item !== amenity)
-        : [...current, amenity]
-    );
-  };
-
   const handleCreateListing = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.city || !formData.price || !formData.area) {
-      alert("يرجى إدخال عنوان الإعلان، المدينة، السعر، والمساحة قبل الحفظ.");
-      return;
-    }
-
     try {
       const newListing = {
-        title: formData.title.trim(),
-        category: formData.category,
-        type: formData.type,
-        city: formData.city,
-        city_id: formData.city,
-        price: Number(formData.price),
-        price_in_usd: formData.priceInUSD ? Number(formData.priceInUSD) : null,
-        area: Number(formData.area),
-        land_area: formData.landArea ? Number(formData.landArea) : 0,
-        bedrooms: formData.bedrooms || "3",
-        bathrooms: Number(formData.bathrooms) || 2,
-        floor: formData.floor,
-        total_floors: formData.totalFloors,
-        ownership_type: formData.ownershipType,
-        finishing: formData.finishing,
-        direction: formData.direction,
-        furnishing: formData.furnishing,
-        neighborhood: formData.neighborhood,
-        advertiser_name: formData.advertiserName || "مسؤول العقارات",
-        phone: formData.phone,
-        whatsapp: formData.whatsapp || formData.phone,
-        amenities: selectedAmenities,
-        description: formData.description,
-        images: formData.imageUrl ? [formData.imageUrl] : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"],
-        is_verified: true,
-        status: "active",
-        created_at: new Date().toISOString(),
-        user_email: user?.email || "admin@system",
-        user_id: user?.id || "admin-user",
+        ...formData,
+        createdAt: serverTimestamp(),
+        userEmail: user?.email || "admin@system",
+        images: [
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+        ],
+        isVerified: true,
       };
 
-      const { data, error: insertError } = await supabase.from("listings").insert(newListing).select().single();
-      if (insertError) throw insertError;
+      const docRef = await addDoc(collection(db, "listings"), newListing);
       setListings((current) => [
         {
-          id: data.id,
+          id: docRef.id,
           ...newListing,
           createdAt: new Date(),
         },
@@ -296,33 +178,17 @@ export default function AdminPanel() {
       setFormData({
         title: "",
         category: "houses",
-        type: "sale",
+        type: "sell",
         city: "دمشق",
-        price: "",
-        priceInUSD: "",
-        area: "",
-        landArea: "",
-        bedrooms: "3",
-        bathrooms: "2",
-        floor: "الطابق الثاني",
-        totalFloors: "4",
-        ownershipType: OWNERSHIP_TYPES[0],
-        finishing: FINISHING_TYPES[0],
-        direction: "قبلي غربي (مشمس)",
-        furnishing: "غير مفروش",
-        neighborhood: "",
-        advertiserName: user?.displayName || "مسؤول العقارات",
-        phone: user?.phoneNumber || "+963",
-        whatsapp: user?.phoneNumber || "+963",
+        price: 0,
+        area: 0,
         description: "",
-        imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
       });
-      setSelectedAmenities(["منظومة طاقة شمسية وإنفيرتر", "خزان ماء إضافي ومضخة", "موقف سيارة مسور"]);
       setActiveTab("listings");
-      alert("تم إنشاء الإعلان الاحترافي بنجاح ✅");
+      alert("تم إنشاء الإعلان بنجاح ✅");
     } catch (error) {
       console.error("خطأ في الإنشاء:", error);
-      alert("حدث خطأ في إنشاء الإعلان الاحترافي");
+      alert("حدث خطأ في إنشاء الإعلان");
     }
   };
 
@@ -604,16 +470,18 @@ export default function AdminPanel() {
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
-                    {SYRIAN_CITIES.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
+                    <option value="دمشق">دمشق</option>
+                    <option value="ريف دمشق">ريف دمشق</option>
+                    <option value="حلب">حلب</option>
+                    <option value="اللاذقية">اللاذقية</option>
+                    <option value="طرطوس">طرطوس</option>
                   </select>
 
                   <input
                     type="number"
                     placeholder="السعر (ل.س)"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                     className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
                     required
                   />
@@ -622,7 +490,7 @@ export default function AdminPanel() {
                     type="number"
                     placeholder="المساحة (م²)"
                     value={formData.area}
-                    onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, area: Number(e.target.value) })}
                     className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
                     required
                   />
@@ -646,30 +514,7 @@ export default function AdminPanel() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({
-                      title: "",
-                      category: "houses",
-                      type: "sale",
-                      city: "دمشق",
-                      price: "",
-                      priceInUSD: "",
-                      area: "",
-                      landArea: "",
-                      bedrooms: "3",
-                      bathrooms: "2",
-                      floor: "الطابق الثاني",
-                      totalFloors: "4",
-                      ownershipType: OWNERSHIP_TYPES[0],
-                      finishing: FINISHING_TYPES[0],
-                      direction: "قبلي غربي (مشمس)",
-                      furnishing: "غير مفروش",
-                      neighborhood: "",
-                      advertiserName: user?.displayName || "مسؤول العقارات",
-                      phone: user?.phoneNumber || "+963",
-                      whatsapp: user?.phoneNumber || "+963",
-                      description: "",
-                      imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-                    })}
+                    onClick={() => setFormData({ title: "", category: "houses", type: "sell", city: "دمشق", price: 0, area: 0, description: "" })}
                     className="px-6 py-3 bg-slate-200 text-slate-800 font-black rounded-xl hover:bg-slate-300 transition-all"
                   >
                     إفراغ

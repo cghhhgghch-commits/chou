@@ -5,6 +5,11 @@ import { App } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
+const nativeAuthCallbackPrefixes = [
+  "com.laqta.app://auth/callback",
+  "com.laqta.syria://auth/callback",
+];
+
 export interface UserProfile {
   id: string;
   email: string | null;
@@ -120,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const urlListener = Capacitor.isNativePlatform()
       ? App.addListener("appUrlOpen", async ({ url }) => {
-          if (!url.startsWith("com.laqta.syria://auth/callback")) return;
+          if (!nativeAuthCallbackPrefixes.some((prefix) => url.startsWith(prefix))) return;
 
           const callbackUrl = new URL(url);
           const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));

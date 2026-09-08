@@ -4,6 +4,8 @@ import {
   ArrowRight, Phone, Mail, MessageSquare, MapPin, 
   Send, CheckCircle2, Clock, ChevronDown, ChevronUp, HelpCircle
 } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import { APP_CONFIG, getWhatsAppUrl } from "../lib/constants";
 
 export default function ContactUs() {
@@ -14,6 +16,19 @@ export default function ContactUs() {
   const [sent, setSent] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  const openExternalLink = async (url: string) => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url });
+        return;
+      }
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Failed to open external link:", error);
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !message) return;
@@ -22,7 +37,7 @@ export default function ContactUs() {
     const subjectLabel = subject === "ad" ? "طلب نشر/تعديل إعلان عقاري" : subject === "service" ? "طلب خدمة صيانة" : "استفسار عام أو اقتراح";
     const waText = `🇸🇾 *رسالة تواصل جديدة عبر موقع لقطة*\n👤 *الاسم:* ${name}\n📞 *الهاتف:* ${phone || "غير محدد"}\n📌 *الموضوع:* ${subjectLabel}\n💬 *الرسالة:*\n${message}`;
     
-    window.open(getWhatsAppUrl(waText), "_blank");
+    void openExternalLink(getWhatsAppUrl(waText));
     setSent(true);
   };
 
@@ -72,11 +87,10 @@ export default function ContactUs() {
 
         {/* Contact Methods Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a
-            href={getWhatsAppUrl("مرحباً، أود الاستفسار عن منصة لقطة")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-3xl shadow-sm transition-all flex flex-col justify-between group"
+          <button
+            type="button"
+            onClick={() => void openExternalLink(getWhatsAppUrl("مرحباً، أود الاستفسار عن منصة لقطة"))}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-3xl shadow-sm transition-all flex flex-col justify-between group text-right"
           >
             <div className="space-y-2">
               <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -89,11 +103,12 @@ export default function ContactUs() {
               <span>تحدث معنا الآن</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
-          </a>
+          </button>
 
-          <a
-            href={`tel:${APP_CONFIG.adminPhone}`}
-            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group"
+          <button
+            type="button"
+            onClick={() => void openExternalLink(`tel:${APP_CONFIG.adminPhone}`)}
+            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group text-right"
           >
             <div className="space-y-2">
               <div className="w-12 h-12 bg-slate-100 text-slate-800 rounded-2xl flex items-center justify-center">
@@ -106,11 +121,12 @@ export default function ContactUs() {
               <span>اتصل الآن</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
-          </a>
+          </button>
 
-          <a
-            href={`mailto:${APP_CONFIG.supportEmail}`}
-            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group"
+          <button
+            type="button"
+            onClick={() => void openExternalLink(`mailto:${APP_CONFIG.supportEmail}`)}
+            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group text-right"
           >
             <div className="space-y-2">
               <div className="w-12 h-12 bg-slate-100 text-slate-800 rounded-2xl flex items-center justify-center">
@@ -123,7 +139,7 @@ export default function ContactUs() {
               <span>أرسل إيميل</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
-          </a>
+          </button>
         </div>
 
         {/* Message Form & FAQs */}

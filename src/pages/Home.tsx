@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { 
   ArrowLeft, Bell, Building2, Wrench, Sun, Droplets, Wind, Paintbrush,
   Hammer, Zap, ShieldCheck, Home as HomeIcon, MapPin, Store, Sparkles,
-  Factory, Landmark, Trees, Truck
+  Factory, Landmark, Trees, Truck, MessageSquare
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import PropertyCard from "../components/properties/PropertyCard";
@@ -332,6 +332,22 @@ export default function Home() {
             })}
           </div>
         </section>
+
+        <Link
+          to="/contact"
+          className="mb-8 flex items-center justify-between gap-4 rounded-3xl border border-brand-200 bg-brand-50 px-5 py-4 text-brand-900 transition-colors hover:bg-brand-100"
+        >
+          <span className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+              <MessageSquare className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-black">اتصل بنا</span>
+              <span className="block text-xs text-brand-700">فريق الدعم جاهز لمساعدتك</span>
+            </span>
+          </span>
+          <ArrowLeft className="h-5 w-5 shrink-0 text-brand-600" />
+        </Link>
 
         {/* Real Estate Highlights / What's New */}
         <section className="mb-8">
