@@ -103,6 +103,10 @@
   padding-top: env(safe-area-inset-top);
 }
 
+.ios-device .ios-header-actions {
+  transform: translateY(7px);
+}
+
 .ios-device nav.fixed {
   padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
 }

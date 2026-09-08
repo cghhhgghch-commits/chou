@@ -48,7 +48,7 @@ export default function Navbar() {
         </nav>
 
         {/* Actions (Responsive & Uncluttered) */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="ios-header-actions flex items-center gap-2 md:gap-3">
           {user ? (
             <div className="flex items-center gap-2">
               <Link 
