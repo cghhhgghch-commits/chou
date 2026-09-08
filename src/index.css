@@ -83,3 +83,26 @@
   }
 }
 .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* iOS zooms focused controls below 16px and can place fixed controls under the home indicator. */
+.ios-device input,
+.ios-device textarea,
+.ios-device select {
+  font-size: 16px !important;
+}
+
+.ios-device header a,
+.ios-device header button,
+.ios-device nav a,
+.ios-device nav button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ios-device header {
+  padding-top: env(safe-area-inset-top);
+}
+
+.ios-device nav.fixed {
+  padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
+}
