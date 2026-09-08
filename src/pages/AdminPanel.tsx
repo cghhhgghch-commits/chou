@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useAuth } from "../lib/AuthContext";
-import { db } from "../lib/firebase";
-import {
-  collection,
-  query,
-  getDocs,
-  deleteDoc,
-  doc,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { useAdmin } from "../lib/AdminContext";
+import { supabase } from "../lib/supabase";
 import {
   LayoutDashboard,
   LogOut,
@@ -39,7 +30,7 @@ interface PropertyListing {
 
 export default function AdminPanel() {
   const navigate = useNavigate();
-  const { signOut, isAdmin, user } = useAuth();
+  const { logoutAdmin, isAdmin, adminUser } = useAdmin();
   const [listings, setListings] = useState<PropertyListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<PropertyListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,12 +73,24 @@ export default function AdminPanel() {
   const fetchListings = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, "listings"));
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map((docSnapshot) => ({
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      }) as PropertyListing);
+      const { data: rows, error } = await supabase
+        .from("listings")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const data = (rows || []).map((row) => ({
+        id: row.id,
+        title: row.title || "",
+        category: row.category || "houses",
+        type: row.type || "sale",
+        city: row.city_id || "",
+        price: Number(row.price || 0),
+        area: Number(row.area || 0),
+        images: Array.isArray(row.images) ? row.images : [],
+        description: row.description || "",
+        createdAt: row.created_at,
+        userEmail: row.advertiser_email || row.email || "",
+      })) as PropertyListing[];
       setListings(data);
       setFilteredListings(data);
     } catch (error) {
@@ -124,7 +127,8 @@ export default function AdminPanel() {
   const handleDeleteListing = async (id: string) => {
     if (confirm("هل تريد حذف هذا الإعلان نهائياً؟")) {
       try {
-        await deleteDoc(doc(db, "listings", id));
+        const { error } = await supabase.from("listings").delete().eq("id", id);
+        if (error) throw error;
         setListings((current) => current.filter((item) => item.id !== id));
         alert("تم حذف الإعلان بنجاح");
       } catch (error) {
@@ -142,7 +146,8 @@ export default function AdminPanel() {
         .filter((item) => item.userEmail === "admin@system" || item.title.toLowerCase().includes("demo"))
         .map((item) => item.id);
 
-      await Promise.all(demoIds.map((id) => deleteDoc(doc(db, "listings", id))));
+      const { error } = await supabase.from("listings").delete().in("id", demoIds);
+      if (error) throw error;
       setListings((current) => current.filter((item) => !demoIds.includes(item.id)));
       alert(`تم حذف ${demoIds.length} إعلان تجريبي`);
     } catch (error) {
@@ -157,18 +162,38 @@ export default function AdminPanel() {
     try {
       const newListing = {
         ...formData,
-        createdAt: serverTimestamp(),
-        userEmail: user?.email || "admin@system",
+        created_at: new Date().toISOString(),
+        advertiser_name: adminUser?.email || "admin@system",
+        status: "active",
+        is_verified: true,
         images: [
           "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
         ],
         isVerified: true,
       };
 
-      const docRef = await addDoc(collection(db, "listings"), newListing);
+      const { data: insertedListing, error } = await supabase
+        .from("listings")
+        .insert({
+          title: newListing.title,
+          category: newListing.category,
+          type: newListing.type,
+          city_id: newListing.city,
+          price: newListing.price,
+          area: newListing.area,
+          description: newListing.description,
+          created_at: newListing.created_at,
+          advertiser_name: newListing.advertiser_name,
+          images: newListing.images,
+          status: newListing.status,
+          is_verified: newListing.is_verified,
+        })
+        .select("*")
+        .single();
+      if (error || !insertedListing) throw error || new Error("تعذر إنشاء الإعلان");
       setListings((current) => [
         {
-          id: docRef.id,
+          id: insertedListing.id,
           ...newListing,
           createdAt: new Date(),
         },
@@ -208,7 +233,7 @@ export default function AdminPanel() {
 
           <button
             onClick={async () => {
-              await signOut();
+              await logoutAdmin();
               navigate("/");
             }}
             className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl transition-colors"
