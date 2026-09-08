@@ -435,7 +435,7 @@ export default function AdminDashboard2() {
         images: safeImages.length ? safeImages : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
         videos: (formData.videos || []).filter(Boolean),
         status: "active",
-        user_id: adminUser?.uid || null,
+        user_id: adminUser?.id || null,
         updated_at: new Date().toISOString(),
       };
 
