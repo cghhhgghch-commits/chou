@@ -19,32 +19,39 @@ const LEGACY_DAILY_NOTIFICATION_ID = 7001;
 export const setupPushNotificationListeners = async () => {
   if (!Capacitor.isNativePlatform()) return;
 
-  const permission = await LocalNotifications.requestPermissions();
-  if (permission.display !== 'granted') return;
+  try {
+    const permission = await LocalNotifications.requestPermissions();
+    if (permission.display !== 'granted') return;
 
-  await LocalNotifications.cancel({ notifications: [{ id: LEGACY_DAILY_NOTIFICATION_ID }] });
+    await LocalNotifications.cancel({ notifications: [{ id: LEGACY_DAILY_NOTIFICATION_ID }] });
 
-  await LocalNotifications.createChannel({
-    id: 'laqta_default',
-    name: 'إشعارات لقطة',
-    description: 'إعلانات وتنبيهات تطبيق لقطة',
-    importance: 4,
-    visibility: 1,
-    sound: 'default',
-  });
-  await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
-    await LocalNotifications.schedule({
-      notifications: [{
-        id: Date.now() % 2147483647,
-        title: notification.title || 'لقطة',
-        body: notification.body || 'لديك تنبيه جديد من لقطة.',
-        channelId: 'laqta_default',
-        largeIcon: 'ic_launcher',
-        summaryText: 'إشعارات تطبيق لقطة',
+    if (Capacitor.getPlatform() === 'android') {
+      await LocalNotifications.createChannel({
+        id: 'laqta_default',
+        name: 'إشعارات لقطة',
+        description: 'إعلانات وتنبيهات تطبيق لقطة',
+        importance: 4,
+        visibility: 1,
         sound: 'default',
-      }],
+      });
+    }
+
+    await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: Date.now() % 2147483647,
+          title: notification.title || 'لقطة',
+          body: notification.body || 'لديك تنبيه جديد من لقطة.',
+          channelId: Capacitor.getPlatform() === 'android' ? 'laqta_default' : undefined,
+          largeIcon: 'ic_launcher',
+          summaryText: 'إشعارات تطبيق لقطة',
+          sound: 'default',
+        }],
+      });
     });
-  });
+  } catch (error) {
+    console.warn('Push notification setup skipped:', error);
+  }
 };
 
 const getOrCreateDeviceId = () => {
