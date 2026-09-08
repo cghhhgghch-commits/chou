@@ -27,7 +27,7 @@ export default function Footer() {
               <h4 className="text-slate-900 mb-2 font-bold text-xs md:text-[11px]">الدعم</h4>
               <ul className="flex flex-col gap-1.5">
                 <li><Link to="/help" className="hover:text-brand-500 transition-colors">مركز المساعدة</Link></li>
-                <li><a href="mailto:laqtasyr1@gmail.com" className="hover:text-brand-500 transition-colors">اتصل بنا</a></li>
+                <li><Link to="/contact" className="hover:text-brand-500 transition-colors">اتصل بنا</Link></li>
               </ul>
             </div>
           </div>
