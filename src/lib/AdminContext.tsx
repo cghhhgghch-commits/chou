@@ -1,17 +1,17 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User } from "firebase/auth";
-import { auth, db } from "./firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { supabase } from "./supabase";
+
+type AuthUser = { id: string; email?: string | null; user_metadata?: Record<string, unknown> };
 
 interface AdminContextType {
-  adminUser: User | null;
+  adminUser: AuthUser | null;
   adminEmail: string | null;
   isAdmin: boolean;
   isLoading: boolean;
   loginAdmin: (email: string, password: string) => Promise<void>;
-  activateAdminSession: (user: User) => Promise<void>;
+  activateAdminSession: (user: AuthUser) => Promise<void>;
   logoutAdmin: () => Promise<void>;
-  checkAdmin: (user: User) => Promise<boolean>;
+  checkAdmin: (user: AuthUser) => Promise<boolean>;
 }
 
 const ADMIN_CONFIG = {
@@ -40,7 +40,7 @@ const isSessionValid = (session: any) => {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [adminUser, setAdminUser] = useState<User | null>(null);
+  const [adminUser, setAdminUser] = useState<AuthUser | null>(null);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,8 +54,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
 
     const adminData = {
+      id: "admin-user-" + Date.now(),
       email: ADMIN_CONFIG.email,
-      uid: "admin-user-" + Date.now(),
       displayName: "مسؤول النظام",
       isAdmin: true,
       expiresAt: Date.now() + ADMIN_SESSION_TTL,
@@ -67,6 +67,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
     const sessionPayload = {
       email: ADMIN_CONFIG.email,
+      userId: adminData.id,
       isAdmin: true,
       loginTime: new Date().toISOString(),
       expiresAt: Date.now() + ADMIN_SESSION_TTL,
@@ -82,18 +83,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
     clearAdminSessions();
 
-    if (auth.currentUser) {
-      await auth.signOut();
-    }
+    await supabase.auth.signOut();
   };
 
-  const activateAdminSession = async (user: User) => {
+  const activateAdminSession = async (user: AuthUser) => {
     setAdminUser(user);
     setAdminEmail(user.email || ADMIN_CONFIG.email);
     setIsAdmin(true);
 
     const sessionPayload = {
       email: user.email || ADMIN_CONFIG.email,
+      userId: user.id,
       isAdmin: true,
       loginTime: new Date().toISOString(),
       expiresAt: Date.now() + ADMIN_SESSION_TTL,
@@ -103,10 +103,15 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(LEGACY_ADMIN_SESSION_KEY, JSON.stringify(sessionPayload));
   };
 
-  const checkAdmin = async (user: User): Promise<boolean> => {
+  const checkAdmin = async (user: AuthUser): Promise<boolean> => {
     try {
-      const adminDoc = await getDoc(doc(db, "admins", user.uid));
-      return adminDoc.exists() && adminDoc.data()?.isAdmin === true;
+      const { data, error } = await supabase
+        .from("admins")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("is_admin", true)
+        .maybeSingle();
+      return !error && Boolean(data);
     } catch {
       return false;
     }
@@ -122,7 +127,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         if (isSessionValid(session)) {
           setAdminEmail(session.email);
           setIsAdmin(true);
-          setAdminUser({ email: session.email, uid: "admin-user-" + Date.now(), isAdmin: true } as any);
+          setAdminUser({ id: session.userId || "admin-session", email: session.email } as AuthUser);
         } else {
           clearAdminSessions();
         }
