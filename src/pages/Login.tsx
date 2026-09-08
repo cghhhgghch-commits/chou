@@ -218,6 +218,8 @@ export default function Login() {
         setError("كلمة المرور ضعيفة. استخدم 6 أحرف على الأقل.");
       } else if (normalizedMessage.includes("rate limit") || normalizedMessage.includes("over_email_send_rate_limit")) {
         setError("تم تجاوز حد إرسال رسائل التأكيد. انتظر قليلًا ثم حاول مرة أخرى.");
+      } else if (normalizedMessage.includes("sending confirmation email")) {
+        setError("تم إنشاء الطلب، لكن تعذر إرسال رسالة التأكيد. تحقق من بيانات SMTP في Supabase ثم حاول مرة أخرى.");
       } else if (normalizedMessage.includes("email") || normalizedMessage.includes("provider")) {
         setError("رفضت خدمة Supabase التسجيل بهذا البريد. تأكد من تفعيل Email Auth وإعداد مزود البريد في لوحة Supabase.");
       } else {
