@@ -20,12 +20,14 @@ export const setupPushNotificationListeners = async () => {
   if (!Capacitor.isNativePlatform()) return;
 
   try {
-    const permission = await LocalNotifications.requestPermissions();
-    if (permission.display !== 'granted') return;
+    const platform = Capacitor.getPlatform();
 
-    await LocalNotifications.cancel({ notifications: [{ id: LEGACY_DAILY_NOTIFICATION_ID }] });
+    if (platform === 'android') {
+      const permission = await LocalNotifications.requestPermissions();
+      if (permission.display !== 'granted') return;
 
-    if (Capacitor.getPlatform() === 'android') {
+      await LocalNotifications.cancel({ notifications: [{ id: LEGACY_DAILY_NOTIFICATION_ID }] });
+
       await LocalNotifications.createChannel({
         id: 'laqta_default',
         name: 'إشعارات لقطة',
@@ -41,17 +43,22 @@ export const setupPushNotificationListeners = async () => {
       const title = nativePayload?.title || nativePayload?.body || 'لقطة';
       const body = nativePayload?.body || nativePayload?.message || 'لديك تنبيه جديد من لقطة.';
 
-      await LocalNotifications.schedule({
-        notifications: [{
-          id: Date.now() % 2147483647,
-          title: String(title || 'لقطة'),
-          body: String(body || 'لديك تنبيه جديد من لقطة.'),
-          channelId: Capacitor.getPlatform() === 'android' ? 'laqta_default' : undefined,
-          largeIcon: 'ic_launcher',
-          summaryText: 'إشعارات تطبيق لقطة',
-          sound: 'default',
-        }],
-      });
+      if (platform === 'android') {
+        await LocalNotifications.schedule({
+          notifications: [{
+            id: Date.now() % 2147483647,
+            title: String(title || 'لقطة'),
+            body: String(body || 'لديك تنبيه جديد من لقطة.'),
+            channelId: 'laqta_default',
+            largeIcon: 'ic_launcher',
+            summaryText: 'إشعارات تطبيق لقطة',
+            sound: 'default',
+          }],
+        });
+        return;
+      }
+
+      console.info('iOS push notification received:', title, body);
     });
   } catch (error) {
     console.warn('Push notification setup skipped:', error);

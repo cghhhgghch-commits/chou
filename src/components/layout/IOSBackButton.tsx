@@ -1,21 +1,60 @@
 import { ArrowRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
+import { resolveIOSBackTarget } from "./iosBackNavigation";
+import { useEffect } from "react";
 
 export default function IOSBackButton() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios") {
+      return undefined;
+    }
+
+    const listener = App.addListener("backButton", () => {
+      const target = resolveIOSBackTarget(location.pathname, window.history.length, document.referrer ? new URL(document.referrer).pathname : null);
+
+      if (target === "back") {
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+        navigate("/", { replace: true });
+        return;
+      }
+
+      navigate(target, { replace: true });
+    });
+
+    return () => {
+      void listener.then((subscription) => subscription.remove());
+    };
+  }, [location.pathname, navigate]);
 
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios" || location.pathname === "/") {
     return null;
   }
 
   const goBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
+    const target = resolveIOSBackTarget(
+      location.pathname,
+      window.history.length,
+      document.referrer ? new URL(document.referrer).pathname : null,
+    );
+
+    if (target === "back") {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+      navigate("/", { replace: true });
       return;
     }
-    navigate("/", { replace: true });
+
+    navigate(target, { replace: true });
   };
 
   return (
