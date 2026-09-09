@@ -63,6 +63,42 @@ const getFcmAccessToken = async (serviceAccount: { client_email: string; private
   return tokenData.access_token as string;
 };
 
+const buildFcmMessageForToken = (token: string, platform: string, title: string, message: string) => {
+  const baseMessage = {
+    token,
+    notification: { title, body: message },
+    data: { type: 'admin_announcement' },
+  };
+
+  if (platform === 'ios') {
+    return {
+      ...baseMessage,
+      apns: {
+        headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
+        payload: {
+          aps: {
+            alert: { title, body: message },
+            sound: 'default',
+            badge: 1,
+            'content-available': 1,
+          },
+        },
+      },
+    };
+  }
+
+  return {
+    ...baseMessage,
+    android: {
+      priority: 'high',
+      notification: {
+        channel_id: 'laqta_default',
+        sound: 'default',
+      },
+    },
+  };
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -113,7 +149,7 @@ serve(async (req) => {
     });
     const data = { type: 'admin_announcement' };
 
-    const tokenQuery = 'select=token&is_active=eq.true';
+    const tokenQuery = 'select=token,platform&is_active=eq.true';
     const tokenResponse = await fetch(`${supabaseUrl}/rest/v1/fcm_tokens?${tokenQuery}`, {
       headers: {
         apikey: serviceRoleKey,
@@ -122,9 +158,15 @@ serve(async (req) => {
     });
 
     const tokenRows = await tokenResponse.json();
-    const tokens = [...new Set((Array.isArray(tokenRows) ? tokenRows : []).map((row) => row.token).filter(Boolean))];
+    const uniqueTokens = Array.isArray(tokenRows) ? tokenRows : [];
+    const payloads = uniqueTokens
+      .map((row) => ({
+        token: typeof row.token === 'string' ? row.token.trim() : '',
+        platform: typeof row.platform === 'string' ? row.platform.toLowerCase() : 'android',
+      }))
+      .filter((row) => row.token);
 
-    if (!tokens.length) {
+    if (!payloads.length) {
       return new Response(JSON.stringify({ sent: 0, message: 'No tokens found' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -132,17 +174,12 @@ serve(async (req) => {
     }
 
     const results: Array<{ token: string; status: number; payload: unknown }> = [];
-    for (const token of tokens) {
+    for (const { token, platform } of payloads) {
       const response = await fetch(`https://fcm.googleapis.com/v1/projects/${encodeURIComponent(serviceAccount.project_id)}/messages:send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({
-          message: {
-            token,
-            notification: { title, body: message },
-            data,
-            android: { priority: 'high', notification: { channel_id: 'laqta_default' } },
-          },
+          message: buildFcmMessageForToken(token, platform, title, message),
         }),
       });
       results.push({ token, status: response.status, payload: await response.json() });

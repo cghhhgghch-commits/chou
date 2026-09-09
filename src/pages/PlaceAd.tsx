@@ -349,17 +349,20 @@ export default function PlaceAd() {
       .from("whatsapp_leads")
       .select("order_number")
       .not("order_number", "is", null)
-      .order("order_number", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order("order_number", { ascending: true });
 
     if (error) {
       console.warn("Could not read next WhatsApp order number:", error);
       return 1;
     }
 
-    if (!data?.order_number) return 1;
-    return Number(data.order_number) + 1;
+    const rows = Array.isArray(data) ? data : [];
+    const lastOrder = rows.reduce((highest, row) => {
+      const current = Number(row.order_number);
+      return Number.isFinite(current) ? Math.max(highest, current) : highest;
+    }, 0);
+
+    return lastOrder ? lastOrder + 1 : 1;
   };
 
   const buildWhatsAppMessage = (
@@ -841,7 +844,6 @@ ${imageSection}
                   type="file" 
                   multiple 
                   accept="image/jpeg,image/png,image/webp,image/heic"
-                  capture="environment"
                   onChange={handleImageChange}
                   className="hidden"
                 />
