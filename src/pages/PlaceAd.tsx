@@ -349,7 +349,8 @@ export default function PlaceAd() {
       .from("whatsapp_leads")
       .select("order_number")
       .not("order_number", "is", null)
-      .order("order_number", { ascending: true });
+      .order("order_number", { ascending: false })
+      .limit(1);
 
     if (error) {
       console.warn("Could not read next WhatsApp order number:", error);
@@ -357,17 +358,16 @@ export default function PlaceAd() {
     }
 
     const rows = Array.isArray(data) ? data : [];
-    const lastOrder = rows.reduce((highest, row) => {
-      const current = Number(row.order_number);
-      return Number.isFinite(current) ? Math.max(highest, current) : highest;
-    }, 0);
+    if (rows.length === 0) return 1;
 
-    return lastOrder ? lastOrder + 1 : 1;
+    const latestOrder = Number(rows[0]?.order_number);
+    return Number.isFinite(latestOrder) ? latestOrder + 1 : 1;
   };
 
   const buildWhatsAppMessage = (
     imageUrls: string[] = previewUrls.filter((url) => url.startsWith("http")),
-    orderNumber = 1
+    orderNumber = 1,
+    listingUrl?: string
   ) => {
     const catObj = SYRIAN_CATEGORIES.find(c => c.id === selectedCategory);
     const catLabel = catObj?.label || selectedCategory;
@@ -375,7 +375,15 @@ export default function PlaceAd() {
     const advRole = advertiserType === 'owner' ? 'المالك المباشر' : advertiserType === 'agency' ? 'مكتب عقاري معتمد' : 'وسيط عقاري';
     const categorySpecificSummary = buildCategorySpecificSummary();
     const orderRef = `ORD-${String(orderNumber).padStart(4, '0')}`;
-    
+    const propertyFeatures = [
+      selectedAmenities.includes("بئر ماء ارتوازي عذب") ? 'بئر ماء' : null,
+      selectedAmenities.includes("مصعد حديث شغال") ? 'مصعد' : null,
+      selectedAmenities.includes("مولدة كهرباء / خط أمبير") ? 'مولدة' : null,
+      selectedAmenities.includes("منظومة طاقة شمسية وإنفيرتر") ? 'طاقة شمسية' : null,
+      ...(selectedAmenities || [])
+    ].filter(Boolean) as string[];
+    const resolvedListingUrl = listingUrl || (typeof window !== 'undefined' ? `${window.location.origin}/property/${editingId || 'preview'}` : "غير متوفر");
+
     const imageSection = imageUrls.length > 0
       ? imageUrls.map((url, index) => `📷 *رابط الصورة ${index + 1}:* ${url}`).join("\n")
       : "📷 لا توجد صور مرفقة";
@@ -394,8 +402,8 @@ export default function PlaceAd() {
 🧭 *الاتجاه والواجهة:* ${direction}
 🎨 *مستوى الإكساء:* ${finishing} (${furnishing})
 ${categorySpecificSummary}
-✨ *المميزات والخدمات المتاحة:*
-${selectedAmenities.map(a => `  • ${a}`).join('\n') || "  • لا توجد ميزات إضافية"}
+✨ *المزايا والميزات المتاحة:*
+${propertyFeatures.length > 0 ? propertyFeatures.map(a => `  • ${a}`).join('\n') : "  • لا توجد ميزات إضافية"}
 
 📝 *التفاصيل والوصف الشامل:*
 ${description || "يرجى التواصل لمعرفة باقي التفاصيل."}
@@ -403,6 +411,7 @@ ${description || "يرجى التواصل لمعرفة باقي التفاصيل
 👤 *صفة المعلن:* ${advRole} (${advertiserName})
 📞 *هاتف الاتصال:* ${phone}
 💬 *رقم الواتساب:* ${whatsapp || phone}
+🔗 *رابط الإعلان:* ${resolvedListingUrl}
 📸 *صور العقار المرفقة:*
 ${imageSection}
 ━━━━━━━━━━━━━━━━━━━━
@@ -595,7 +604,9 @@ ${imageSection}
       }
 
       const orderNumber = await getNextWhatsAppOrderNumber();
-      const whatsappMessage = buildWhatsAppMessage(finalImageUrls, orderNumber);
+      const listingUrl = createdId ? `${window.location.origin}/property/${createdId}` : `${window.location.origin}/property/${crypto.randomUUID()}`;
+      const whatsappMessage = buildWhatsAppMessage(finalImageUrls, orderNumber, listingUrl);
+
       try {
         const { error: leadError } = await supabase.from("whatsapp_leads").insert({
           message: whatsappMessage,
@@ -610,14 +621,17 @@ ${imageSection}
             area,
             category: selectedCategory,
             description: description.trim(),
+            listing_url: listingUrl,
           },
         });
-        if (leadError) console.warn("Could not save admin notification:", leadError);
+
+        if (leadError) {
+          console.warn("Could not save admin notification:", leadError);
+        }
       } catch (leadError) {
         console.warn("Admin notification table is unavailable:", leadError);
       }
 
-      // Construct WhatsApp link
       const waUrl = getWhatsAppUrl(whatsappMessage);
       setGeneratedWhatsAppUrl(waUrl);
       setShowSuccessModal(true);

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 export default function IOSBackButton() {
   const location = useLocation();
   const navigate = useNavigate();
+  const hiddenPaths = new Set(["/", "/login", "/register", "/forgot-password", "/admin/login"]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios") {
@@ -34,7 +35,7 @@ export default function IOSBackButton() {
     };
   }, [location.pathname, navigate]);
 
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios" || location.pathname === "/") {
+  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== "ios" || hiddenPaths.has(location.pathname)) {
     return null;
   }
 
