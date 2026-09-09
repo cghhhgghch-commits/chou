@@ -344,12 +344,34 @@ export default function PlaceAd() {
     }
   };
 
-  const buildWhatsAppMessage = (imageUrls: string[] = previewUrls.filter((url) => url.startsWith("http"))) => {
+  const getNextWhatsAppOrderNumber = async () => {
+    const { data, error } = await supabase
+      .from("whatsapp_leads")
+      .select("order_number")
+      .not("order_number", "is", null)
+      .order("order_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Could not read next WhatsApp order number:", error);
+      return 1;
+    }
+
+    if (!data?.order_number) return 1;
+    return Number(data.order_number) + 1;
+  };
+
+  const buildWhatsAppMessage = (
+    imageUrls: string[] = previewUrls.filter((url) => url.startsWith("http")),
+    orderNumber = 1
+  ) => {
     const catObj = SYRIAN_CATEGORIES.find(c => c.id === selectedCategory);
     const catLabel = catObj?.label || selectedCategory;
     const dealLabel = dealType === 'sale' ? 'بيع قطعي' : dealType === 'rent' ? `إيجار (${pricePeriod})` : 'على العظم / استثمار';
     const advRole = advertiserType === 'owner' ? 'المالك المباشر' : advertiserType === 'agency' ? 'مكتب عقاري معتمد' : 'وسيط عقاري';
     const categorySpecificSummary = buildCategorySpecificSummary();
+    const orderRef = `ORD-${String(orderNumber).padStart(4, '0')}`;
     
     const imageSection = imageUrls.length > 0
       ? imageUrls.map((url, index) => `📷 *رابط الصورة ${index + 1}:* ${url}`).join("\n")
@@ -357,6 +379,7 @@ export default function PlaceAd() {
 
     return `🇸🇾 *طلب نشر وتوثيق إعلان عقاري جديد على تطبيق لقطة*
 ━━━━━━━━━━━━━━━━━━━━
+📦 *رقم الطلب:* ${orderRef}
 🏠 *عنوان الإعلان:* ${title}
 📍 *المحافظة والمنطقة:* ${cityId} - ${areaName || "غير محدد"}
 🏷️ *القسم الرئيسي:* ${catLabel} (${catObj?.subtitle || ""})
@@ -568,12 +591,16 @@ ${imageSection}
         return;
       }
 
-      const whatsappMessage = buildWhatsAppMessage(finalImageUrls);
+      const orderNumber = await getNextWhatsAppOrderNumber();
+      const whatsappMessage = buildWhatsAppMessage(finalImageUrls, orderNumber);
       try {
         const { error: leadError } = await supabase.from("whatsapp_leads").insert({
           message: whatsappMessage,
+          order_number: orderNumber,
           status: "pending",
           parsed_data: {
+            order_number: orderNumber,
+            order_reference: `ORD-${String(orderNumber).padStart(4, '0')}`,
             title: title.trim(),
             city: cityId,
             price,

@@ -36,12 +36,16 @@ export const setupPushNotificationListeners = async () => {
       });
     }
 
-    await PushNotifications.addListener('pushNotificationReceived', async (notification) => {
+    await PushNotifications.addListener('pushNotificationReceived', async (event) => {
+      const nativePayload = (event as any)?.notification ?? event ?? {};
+      const title = nativePayload?.title || nativePayload?.body || 'لقطة';
+      const body = nativePayload?.body || nativePayload?.message || 'لديك تنبيه جديد من لقطة.';
+
       await LocalNotifications.schedule({
         notifications: [{
           id: Date.now() % 2147483647,
-          title: notification.title || 'لقطة',
-          body: notification.body || 'لديك تنبيه جديد من لقطة.',
+          title: String(title || 'لقطة'),
+          body: String(body || 'لديك تنبيه جديد من لقطة.'),
           channelId: Capacitor.getPlatform() === 'android' ? 'laqta_default' : undefined,
           largeIcon: 'ic_launcher',
           summaryText: 'إشعارات تطبيق لقطة',

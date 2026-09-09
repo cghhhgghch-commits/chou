@@ -93,11 +93,30 @@ alter table public.conversation_messages add column if not exists attachment_typ
 -- Pending listing submissions for the admin review queue
 create table if not exists public.whatsapp_leads (
   id uuid primary key default gen_random_uuid(),
+  order_number bigint,
   message text not null,
   status text default 'pending',
   parsed_data jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
+
+alter table public.whatsapp_leads add column if not exists order_number bigint;
+create sequence if not exists public.whatsapp_leads_order_number_seq;
+alter table public.whatsapp_leads alter column order_number set default nextval('public.whatsapp_leads_order_number_seq');
+
+with numbered as (
+  select id,
+         row_number() over (order by created_at asc, id asc) as rn
+  from public.whatsapp_leads
+  where order_number is null
+)
+update public.whatsapp_leads w
+set order_number = n.rn
+from numbered n
+where w.id = n.id;
+
+alter table public.whatsapp_leads alter column order_number set not null;
+create unique index if not exists whatsapp_leads_order_number_idx on public.whatsapp_leads(order_number);
 
 insert into storage.buckets (id, name, public)
 values ('listing-media', 'listing-media', true)
