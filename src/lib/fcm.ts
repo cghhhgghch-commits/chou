@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { PushNotifications } from '@capacitor/push-notifications';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 import { supabase } from './supabase';
 
 export type FcmPlatform = 'android' | 'ios' | 'web';
@@ -38,7 +38,7 @@ export const setupPushNotificationListeners = async () => {
       });
     }
 
-    await PushNotifications.addListener('pushNotificationReceived', async (event) => {
+    await FirebaseMessaging.addListener('notificationReceived', async (event) => {
       const nativePayload = (event as any)?.notification ?? event ?? {};
       const title = nativePayload?.title || nativePayload?.body || 'لقطة';
       const body = nativePayload?.body || nativePayload?.message || 'لديك تنبيه جديد من لقطة.';
@@ -119,28 +119,14 @@ export const syncNativePushToken = async (userId?: string) => {
   }
 
   try {
-    const permission = await PushNotifications.requestPermissions();
+    const permission = await FirebaseMessaging.requestPermissions();
     if (permission.receive !== 'granted') {
       console.warn('Push permission denied by user; skipping push registration.');
       return null;
     }
 
-    let registrationListener: { remove: () => Promise<void> } | null = null;
-    let registrationErrorListener: { remove: () => Promise<void> } | null = null;
-    const tokenPromise = new Promise<string>((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error('FCM registration timeout')), 15000);
-      void PushNotifications.addListener('registration', ({ value }) => {
-        window.clearTimeout(timeout);
-        resolve(value);
-      }).then((listener) => { registrationListener = listener; });
-      void PushNotifications.addListener('registrationError', (error) => {
-        window.clearTimeout(timeout);
-        reject(new Error(error.error || 'FCM registration failed'));
-      }).then((listener) => { registrationErrorListener = listener; });
-    });
-
-    await PushNotifications.register();
-    const tokenValue = await tokenPromise;
+    const { token: tokenValue } = await FirebaseMessaging.getToken();
+    if (!tokenValue) throw new Error('Firebase returned an empty FCM token');
 
     const result = await registerFcmToken({
       token: tokenValue,
@@ -150,8 +136,6 @@ export const syncNativePushToken = async (userId?: string) => {
       user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : `${Capacitor.getPlatform()}-capacitor`,
     });
 
-    await registrationListener?.remove();
-    await registrationErrorListener?.remove();
     return result;
   } catch (error) {
     console.error('Failed to sync native push token:', error);

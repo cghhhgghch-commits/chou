@@ -18,18 +18,27 @@
 هذا التطبيق يعمل حاليًا على Supabase كخادم بيانات رئيسي، وليس على Firebase كقاعدة بيانات. لذلك يكون الحل الأكثر أمانًا والأقل تعقيدًا ما يلي:
 
 - Supabase: البيانات والملفات والأمان
-- Firebase Cloud Messaging (اختياري لاحقًا): push notifications للهواتف
+- Firebase Cloud Messaging: push notifications للهواتف عبر `@capacitor-firebase/messaging`
 - Notification context داخل التطبيق: إشعارات داخل التطبيق والربط بالصفحات
 
-## متى يتم استخدام FCM
+## إعداد iOS الضروري
 
-إذا أردت push notifications على Android/ويب الحقيقي، فيجب تنفيذ:
+لكي تصل الإشعارات إلى iPhone، يجب تنفيذ الخطوات التالية في Firebase وApple:
 
-1. إعداد Firebase project
-2. ربطه بAndroid app
-3. تفعيل FCM
-4. إرسال token إلى Supabase أو backend
-5. إرسال push عبر Cloud Function أو Edge Function
+1. إضافة تطبيق iOS في Firebase بنفس Bundle ID: `com.laqta.syria`.
+2. التأكد من أن `GoogleService-Info.plist` هو ملف مشروع Firebase الصحيح وموجود ضمن Target Membership في Xcode.
+3. إنشاء APNs Authentication Key من Apple Developer مع صلاحية Push Notifications، ثم رفعه في Firebase Console ضمن Project Settings > Cloud Messaging.
+4. تفعيل Push Notifications وBackground Modes > Remote notifications في Xcode، والتأكد من أن provisioning profile يطابق Bundle ID.
+5. تثبيت التطبيق على جهاز حقيقي؛ محاكي iOS لا يستقبل push notifications.
+
+التطبيق يسجل FCM token الحقيقي من Firebase على iOS وAndroid ثم يحفظه في جدول `fcm_tokens`. لا تستخدم APNs device token مباشرة مع Firebase HTTP v1.
+
+## إرسال الإشعارات
+
+1. إعداد Firebase project وربط تطبيق Android وiOS.
+2. ضبط Secrets الخاصة بـ Supabase Edge Function: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, و`FIREBASE_SERVICE_ACCOUNT_JSON`.
+3. نشر `supabase/functions/send-push-notification`.
+4. إرسال token إلى Supabase ثم الإرسال عبر Edge Function.
 
 ## ملاحظات الأمان
 
