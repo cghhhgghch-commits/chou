@@ -331,18 +331,8 @@ export default function AdminDashboard2() {
 
     setIsSendingNotification(true);
     try {
-      let { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-      if (!sessionData.session) throw new Error("Invalid session");
-
-      const refreshedSession = await supabase.auth.refreshSession();
-      if (!refreshedSession.error && refreshedSession.data.session) {
-        sessionData = refreshedSession.data;
-      }
-
       const { data, error } = await supabase.functions.invoke("send-push-notification", {
         body: { title, message },
-        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
       });
       if (error) throw error;
 
@@ -354,16 +344,7 @@ export default function AdminDashboard2() {
         : "تم قبول الإشعار، لكن لا توجد أجهزة مسجلة حالياً لاستلامه");
     } catch (error) {
       console.error("Failed to send admin notification:", error);
-      let detail = error instanceof Error ? error.message : "تحقق من إعدادات Firebase وSupabase Edge Function.";
-      const response = (error as { context?: Response })?.context;
-      if (response) {
-        try {
-          const payload = await response.clone().json() as { error?: string; errors?: Array<{ message?: string }> };
-          detail = payload.errors?.[0]?.message || payload.error || detail;
-        } catch {
-          // Keep the original error when the function response is not JSON.
-        }
-      }
+      const detail = error instanceof Error ? error.message : "تحقق من إعدادات Firebase وSupabase Edge Function.";
       alert(`تعذر إرسال الإشعار: ${detail}`);
     } finally {
       setIsSendingNotification(false);
