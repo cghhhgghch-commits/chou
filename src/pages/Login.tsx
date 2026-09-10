@@ -7,9 +7,7 @@ import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
-const nativeAuthCallbackUrl = Capacitor.getPlatform() === "android"
-  ? "com.laqta.realestate://auth/callback"
-  : "com.laqta.syria://auth/callback";
+const nativeAuthCallbackUrl = "com.laqta.syria://auth/callback";
 
 export default function Login() {
   const location = useLocation();

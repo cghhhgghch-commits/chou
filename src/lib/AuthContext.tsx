@@ -6,7 +6,6 @@ import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
 const nativeAuthCallbackPrefixes = [
-  "com.laqta.realestate://auth/callback",
   "com.laqta.syria://auth/callback",
 ];
 
