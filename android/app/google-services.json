@@ -10,6 +10,25 @@
       "client_info": {
         "mobilesdk_app_id": "1:726058413198:android:0942701d71f508e4fcaddf",
         "android_client_info": {
+          "package_name": "com.laqta.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Cpbrb_3n_owq5w19Rz29wLk5coj90c4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726058413198:android:da9980c5221c2292fcaddf",
+        "android_client_info": {
           "package_name": "com.laqta.realestate"
         }
       },
