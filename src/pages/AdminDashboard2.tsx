@@ -331,8 +331,18 @@ export default function AdminDashboard2() {
 
     setIsSendingNotification(true);
     try {
+      let { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!sessionData.session) throw new Error("Invalid session");
+
+      const refreshedSession = await supabase.auth.refreshSession();
+      if (!refreshedSession.error && refreshedSession.data.session) {
+        sessionData = refreshedSession.data;
+      }
+
       const { data, error } = await supabase.functions.invoke("send-push-notification", {
         body: { title, message },
+        headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
       });
       if (error) throw error;
 
