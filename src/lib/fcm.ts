@@ -126,6 +126,7 @@ export const syncNativePushToken = async (userId?: string) => {
   }
 
   try {
+    const platform = Capacitor.getPlatform();
     let tokenListener: { remove: () => Promise<void> } | null = null;
     const tokenReceivedPromise = new Promise<string>((resolve) => {
       void FirebaseMessaging.addListener('tokenReceived', ({ token }) => resolve(token))
@@ -139,7 +140,7 @@ export const syncNativePushToken = async (userId?: string) => {
       return null;
     }
 
-    let tokenValue = typeof window !== 'undefined'
+    let tokenValue = platform === 'android' && typeof window !== 'undefined'
       ? window.localStorage.getItem(TOKEN_STORAGE_KEY) || ''
       : '';
     for (let attempt = 0; attempt < 3 && !tokenValue; attempt += 1) {
