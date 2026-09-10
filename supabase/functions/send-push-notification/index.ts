@@ -187,7 +187,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       sent: results.filter((result) => result.status >= 200 && result.status < 300).length,
-      attempted: tokens.length,
+      attempted: payloads.length,
       failed: results.filter((result) => result.status < 200 || result.status >= 300).length,
     }), {
       status: results.some((result) => result.status >= 200 && result.status < 300) ? 200 : 400,
