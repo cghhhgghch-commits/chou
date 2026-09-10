@@ -139,9 +139,7 @@ export const syncNativePushToken = async (userId?: string) => {
       return null;
     }
 
-    let tokenValue = typeof window !== 'undefined'
-      ? window.localStorage.getItem(TOKEN_STORAGE_KEY) || ''
-      : '';
+    let tokenValue = '';
     for (let attempt = 0; attempt < 3 && !tokenValue; attempt += 1) {
       try {
         const result = await FirebaseMessaging.getToken();
@@ -150,6 +148,10 @@ export const syncNativePushToken = async (userId?: string) => {
         if (attempt === 2) throw error;
         await new Promise((resolve) => window.setTimeout(resolve, 1500));
       }
+    }
+
+    if (!tokenValue && typeof window !== 'undefined') {
+      tokenValue = window.localStorage.getItem(TOKEN_STORAGE_KEY) || '';
     }
 
     if (!tokenValue) {
