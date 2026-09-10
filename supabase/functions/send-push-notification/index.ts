@@ -74,11 +74,7 @@ const buildFcmMessageForToken = (token: string, platform: string, title: string,
     return {
       ...baseMessage,
       apns: {
-        headers: {
-          'apns-priority': '10',
-          'apns-push-type': 'alert',
-          'apns-topic': 'com.laqta.syria',
-        },
+        headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
         payload: {
           aps: {
             alert: { title, body: message },
@@ -191,7 +187,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       sent: results.filter((result) => result.status >= 200 && result.status < 300).length,
-      attempted: payloads.length,
+      attempted: tokens.length,
       failed: results.filter((result) => result.status < 200 || result.status >= 300).length,
     }), {
       status: results.some((result) => result.status >= 200 && result.status < 300) ? 200 : 400,
