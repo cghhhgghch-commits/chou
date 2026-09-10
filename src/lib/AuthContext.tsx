@@ -122,27 +122,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
+    const handleNativeAuthCallback = async (url: string) => {
+      if (!nativeAuthCallbackPrefixes.some((prefix) => url.startsWith(prefix))) return;
+
+      const callbackUrl = new URL(url);
+      const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+      const code = callbackUrl.searchParams.get("code");
+
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (error) throw error;
+      } else if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+      }
+
+      await Browser.close();
+      window.history.replaceState({}, document.title, "/");
+    };
+
     const urlListener = Capacitor.isNativePlatform()
-      ? App.addListener("appUrlOpen", async ({ url }) => {
-          if (!nativeAuthCallbackPrefixes.some((prefix) => url.startsWith(prefix))) return;
-
-          const callbackUrl = new URL(url);
-          const hashParams = new URLSearchParams(callbackUrl.hash.slice(1));
-          const accessToken = hashParams.get("access_token");
-          const refreshToken = hashParams.get("refresh_token");
-          const code = callbackUrl.searchParams.get("code");
-
-          if (accessToken && refreshToken) {
-            await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
-          } else if (code) {
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) throw error;
-          }
-
-          await Browser.close();
-          window.history.replaceState({}, document.title, "/");
+      ? App.addListener("appUrlOpen", ({ url }) => {
+          void handleNativeAuthCallback(url).catch((error) => console.error("Native auth callback failed:", error));
         })
       : null;
+
+    if (Capacitor.isNativePlatform()) {
+      void App.getLaunchUrl()
+        .then((launch) => launch?.url ? handleNativeAuthCallback(launch.url) : undefined)
+        .catch((error) => console.error("Native launch callback failed:", error));
+    }
 
     const syncSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
