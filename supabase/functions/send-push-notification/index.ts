@@ -189,6 +189,14 @@ serve(async (req) => {
       sent: results.filter((result) => result.status >= 200 && result.status < 300).length,
       attempted: payloads.length,
       failed: results.filter((result) => result.status < 200 || result.status >= 300).length,
+      errors: results
+        .filter((result) => result.status < 200 || result.status >= 300)
+        .map((result) => ({
+          status: result.status,
+          message: typeof result.payload === 'object' && result.payload !== null && 'error' in result.payload
+            ? (result.payload as { error?: { message?: string } }).error?.message || 'Firebase rejected the notification'
+            : 'Firebase rejected the notification',
+        })),
     }), {
       status: results.some((result) => result.status >= 200 && result.status < 300) ? 200 : 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

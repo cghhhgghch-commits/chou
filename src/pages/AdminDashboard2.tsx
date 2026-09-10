@@ -344,7 +344,16 @@ export default function AdminDashboard2() {
         : "تم قبول الإشعار، لكن لا توجد أجهزة مسجلة حالياً لاستلامه");
     } catch (error) {
       console.error("Failed to send admin notification:", error);
-      const detail = error instanceof Error ? error.message : "تحقق من إعدادات Firebase وSupabase Edge Function.";
+      let detail = error instanceof Error ? error.message : "تحقق من إعدادات Firebase وSupabase Edge Function.";
+      const response = (error as { context?: Response })?.context;
+      if (response) {
+        try {
+          const payload = await response.clone().json() as { error?: string; errors?: Array<{ message?: string }> };
+          detail = payload.errors?.[0]?.message || payload.error || detail;
+        } catch {
+          // Keep the original error when the function response is not JSON.
+        }
+      }
       alert(`تعذر إرسال الإشعار: ${detail}`);
     } finally {
       setIsSendingNotification(false);
