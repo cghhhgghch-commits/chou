@@ -14,6 +14,7 @@ export interface FcmTokenPayload {
 }
 
 const STORAGE_KEY = 'laqta.fcm.device_id';
+const TOKEN_STORAGE_KEY = 'laqta.fcm.pending_token';
 const LEGACY_DAILY_NOTIFICATION_ID = 7001;
 
 export const setupPushNotificationListeners = async () => {
@@ -21,6 +22,12 @@ export const setupPushNotificationListeners = async () => {
 
   try {
     const platform = Capacitor.getPlatform();
+
+    await FirebaseMessaging.addListener('tokenReceived', ({ token }) => {
+      if (token && typeof window !== 'undefined') {
+        window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      }
+    });
 
     if (platform === 'android') {
       const permission = await LocalNotifications.requestPermissions();
@@ -132,7 +139,9 @@ export const syncNativePushToken = async (userId?: string) => {
       return null;
     }
 
-    let tokenValue = '';
+    let tokenValue = typeof window !== 'undefined'
+      ? window.localStorage.getItem(TOKEN_STORAGE_KEY) || ''
+      : '';
     for (let attempt = 0; attempt < 3 && !tokenValue; attempt += 1) {
       try {
         const result = await FirebaseMessaging.getToken();
@@ -161,6 +170,9 @@ export const syncNativePushToken = async (userId?: string) => {
     });
 
     await tokenListener?.remove();
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
     return result;
   } catch (error) {
     console.error('Failed to sync native push token:', error);
