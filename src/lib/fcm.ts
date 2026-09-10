@@ -119,13 +119,37 @@ export const syncNativePushToken = async (userId?: string) => {
   }
 
   try {
+    let tokenListener: { remove: () => Promise<void> } | null = null;
+    const tokenReceivedPromise = new Promise<string>((resolve) => {
+      void FirebaseMessaging.addListener('tokenReceived', ({ token }) => resolve(token))
+        .then((listener) => { tokenListener = listener; });
+    });
+
     const permission = await FirebaseMessaging.requestPermissions();
     if (permission.receive !== 'granted') {
       console.warn('Push permission denied by user; skipping push registration.');
+      await tokenListener?.remove();
       return null;
     }
 
-    const { token: tokenValue } = await FirebaseMessaging.getToken();
+    let tokenValue = '';
+    for (let attempt = 0; attempt < 3 && !tokenValue; attempt += 1) {
+      try {
+        const result = await FirebaseMessaging.getToken();
+        tokenValue = result.token || '';
+      } catch (error) {
+        if (attempt === 2) throw error;
+        await new Promise((resolve) => window.setTimeout(resolve, 1500));
+      }
+    }
+
+    if (!tokenValue) {
+      tokenValue = await Promise.race([
+        tokenReceivedPromise,
+        new Promise<string>((_, reject) => window.setTimeout(() => reject(new Error('Firebase token timeout')), 5000)),
+      ]);
+    }
+
     if (!tokenValue) throw new Error('Firebase returned an empty FCM token');
 
     const result = await registerFcmToken({
@@ -136,6 +160,7 @@ export const syncNativePushToken = async (userId?: string) => {
       user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : `${Capacitor.getPlatform()}-capacitor`,
     });
 
+    await tokenListener?.remove();
     return result;
   } catch (error) {
     console.error('Failed to sync native push token:', error);
