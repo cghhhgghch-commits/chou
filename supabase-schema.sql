@@ -118,6 +118,36 @@ where w.id = n.id;
 alter table public.whatsapp_leads alter column order_number set not null;
 create unique index if not exists whatsapp_leads_order_number_idx on public.whatsapp_leads(order_number);
 
+create or replace function public.next_whatsapp_order_number()
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  current_max bigint;
+  next_order bigint;
+begin
+  if auth.uid() is null then
+    raise exception 'authentication required';
+  end if;
+
+  lock table public.whatsapp_leads in share row exclusive mode;
+  select coalesce(max(order_number), 0) into current_max
+  from public.whatsapp_leads;
+
+  if current_max = 0 then
+    perform setval('public.whatsapp_leads_order_number_seq', 1, false);
+  else
+    perform setval('public.whatsapp_leads_order_number_seq', current_max, true);
+  end if;
+
+  next_order := nextval('public.whatsapp_leads_order_number_seq');
+  return next_order;
+end;
+$$;
+grant execute on function public.next_whatsapp_order_number() to authenticated;
+
 insert into storage.buckets (id, name, public)
 values ('listing-media', 'listing-media', true)
 on conflict (id) do update set public = true;

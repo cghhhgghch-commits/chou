@@ -55,12 +55,7 @@ export default function PlaceAd() {
   const [area, setArea] = useState("");
   const [landArea, setLandArea] = useState("");
   const [furnishing, setFurnishing] = useState("غير مفروش");
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([
-    "منظومة طاقة شمسية وإنفيرتر",
-    "خزان ماء إضافي ومضخة",
-    "سند طابو نظامي فوري",
-    "إطلالة مفتوحة ومشمسة"
-  ]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [categoryDetailText, setCategoryDetailText] = useState("");
   const [categoryNumericDetail, setCategoryNumericDetail] = useState("");
   const [categoryExtraDetail, setCategoryExtraDetail] = useState("");
@@ -344,26 +339,6 @@ export default function PlaceAd() {
     }
   };
 
-  const getNextWhatsAppOrderNumber = async () => {
-    const { data, error } = await supabase
-      .from("whatsapp_leads")
-      .select("order_number")
-      .not("order_number", "is", null)
-      .order("order_number", { ascending: false })
-      .limit(1);
-
-    if (error) {
-      console.warn("Could not read next WhatsApp order number:", error);
-      return 1;
-    }
-
-    const rows = Array.isArray(data) ? data : [];
-    if (rows.length === 0) return 1;
-
-    const latestOrder = Number(rows[0]?.order_number);
-    return Number.isFinite(latestOrder) ? latestOrder + 1 : 1;
-  };
-
   const buildWhatsAppMessage = (
     imageUrls: string[] = previewUrls.filter((url) => url.startsWith("http")),
     orderNumber = 1,
@@ -375,13 +350,7 @@ export default function PlaceAd() {
     const advRole = advertiserType === 'owner' ? 'المالك المباشر' : advertiserType === 'agency' ? 'مكتب عقاري معتمد' : 'وسيط عقاري';
     const categorySpecificSummary = buildCategorySpecificSummary();
     const orderRef = `ORD-${String(orderNumber).padStart(4, '0')}`;
-    const propertyFeatures = [
-      selectedAmenities.includes("بئر ماء ارتوازي عذب") ? 'بئر ماء' : null,
-      selectedAmenities.includes("مصعد حديث شغال") ? 'مصعد' : null,
-      selectedAmenities.includes("مولدة كهرباء / خط أمبير") ? 'مولدة' : null,
-      selectedAmenities.includes("منظومة طاقة شمسية وإنفيرتر") ? 'طاقة شمسية' : null,
-      ...(selectedAmenities || [])
-    ].filter(Boolean) as string[];
+    const propertyFeatures = selectedAmenities;
     const resolvedListingUrl = listingUrl || (typeof window !== 'undefined' ? `${window.location.origin}/property/${editingId || 'preview'}` : "غير متوفر");
 
     const imageSection = imageUrls.length > 0
@@ -568,6 +537,7 @@ ${imageSection}
         area: area ? Number(area) : 0,
         land_area: landArea ? Number(landArea) : 0,
         furnishing,
+        has_solar_power: selectedAmenities.includes("منظومة طاقة شمسية وإنفيرتر"),
         has_water_well: selectedAmenities.includes("بئر ماء ارتوازي عذب"),
         has_elevator: selectedAmenities.includes("مصعد حديث شغال"),
         has_generator: selectedAmenities.includes("مولدة كهرباء / خط أمبير"),
@@ -603,7 +573,10 @@ ${imageSection}
         return;
       }
 
-      const orderNumber = await getNextWhatsAppOrderNumber();
+      const { data: orderNumber, error: orderError } = await supabase.rpc("next_whatsapp_order_number");
+      if (orderError || !Number.isFinite(Number(orderNumber))) {
+        throw orderError || new Error("تعذر إنشاء رقم الطلب");
+      }
       const listingUrl = createdId ? `${window.location.origin}/property/${createdId}` : `${window.location.origin}/property/${crypto.randomUUID()}`;
       const whatsappMessage = buildWhatsAppMessage(finalImageUrls, orderNumber, listingUrl);
 
