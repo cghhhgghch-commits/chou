@@ -1,4 +1,4 @@
-package com.laqta.app;
+package com.laqta.realestate;
 
 import com.getcapacitor.BridgeActivity;
 

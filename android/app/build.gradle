@@ -7,10 +7,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.laqta.app"
+    namespace = "com.laqta.realestate"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.laqta.app"
+        applicationId "com.laqta.realestate"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

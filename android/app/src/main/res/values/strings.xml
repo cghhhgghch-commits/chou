@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">لقطة</string>
     <string name="title_activity_main">لقطة</string>
-    <string name="package_name">com.laqta.app</string>
-    <string name="custom_url_scheme">com.laqta.app</string>
+    <string name="package_name">com.laqta.realestate</string>
+    <string name="custom_url_scheme">com.laqta.realestate</string>
 </resources>
