@@ -56,10 +56,19 @@ jobs:
       - name: Read provisioning profile details
         shell: bash
         run: |
-          profile_path=$(find "$HOME/Library/MobileDevice/Provisioning Profiles" -name "*.mobileprovision" -print -quit)
+          profile_path=$(find "$HOME/Library/MobileDevice/Provisioning Profiles" -name "*.mobileprovision" -print0 | xargs -0 ls -t | head -n 1)
+          if [ -z "$profile_path" ]; then
+            echo "No App Store provisioning profile was downloaded"
+            exit 1
+          fi
           security cms -D -i "$profile_path" > "$RUNNER_TEMP/profile.plist"
           profile_uuid=$(/usr/libexec/PlistBuddy -c "Print :UUID" "$RUNNER_TEMP/profile.plist")
           profile_name=$(/usr/libexec/PlistBuddy -c "Print :Name" "$RUNNER_TEMP/profile.plist")
+          aps_environment=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:aps-environment" "$RUNNER_TEMP/profile.plist")
+          application_identifier=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" "$RUNNER_TEMP/profile.plist")
+          echo "Using profile: $profile_name ($profile_uuid)"
+          echo "APNs environment: $aps_environment"
+          echo "Application identifier: $application_identifier"
           echo "PROFILE_UUID=$profile_uuid" >> "$GITHUB_ENV"
           echo "PROFILE_NAME=$profile_name" >> "$GITHUB_ENV"
 
