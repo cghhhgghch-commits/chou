@@ -131,58 +131,72 @@ jobs:
       - name: Re-sign IPA with push entitlements
         shell: bash
         run: |
+          set -x
           cd "$RUNNER_TEMP"
           rm -rf resign
           mkdir -p resign
           unzip -q "$IPA_PATH" -d resign
           APP_PATH=$(find resign/Payload -maxdepth 1 -name "*.app" -print -quit)
           echo "App path: $APP_PATH"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "❌ App bundle not found. Listing Payload:"
+            ls -la resign/Payload/
+            exit 1
+          fi
 
-          cat > "$RUNNER_TEMP/App.entitlements" <<ENT
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>aps-environment</key>
-            <string>production</string>
-            <key>application-identifier</key>
-            <string>${{ secrets.APPLE_TEAM_ID }}.com.laqta.syria</string>
-            <key>com.apple.developer.team-identifier</key>
-            <string>${{ secrets.APPLE_TEAM_ID }}</string>
-            <key>beta-reports-active</key>
-            <true/>
-            <key>get-task-allow</key>
-            <false/>
-          </dict>
-          </plist>
-          ENT
+          {
+            echo '<?xml version="1.0" encoding="UTF-8"?>'
+            echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
+            echo '<plist version="1.0">'
+            echo '<dict>'
+            echo '  <key>aps-environment</key>'
+            echo '  <string>production</string>'
+            echo '  <key>application-identifier</key>'
+            echo '  <string>${{ secrets.APPLE_TEAM_ID }}.com.laqta.syria</string>'
+            echo '  <key>com.apple.developer.team-identifier</key>'
+            echo '  <string>${{ secrets.APPLE_TEAM_ID }}</string>'
+            echo '  <key>beta-reports-active</key>'
+            echo '  <true/>'
+            echo '  <key>get-task-allow</key>'
+            echo '  <false/>'
+            echo '</dict>'
+            echo '</plist>'
+          } > "$RUNNER_TEMP/App.entitlements"
+
+          echo "=== Entitlements file content ==="
+          cat "$RUNNER_TEMP/App.entitlements"
+
+          echo "=== Available signing identities ==="
+          security find-identity -v -p codesigning || true
 
           IDENTITY=$(security find-identity -v -p codesigning | grep "Apple Distribution" | head -n 1 | awk '{print $2}')
+          if [ -z "$IDENTITY" ]; then
+            IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -n 1 | awk '{print $2}')
+          fi
           echo "Signing identity: $IDENTITY"
           if [ -z "$IDENTITY" ]; then
-            echo "❌ No Apple Distribution identity found"
-            security find-identity -v -p codesigning
+            echo "❌ No Distribution identity found"
             exit 1
           fi
 
           if [ -d "$APP_PATH/Frameworks" ]; then
             find "$APP_PATH/Frameworks" -name "*.framework" -type d | while read fw; do
               echo "Re-signing framework: $fw"
-              codesign --force --sign "$IDENTITY" "$fw" || true
+              codesign --force --sign "$IDENTITY" "$fw" 2>&1 || true
             done
             find "$APP_PATH/Frameworks" -name "*.dylib" -type f | while read dyl; do
               echo "Re-signing dylib: $dyl"
-              codesign --force --sign "$IDENTITY" "$dyl" || true
+              codesign --force --sign "$IDENTITY" "$dyl" 2>&1 || true
             done
           fi
 
           codesign --force --sign "$IDENTITY" \
             --entitlements "$RUNNER_TEMP/App.entitlements" \
             --preserve-metadata=identifier,requirements,flags,runtime \
-            "$APP_PATH"
+            "$APP_PATH" 2>&1
 
           echo "=== Entitlements after re-sign ==="
-          codesign -d --entitlements :- "$APP_PATH" 2>/dev/null || true
+          codesign -d --entitlements :- "$APP_PATH" 2>&1 || true
 
           if codesign -d --entitlements :- "$APP_PATH" 2>/dev/null | grep -q "aps-environment"; then
             echo "✅ aps-environment FOUND after re-sign"
@@ -196,7 +210,7 @@ jobs:
           zip -qry "$RUNNER_TEMP/resigned.ipa" Payload
           cd "$RUNNER_TEMP"
           echo "IPA_PATH=$RUNNER_TEMP/resigned.ipa" >> "$GITHUB_ENV"
-          echo "✅ Re-signed IPA ready"
+          echo "✅ Re-signed IPA ready at $RUNNER_TEMP/resigned.ipa"
 
       - name: Upload production IPA to App Store Connect
         uses: apple-actions/upload-testflight-build@v2
