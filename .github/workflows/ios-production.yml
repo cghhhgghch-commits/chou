@@ -169,10 +169,8 @@ jobs:
           echo "=== Available signing identities ==="
           security find-identity -v -p codesigning || true
 
-          IDENTITY=$(security find-identity -v -p codesigning | grep "Apple Distribution" | head -n 1 | awk '{print $2}')
-          if [ -z "$IDENTITY" ]; then
-            IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -n 1 | awk '{print $2}')
-          fi
+          # ابحث عن أي هوية تحتوي على Distribution (Apple أو iPhone)
+          IDENTITY=$(security find-identity -v -p codesigning | grep -E "Apple Distribution|iPhone Distribution" | head -n 1 | awk '{print $2}' || true)
           echo "Signing identity: $IDENTITY"
           if [ -z "$IDENTITY" ]; then
             echo "❌ No Distribution identity found"
@@ -180,14 +178,14 @@ jobs:
           fi
 
           if [ -d "$APP_PATH/Frameworks" ]; then
-            find "$APP_PATH/Frameworks" -name "*.framework" -type d | while read fw; do
+            while IFS= read -r fw; do
               echo "Re-signing framework: $fw"
               codesign --force --sign "$IDENTITY" "$fw" 2>&1 || true
-            done
-            find "$APP_PATH/Frameworks" -name "*.dylib" -type f | while read dyl; do
+            done < <(find "$APP_PATH/Frameworks" -name "*.framework" -type d)
+            while IFS= read -r dyl; do
               echo "Re-signing dylib: $dyl"
               codesign --force --sign "$IDENTITY" "$dyl" 2>&1 || true
-            done
+            done < <(find "$APP_PATH/Frameworks" -name "*.dylib" -type f)
           fi
 
           codesign --force --sign "$IDENTITY" \
