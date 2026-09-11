@@ -84,8 +84,6 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
             CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             archive
 
@@ -129,6 +127,16 @@ jobs:
             exit 1
           fi
           echo "IPA_PATH=$ipa_path" >> "$GITHUB_ENV"
+
+      - name: Verify entitlements in IPA
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          rm -rf ipa_check
+          unzip -q "$IPA_PATH" -d ipa_check
+          APP_PATH=$(find ipa_check/Payload -maxdepth 1 -name "*.app" -print -quit)
+          echo "=== Entitlements in IPA ==="
+          codesign -d --entitlements :- "$APP_PATH" || true
 
       - name: Upload production IPA to App Store Connect
         uses: apple-actions/upload-testflight-build@v2

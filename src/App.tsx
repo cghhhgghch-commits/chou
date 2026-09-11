@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
@@ -26,8 +27,13 @@ import NotificationModal from "./components/notifications/NotificationModal";
 import AdminLogin from "./pages/AdminLogin";
 import { AdminProvider } from "./lib/AdminContext";
 import IOSBackButton from "./components/layout/IOSBackButton";
+import { setupPushNotificationListeners } from "./lib/fcm";
 
 export default function App() {
+  useEffect(() => {
+    void setupPushNotificationListeners();
+  }, []);
+
   return (
     <AdminProvider>
       <AuthProvider>
