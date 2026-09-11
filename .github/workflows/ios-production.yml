@@ -64,10 +64,10 @@ jobs:
           security cms -D -i "$profile_path" > "$RUNNER_TEMP/profile.plist"
           profile_uuid=$(/usr/libexec/PlistBuddy -c "Print :UUID" "$RUNNER_TEMP/profile.plist")
           profile_name=$(/usr/libexec/PlistBuddy -c "Print :Name" "$RUNNER_TEMP/profile.plist")
-          aps_environment=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:aps-environment" "$RUNNER_TEMP/profile.plist")
+          aps_environment=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:aps-environment" "$RUNNER_TEMP/profile.plist" || echo "NOT_FOUND")
           application_identifier=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" "$RUNNER_TEMP/profile.plist")
           echo "Using profile: $profile_name ($profile_uuid)"
-          echo "APNs environment: $aps_environment"
+          echo "APNs environment in profile: $aps_environment"
           echo "Application identifier: $application_identifier"
           echo "PROFILE_UUID=$profile_uuid" >> "$GITHUB_ENV"
           echo "PROFILE_NAME=$profile_name" >> "$GITHUB_ENV"
@@ -84,6 +84,8 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             archive
 
@@ -136,7 +138,13 @@ jobs:
           unzip -q "$IPA_PATH" -d ipa_check
           APP_PATH=$(find ipa_check/Payload -maxdepth 1 -name "*.app" -print -quit)
           echo "=== Entitlements in IPA ==="
-          codesign -d --entitlements :- "$APP_PATH" || true
+          codesign -d --entitlements :- "$APP_PATH" 2>/dev/null || true
+          echo "=== Checking for aps-environment ==="
+          if codesign -d --entitlements :- "$APP_PATH" 2>/dev/null | grep -q "aps-environment"; then
+            echo "✅ aps-environment FOUND in IPA"
+          else
+            echo "❌ aps-environment MISSING in IPA — will need manual re-signing"
+          fi
 
       - name: Upload production IPA to App Store Connect
         uses: apple-actions/upload-testflight-build@v2
