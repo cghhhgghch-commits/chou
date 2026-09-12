@@ -191,18 +191,26 @@ export default function PlaceAd() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files).filter((file) => file.type.startsWith("image/") && file.size <= 8 * 1024 * 1024);
-      const remainingSlots = Math.max(0, 8 - previewUrls.length);
-      const selectedFiles = filesArray.slice(0, remainingSlots);
-      if (filesArray.length !== selectedFiles.length) {
-        setError("يمكنك إضافة 8 صور كحد أقصى، وحجم كل صورة يجب ألا يتجاوز 8 ميغابايت.");
-      }
-      if (!selectedFiles.length) return;
-      setImages(prev => [...prev, ...selectedFiles]);
-      const newUrls = selectedFiles.map(file => URL.createObjectURL(file));
-      setPreviewUrls(prev => [...prev, ...newUrls]);
+    if (!e.target.files) return;
+
+    const filesArray = Array.from(e.target.files).filter(
+      (file) => file.type.startsWith("image/") && file.size <= 8 * 1024 * 1024
+    );
+    const remainingSlots = Math.max(0, 8 - previewUrls.length);
+    const selectedFiles = filesArray.slice(0, remainingSlots);
+
+    if (filesArray.length !== selectedFiles.length) {
+      setError("يمكنك إضافة 8 صور كحد أقصى، وحجم كل صورة يجب ألا يتجاوز 8 ميغابايت.");
     }
+
+    if (!selectedFiles.length) {
+      e.target.value = "";
+      return;
+    }
+
+    setImages(prev => [...prev, ...selectedFiles]);
+    const newUrls = selectedFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(prev => [...prev, ...newUrls]);
     e.target.value = "";
   };
 
@@ -818,17 +826,31 @@ ${imageSection}
             )}
 
             <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
-              <label className="w-full sm:w-auto cursor-pointer bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
-                <Plus className="w-4 h-4" />
-                <span>اختيار صور من الجهاز</span>
-                <input 
-                  type="file" 
-                  multiple 
-                  accept="image/jpeg,image/png,image/webp,image/heic"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
+              <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
+                <label className="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
+                  <Camera className="w-4 h-4" />
+                  <span>التقاط صورة</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+
+                <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
+                  <Plus className="w-4 h-4" />
+                  <span>اختيار صور من الجهاز</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,image/heic"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
 
               <div className="w-full sm:flex-1 flex items-center gap-2">
                 <div className="relative flex-1">
