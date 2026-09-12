@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { 
   ArrowRight, Camera, MapPin, Tag, CheckCircle2, Loader2, 
@@ -71,6 +71,8 @@ export default function PlaceAd() {
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [customImageUrl, setCustomImageUrl] = useState("");
+  const [showImageMenu, setShowImageMenu] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Submission & Dialog State
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -215,29 +217,46 @@ export default function PlaceAd() {
     e.target.value = "";
   };
 
-  const handleCameraCapture = async () => {
+  // فتح مكتبة الصور مباشرة (بدون خيار Take Photo)
+  const handlePickFromLibrary = async () => {
+    setShowImageMenu(false);
+    const remainingSlots = Math.max(0, 8 - previewUrls.length);
+    if (remainingSlots <= 0) {
+      setError("يمكنك إضافة 8 صور كحد أقصى.");
+      return;
+    }
+
     try {
-      const photo = await CapacitorCamera.getPhoto({
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
+      const result = await CapacitorCamera.pickImages({
         quality: 80,
-        allowEditing: false,
-        saveToGallery: true,
+        limit: remainingSlots,
       });
 
-      if (!photo.webPath) {
-        setError("لم يتم التقاط صورة، حاول مرة أخرى.");
-        return;
+      if (!result.photos || result.photos.length === 0) return;
+
+      const files: File[] = [];
+      for (const photo of result.photos) {
+        if (!photo.webPath) continue;
+        const response = await fetch(photo.webPath);
+        const blob = await response.blob();
+        const file = new File(
+          [blob],
+          `library-photo-${Date.now()}-${Math.random().toString(16).slice(2)}.jpg`,
+          { type: blob.type || "image/jpeg" }
+        );
+        files.push(file);
       }
 
-      const response = await fetch(photo.webPath);
-      const blob = await response.blob();
-      const file = new File([blob], `camera-photo-${Date.now()}.jpg`, { type: blob.type || "image/jpeg" });
-      addFilesToGallery([file]);
+      addFilesToGallery(files);
     } catch (err) {
-      console.warn("Camera capture failed:", err);
-      setError("تعذّر فتح الكاميرا أو الموافقة على الوصول إليها. حاول مرة أخرى.");
+      console.warn("Photo library pick failed:", err);
     }
+  };
+
+  // فتح متصفح الملفات (بدون صورة الكاميرا)
+  const handlePickFiles = () => {
+    setShowImageMenu(false);
+    fileInputRef.current?.click();
   };
 
   const handleAddImageUrl = () => {
@@ -853,26 +872,25 @@ ${imageSection}
 
             <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
               <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
+                {/* زر واحد يفتح قائمة مخصصة */}
                 <button
                   type="button"
-                  onClick={handleCameraCapture}
+                  onClick={() => setShowImageMenu(true)}
                   className="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors"
                 >
-                  <Camera className="w-4 h-4" />
-                  <span>التقاط صورة</span>
+                  <Plus className="w-4 h-4" />
+                  <span>إضافة صور</span>
                 </button>
 
-                <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
-                  <Plus className="w-4 h-4" />
-                  <span>اختيار صور من الجهاز</span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/jpeg,image/png,image/webp,image/heic"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </label>
+                {/* input مخفي لخيار "تصفح الملفات" */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf,.doc,.docx,.heic"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
 
               <div className="w-full sm:flex-1 flex items-center gap-2">
@@ -1315,6 +1333,60 @@ ${imageSection}
         </form>
 
       </div>
+
+      {/* Custom Image Picker Menu - NO Take Photo Option */}
+      {showImageMenu && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowImageMenu(false)}
+        >
+          <div
+            className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-4 pb-6 space-y-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-3" />
+
+            {/* خيار 1: مكتبة الصور */}
+            <button
+              type="button"
+              onClick={handlePickFromLibrary}
+              className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-right"
+            >
+              <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+                <Camera className="w-5 h-5 text-brand-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-black text-slate-900">مكتبة الصور</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">اختر صوراً من معرض جهازك</p>
+              </div>
+            </button>
+
+            {/* خيار 2: تصفح الملفات */}
+            <button
+              type="button"
+              onClick={handlePickFiles}
+              className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-right"
+            >
+              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                <Link2 className="w-5 h-5 text-slate-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-black text-slate-900">تصفح الملفات</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">اختر ملفات من متصفح الجهاز</p>
+              </div>
+            </button>
+
+            {/* زر الإلغاء */}
+            <button
+              type="button"
+              onClick={() => setShowImageMenu(false)}
+              className="w-full mt-2 py-3 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Success Modal */}
       {showSuccessModal && (
