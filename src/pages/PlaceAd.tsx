@@ -5,6 +5,7 @@ import {
   Sun, Building2, Sparkles, X, Plus,
   MessageSquare, Phone, Link2
 } from "lucide-react";
+import { Camera as CapacitorCamera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import { useAdmin } from "../lib/AdminContext";
@@ -190,28 +191,53 @@ export default function PlaceAd() {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-
-    const filesArray = Array.from(e.target.files).filter(
+  const addFilesToGallery = (fileList: File[]) => {
+    const validFiles = fileList.filter(
       (file) => file.type.startsWith("image/") && file.size <= 8 * 1024 * 1024
     );
     const remainingSlots = Math.max(0, 8 - previewUrls.length);
-    const selectedFiles = filesArray.slice(0, remainingSlots);
+    const selectedFiles = validFiles.slice(0, remainingSlots);
 
-    if (filesArray.length !== selectedFiles.length) {
+    if (validFiles.length !== selectedFiles.length) {
       setError("يمكنك إضافة 8 صور كحد أقصى، وحجم كل صورة يجب ألا يتجاوز 8 ميغابايت.");
     }
 
-    if (!selectedFiles.length) {
-      e.target.value = "";
-      return;
-    }
+    if (!selectedFiles.length) return;
 
     setImages(prev => [...prev, ...selectedFiles]);
     const newUrls = selectedFiles.map(file => URL.createObjectURL(file));
     setPreviewUrls(prev => [...prev, ...newUrls]);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    addFilesToGallery(Array.from(e.target.files));
     e.target.value = "";
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const photo = await CapacitorCamera.getPhoto({
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+        quality: 80,
+        allowEditing: false,
+        saveToGallery: true,
+      });
+
+      if (!photo.webPath) {
+        setError("لم يتم التقاط صورة، حاول مرة أخرى.");
+        return;
+      }
+
+      const response = await fetch(photo.webPath);
+      const blob = await response.blob();
+      const file = new File([blob], `camera-photo-${Date.now()}.jpg`, { type: blob.type || "image/jpeg" });
+      addFilesToGallery([file]);
+    } catch (err) {
+      console.warn("Camera capture failed:", err);
+      setError("تعذّر فتح الكاميرا أو الموافقة على الوصول إليها. حاول مرة أخرى.");
+    }
   };
 
   const handleAddImageUrl = () => {
@@ -827,17 +853,14 @@ ${imageSection}
 
             <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
               <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
-                <label className="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
+                <button
+                  type="button"
+                  onClick={handleCameraCapture}
+                  className="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors"
+                >
                   <Camera className="w-4 h-4" />
                   <span>التقاط صورة</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </label>
+                </button>
 
                 <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-colors">
                   <Plus className="w-4 h-4" />
