@@ -35,6 +35,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>يحتاج التطبيق إلى الوصول إلى الكاميرا لالتقاط صور العقار عند إضافة إعلان.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>يحتاج التطبيق إلى الوصول إلى الصور لاختيار صور العقار عند إضافة إعلان.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
