@@ -26,6 +26,8 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   refreshProfile: () => Promise<UserProfile | null>;
+  signInWithApple: () => Promise<{ error: Error | null }>;
+  deleteAccount: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -35,6 +37,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isAdmin: false,
   refreshProfile: async () => null,
+  signInWithApple: async () => ({ error: null }),
+  deleteAccount: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -225,8 +229,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
   };
 
+  const signInWithApple = async (): Promise<{ error: Error | null }> => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "apple" });
+    return { error: error ? new Error(error.message) : null };
+  };
+
+  const deleteAccount = async (): Promise<{ error: Error | null }> => {
+    const { error } = await supabase.functions.invoke("delete-user", {
+      body: {},
+    });
+
+    return { error: error ? new Error(error.message) : null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin, refreshProfile, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAdmin, refreshProfile, signInWithApple, deleteAccount, signOut }}>
       {children}
     </AuthContext.Provider>
   );

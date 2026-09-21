@@ -4,11 +4,11 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import {
   User, Settings, Save, Loader2, AlertCircle, CheckCircle2,
-  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall
+  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall, Trash2
 } from "lucide-react";
 
 export default function Profile() {
-  const { user, profile, loading: authLoading, signOut, refreshProfile } = useAuth();
+  const { user, profile, loading: authLoading, signOut, deleteAccount, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
@@ -18,6 +18,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -151,6 +152,26 @@ export default function Profile() {
       }
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm("هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.");
+    if (!confirmed) return;
+
+    setDeletingAccount(true);
+    setError("");
+
+    try {
+      const { error: deleteError } = await deleteAccount();
+      if (deleteError) throw deleteError;
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Account deletion error:", err);
+      setError("تعذر حذف الحساب. حاول مرة أخرى أو تواصل مع الدعم الفني.");
+    } finally {
+      setDeletingAccount(false);
     }
   };
 
@@ -326,6 +347,24 @@ export default function Profile() {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-red-200 p-6 shadow-xs">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-base font-bold text-red-700">حذف الحساب</h2>
+            <p className="text-xs text-slate-500 mt-1">سيتم حذف حسابك وبياناته نهائياً ولا يمكن التراجع عن هذا الإجراء.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            disabled={deletingAccount}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {deletingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            حذف الحساب
+          </button>
         </div>
       </div>
 

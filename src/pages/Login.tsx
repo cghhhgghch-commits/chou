@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAdmin } from "../lib/AdminContext";
-import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, ShieldCheck } from "lucide-react";
+import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, Apple } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
@@ -18,7 +18,7 @@ export default function Login() {
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | null>(null);
+  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
   const [showGoogleConfirm, setShowGoogleConfirm] = useState(false);
   const [error, setError] = useState("");
   const { checkAdmin, activateAdminSession } = useAdmin();
@@ -276,6 +276,38 @@ export default function Login() {
     setShowGoogleConfirm(true);
   };
 
+  const handleAppleAuth = async () => {
+    setError("");
+    setSocialLoading("apple");
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "apple",
+        options: {
+          redirectTo: Capacitor.isNativePlatform()
+            ? nativeAuthCallbackUrl
+            : `${window.location.origin}/`,
+          ...(Capacitor.isNativePlatform() ? { skipBrowserRedirect: true } : {}),
+        },
+      });
+
+      if (error) throw error;
+      if (Capacitor.isNativePlatform() && data.url) {
+        await Browser.open({ url: data.url });
+      }
+    } catch (err: any) {
+      console.error("Apple Auth error:", err);
+      const message = err?.message || "";
+      if (message.includes("Unsupported provider") || message.includes("provider is not enabled")) {
+        setError("خدمة Apple غير مفعلة في Supabase. يجب تفعيل Apple Provider من لوحة التحكم ثم المحاولة مرة أخرى.");
+      } else {
+        setError("تعذر تسجيل الدخول بـ Apple. يرجى المحاولة مرة أخرى أو استخدام طريقة تسجيل دخول أخرى.");
+      }
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -420,13 +452,22 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  disabled={loading || socialLoading === "google"}
+                  disabled={loading || socialLoading !== null}
                   className="w-full py-3 px-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
                 >
                   <Chrome className="w-4 h-4 text-red-500" />
                   تسجيل الدخول عبر Google
                 </button>
               )}
+              <button
+                type="button"
+                onClick={handleAppleAuth}
+                disabled={loading || socialLoading !== null}
+                className="w-full py-3 px-4 border border-slate-200 bg-black hover:bg-slate-800 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <Apple className="w-4 h-4" />
+                تسجيل الدخول باستخدام Apple
+              </button>
             </form>
 
             {showGoogleConfirm && (
