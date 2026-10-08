@@ -138,17 +138,11 @@ export default function Properties() {
 
   const availableAreas = useMemo(() => {
     const selectedGovernorateName = selectedGovernorate.trim();
-    const governorateAreas = SYRIAN_GOVERNORATES.find(
+
+    return SYRIAN_GOVERNORATES.find(
       (governorate) => governorate.name === selectedGovernorateName,
     )?.popularAreas ?? [];
-
-    const areaMatches = firestoreProperties
-      .filter((property) => !selectedGovernorateName || property.city === selectedGovernorateName)
-      .map((property) => property.areaName)
-      .filter((area): area is string => Boolean(area && area.trim()));
-
-    return [...new Set(governorateAreas.filter((area) => areaMatches.includes(area)))];
-  }, [firestoreProperties, selectedGovernorate]);
+  }, [selectedGovernorate]);
 
   useEffect(() => {
     if (selectedGovernorate && selectedArea && !availableAreas.includes(selectedArea)) {
