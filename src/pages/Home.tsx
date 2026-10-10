@@ -6,10 +6,12 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import PropertyCard from "../components/properties/PropertyCard";
+import Image from "../components/ui/Image";
 import { supabase } from "../lib/supabase";
 import { Property } from "../types";
 import { maintenanceServices } from "../data/servicesData";
 import { SYRIAN_CITIES } from "../lib/constants";
+import { CATEGORY_IMAGES, FEATURED_CHALET_IMAGE, PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export default function Home() {
           furnishing: item.furnishing || "",
           description: item.description || "",
           amenities: Array.isArray(item.amenities) ? item.amenities : [],
-          images: Array.isArray(item.images) && item.images.length > 0 ? item.images : ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80"],
+          images: Array.isArray(item.images) && item.images.length > 0 ? item.images : [PROPERTY_IMAGE_FALLBACK],
           isVerified: Boolean(item.is_verified),
           agent: {
             name: item.advertiser_name || "معلن معتمد",
@@ -78,7 +80,7 @@ export default function Home() {
       icon: HomeIcon,
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-50',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.houses,
       link: '/properties?category=houses' 
     },
     { 
@@ -90,7 +92,7 @@ export default function Home() {
       icon: Building2,
       iconColor: 'text-slate-800',
       iconBg: 'bg-slate-100',
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.buildings,
       link: '/properties?category=buildings' 
     },
     { 
@@ -102,7 +104,7 @@ export default function Home() {
       icon: Trees,
       iconColor: 'text-emerald-700',
       iconBg: 'bg-emerald-50',
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.farms,
       link: '/properties?category=farms' 
     },
     { 
@@ -114,7 +116,7 @@ export default function Home() {
       icon: MapPin,
       iconColor: 'text-stone-700',
       iconBg: 'bg-stone-100',
-      image: 'https://images.unsplash.com/photo-1500076656116-558758c991c1?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.lands,
       link: '/properties?category=lands' 
     },
     { 
@@ -126,7 +128,7 @@ export default function Home() {
       icon: Store,
       iconColor: 'text-purple-700',
       iconBg: 'bg-purple-50',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.shops,
       link: '/properties?category=shops' 
     },
     { 
@@ -138,7 +140,7 @@ export default function Home() {
       icon: Sparkles,
       iconColor: 'text-amber-600',
       iconBg: 'bg-amber-50',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.villas,
       link: '/properties?category=villas' 
     },
     { 
@@ -150,7 +152,7 @@ export default function Home() {
       icon: Factory,
       iconColor: 'text-orange-700',
       iconBg: 'bg-orange-50',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.factories,
       link: '/properties?category=factories' 
     },
     { 
@@ -162,7 +164,7 @@ export default function Home() {
       icon: Landmark,
       iconColor: 'text-indigo-600',
       iconBg: 'bg-indigo-50',
-      image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=85', 
+      image: CATEGORY_IMAGES.other,
       link: '/properties?category=other' 
     },
   ];
@@ -244,15 +246,12 @@ export default function Home() {
                   className="bg-white hover:bg-slate-50/80 rounded-2xl border border-slate-200/90 overflow-hidden flex flex-col relative hover:shadow-lg hover:border-brand-400/80 transition-all group duration-300 transform hover:-translate-y-0.5"
                 >
                   {/* Photo Container with subtle gradient & tag */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-                    <img 
-                      src={cat.image} 
-                      alt={cat.label} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" 
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80';
-                      }}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                    <Image
+                      src={cat.image}
+                      alt={cat.label}
+                      containerClassName="h-full w-full"
+                      className="transition-transform duration-200 group-hover:scale-[1.02]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     
@@ -353,8 +352,8 @@ export default function Home() {
         <section className="mb-8">
           <h2 className="text-lg font-bold text-slate-900 mb-3.5">الخيارات المميزة</h2>
           <div className="flex gap-4 overflow-x-auto pb-3 hide-scrollbar snap-x">
-            <Link to="/properties?category=chalet" className="min-w-[280px] h-[160px] relative rounded-2xl overflow-hidden shadow-sm snap-center group">
-              <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80" alt="Chalets" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Link to="/properties?category=chalet" className="relative aspect-[4/3] min-w-[240px] overflow-hidden rounded-2xl shadow-sm snap-center group">
+              <Image src={FEATURED_CHALET_IMAGE} alt="شاليه" containerClassName="absolute inset-0 h-full w-full" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent"></div>
               <div className="absolute bottom-3.5 left-3.5 right-3.5">
                 <h3 className="text-white font-bold text-base leading-tight mb-0.5">شاليهات ومنازل خارج المدينة</h3>

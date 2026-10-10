@@ -30,6 +30,8 @@ import {
   Ruler,
 } from "lucide-react";
 import { SYRIAN_CITIES, SYRIAN_CATEGORY_ICONS } from "../lib/constants";
+import Image from "../components/ui/Image";
+import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 interface PropertyListing {
   id: string;
@@ -131,7 +133,7 @@ export default function AdminDashboard2() {
     bedrooms: "3",
     bathrooms: "2",
     description: "",
-    images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
+    images: [PROPERTY_IMAGE_FALLBACK],
     videos: [""],
   });
 
@@ -437,7 +439,7 @@ export default function AdminDashboard2() {
         bedrooms: Number(formData.bedrooms) || 0,
         bathrooms: Number(formData.bathrooms) || 0,
         description: formData.description.trim(),
-        images: safeImages.length ? safeImages : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
+        images: safeImages.length ? safeImages : [PROPERTY_IMAGE_FALLBACK],
         videos: (formData.videos || []).filter(Boolean),
         status: "active",
         user_id: adminUser?.id || null,
@@ -470,7 +472,7 @@ export default function AdminDashboard2() {
         bedrooms: "3",
         bathrooms: "2",
         description: "",
-        images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
+        images: [PROPERTY_IMAGE_FALLBACK],
         videos: [""],
       });
       setWhatsappMessage("");
@@ -501,7 +503,7 @@ export default function AdminDashboard2() {
       bedrooms: "3",
       bathrooms: "2",
       description: "",
-      images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
+      images: [PROPERTY_IMAGE_FALLBACK],
       videos: [""],
     });
     setWhatsappMessage("");
@@ -858,7 +860,7 @@ export default function AdminDashboard2() {
                         images: [e.target.value],
                       })
                     }
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder="/images/property-photo.webp"
                     className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -1065,18 +1067,12 @@ export default function AdminDashboard2() {
                       </div>
                     ) : (
                       /* الصورة */
-                      <div className="w-full h-64 bg-slate-300">
-                        {item.images?.[0] ? (
-                          <img
-                            src={item.images[0]}
-                            alt={item.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                            <Building2 className="w-12 h-12 text-slate-400" />
-                          </div>
-                        )}
+                      <div className="w-full">
+                        <Image
+                          src={item.images?.[0]}
+                          alt={item.title}
+                          containerClassName="w-full"
+                        />
                       </div>
                     )}
                   </div>

@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import { Property } from "../types";
+import Image from "../components/ui/Image";
+import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 export default function MyAds() {
   const { user } = useAuth();
@@ -37,7 +39,7 @@ export default function MyAds() {
           category: item.category || "houses",
           type: item.type || "sale",
           area: Number(item.area || 0),
-          images: Array.isArray(item.images) && item.images.length > 0 ? item.images : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"],
+          images: Array.isArray(item.images) && item.images.length > 0 ? item.images : [PROPERTY_IMAGE_FALLBACK],
           status: item.status || "active",
           isVerified: Boolean(item.is_verified),
           description: item.description || "",
@@ -116,7 +118,7 @@ export default function MyAds() {
           {ads.map((ad) => (
             <div key={ad.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs">
               <div className="flex flex-col gap-4 p-4 md:flex-row">
-                <img src={ad.images[0]} alt={ad.title} className="h-36 w-full rounded-2xl object-cover md:w-48" />
+                <Image src={ad.images[0]} alt={ad.title} containerClassName="w-full rounded-xl md:w-48" />
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-3">
                     <div>

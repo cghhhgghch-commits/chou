@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Heart, BadgeCheck, Phone, MapPin, Grid, BedDouble, Bath, Sun, ShieldCheck } from "lucide-react";
 import { Property } from "../../types";
+import Image from "../ui/Image";
 
 export default function PropertyCard({ property }: { property: Property }) {
   // Format price smartly for Syrian currency (Millions / Billions)
@@ -56,15 +57,12 @@ export default function PropertyCard({ property }: { property: Property }) {
 
   return (
     <div className="card flex flex-col overflow-hidden hover:shadow-lg transition-all duration-200 bg-white border border-slate-200/90 rounded-2xl group">
-      <Link to={`/property/${property.id}`} className="relative block h-[180px] sm:h-[200px] overflow-hidden bg-slate-100">
-        <img 
-          src={property.images[0]} 
-          alt={property.title} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-          loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80';
-          }}
+      <Link to={`/property/${property.id}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
+        <Image
+          src={property.images[0]}
+          alt={property.title}
+          containerClassName="h-full w-full"
+          className="transition-transform duration-200 group-hover:scale-[1.02]"
         />
         
         {/* Top Badges */}

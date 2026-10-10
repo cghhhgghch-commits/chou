@@ -9,6 +9,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { Property } from "../types";
 import { APP_CONFIG, formatSyrianPrice, getWhatsAppUrl } from "../lib/constants";
+import Image from "../components/ui/Image";
+import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -71,7 +73,7 @@ export default function PropertyDetails() {
             description: data.description || "عقار مميز بمواصفات ممتازة وموقع استراتيجي.",
             amenities: Array.isArray(data.amenities) ? data.amenities : ["طاقة شمسية", "سند طابو فوري"],
             images: Array.isArray(data.images) && data.images.length > 0 ? data.images : [
-              "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+              PROPERTY_IMAGE_FALLBACK
             ],
             isVerified: data.is_verified ?? true,
             isFeatured: data.is_featured ?? false,
@@ -233,11 +235,11 @@ export default function PropertyDetails() {
             </div>
 
             {/* Image Gallery */}
-            <div className="relative bg-slate-900 md:rounded-3xl overflow-hidden aspect-[4/3] md:aspect-video group border border-slate-200 shadow-xs">
-              <img 
-                src={property.images[activeImage] || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"} 
-                alt={property.title} 
-                className="w-full h-full object-cover" 
+            <div className="relative bg-slate-900 md:rounded-3xl overflow-hidden aspect-[4/3] group border border-slate-200 shadow-xs">
+              <Image
+                src={property.images[activeImage] || PROPERTY_IMAGE_FALLBACK}
+                alt={property.title}
+                containerClassName="absolute inset-0 h-full w-full"
               />
               
               {/* Badges on top of Image */}
@@ -282,11 +284,11 @@ export default function PropertyDetails() {
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
+                    className={`relative w-16 aspect-[4/3] rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
                       activeImage === i ? "border-brand-500 scale-95 ring-2 ring-brand-500/20" : "border-slate-200 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <Image src={img} alt={`${property.title} - صورة ${i + 1}`} containerClassName="h-full w-full" />
                   </button>
                 ))}
               </div>

@@ -22,6 +22,7 @@ import {
   formatSyrianPrice,
 } from "../lib/constants";
 import { filterProperties, getAvailableAreas } from "../lib/propertyFilters";
+import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 export const CATEGORY_TABS = [
   { id: "all", label: "الكل", icon: null },
@@ -116,7 +117,7 @@ export default function Properties() {
         amenities: Array.isArray(item.amenities) ? item.amenities : ["طاقة شمسية", "سند طابو"],
         images: Array.isArray(item.images) && item.images.length > 0
           ? item.images
-          : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"],
+          : [PROPERTY_IMAGE_FALLBACK],
         isVerified: item.is_verified ?? true,
         isFeatured: item.is_featured ?? true,
         advertiserType: item.advertiser_type || "owner",

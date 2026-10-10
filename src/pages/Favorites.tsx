@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import { useFavorites } from "../lib/FavoritesContext";
 import { Property } from "../types";
 import PropertyCard from "../components/properties/PropertyCard";
+import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 
 export default function Favorites() {
   const { favoriteIds, loading: favoritesLoading } = useFavorites();
@@ -60,7 +61,7 @@ export default function Favorites() {
           hasGenerator: Boolean(data.has_generator),
           description: data.description || "",
           amenities: Array.isArray(data.amenities) ? data.amenities : [],
-          images: Array.isArray(data.images) && data.images.length > 0 ? data.images : ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"],
+          images: Array.isArray(data.images) && data.images.length > 0 ? data.images : [PROPERTY_IMAGE_FALLBACK],
           isVerified: Boolean(data.is_verified),
           isFeatured: Boolean(data.is_featured),
           advertiserType: data.advertiser_type || "owner",

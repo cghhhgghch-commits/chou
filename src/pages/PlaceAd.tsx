@@ -9,6 +9,7 @@ import { Camera as CapacitorCamera, CameraResultType, CameraSource } from "@capa
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import { useAdmin } from "../lib/AdminContext";
+import Image from "../components/ui/Image";
 import { 
   APP_CONFIG, 
   SYRIAN_CITIES,
@@ -858,7 +859,7 @@ ${imageSection}
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                 {previewUrls.map((url, i) => (
                   <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
-                    <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                    <Image src={url} alt={`معاينة الصورة ${i + 1}`} containerClassName="h-full w-full" />
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
