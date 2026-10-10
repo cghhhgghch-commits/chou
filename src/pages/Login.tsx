@@ -5,6 +5,8 @@ import { useAdmin } from "../lib/AdminContext";
 import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, Apple } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
+import Image from "../components/ui/Image";
+import { AUTH_PANEL_IMAGE } from "../config/images";
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 const nativeAuthCallbackUrl = "com.laqta.syria://auth/callback";
@@ -309,21 +311,44 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Home className="w-8 h-8 text-white" />
+    <main className="min-h-screen bg-stone-50 px-4 py-6 md:px-6 md:py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <aside className="relative hidden min-h-[680px] overflow-hidden rounded-xl bg-stone-900 lg:block">
+          <Image
+            src={AUTH_PANEL_IMAGE}
+            alt="واجهة منزل"
+            containerClassName="absolute inset-0 h-full w-full"
+          />
+          <div className="absolute inset-0 bg-stone-950/45" />
+          <div className="absolute inset-x-8 top-8 flex items-center gap-3 text-white">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-500">
+              <Home className="h-6 w-6" />
+            </span>
+            <span className="text-xl font-bold">لقطة</span>
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">لقطة</h1>
-          <p className="text-slate-400 text-sm">منصة العقارات السورية</p>
+          <div className="absolute inset-x-8 bottom-10 max-w-md text-white">
+            <p className="mb-2 text-sm font-medium text-white/80">لقطة للعقارات والخدمات</p>
+            <h2 className="text-3xl font-bold leading-[1.8]">مكانك القادم يبدأ بخطوة واضحة</h2>
+            <p className="mt-2 text-base leading-8 text-white/85">تابع إعلاناتك ورسائلك وخدماتك من حساب واحد.</p>
+          </div>
+        </aside>
+
+        <div className="w-full max-w-xl justify-self-center">
+        {/* Logo */}
+        <div className="mb-6 flex items-center justify-center gap-3 lg:hidden">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-500 text-white">
+            <Home className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-stone-900">لقطة</h1>
+            <p className="text-xs text-stone-600">منصة العقارات السورية</p>
+          </div>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
           {/* Tabs */}
-          <div className="flex border-b border-slate-200">
+          <div className="flex border-b border-stone-200">
             <button
               onClick={() => {
                 setMode("login");
@@ -331,8 +356,8 @@ export default function Login() {
               }}
               className={`flex-1 py-4 px-6 font-black text-center transition-colors ${
                 mode === "login"
-                  ? "bg-brand-50 text-brand-600 border-b-2 border-brand-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-b-2 border-brand-500 bg-brand-50 text-brand-800"
+                  : "text-stone-600 hover:text-stone-900"
               }`}
             >
               دخول
@@ -344,8 +369,8 @@ export default function Login() {
               }}
               className={`flex-1 py-4 px-6 font-black text-center transition-colors ${
                 mode === "register"
-                  ? "bg-brand-50 text-brand-600 border-b-2 border-brand-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "border-b-2 border-brand-500 bg-brand-50 text-brand-800"
+                  : "text-stone-600 hover:text-stone-900"
               }`}
             >
               تسجيل جديد
@@ -353,7 +378,7 @@ export default function Login() {
           </div>
 
           {/* Form */}
-          <div className="p-8">
+          <div className="p-5 sm:p-8">
             <form onSubmit={mode === "login" ? handleLogin : handleRegister} className="space-y-5">
               {/* Name - Only for Register */}
               {mode === "register" && (
@@ -364,7 +389,7 @@ export default function Login() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="أدخل اسمك"
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                    className="w-full rounded-lg border border-stone-300 px-4 py-3 text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                     required
                   />
                 </div>
@@ -372,7 +397,7 @@ export default function Login() {
 
               {/* Email */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-stone-800">
                   <Mail className="w-4 h-4" />
                   البريد الإلكتروني
                 </label>
@@ -383,14 +408,14 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="أدخل بريدك"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+                  className="w-full rounded-lg border border-stone-300 px-4 py-3 text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   required
                 />
               </div>
 
               {/* Password */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-stone-800">
                   <Lock className="w-4 h-4" />
                   كلمة المرور
                 </label>
@@ -400,13 +425,14 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="أدخل كلمة مرورك"
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all pr-12"
+                    className="w-full rounded-lg border border-stone-300 py-3 pe-12 ps-4 text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-4 top-3.5 text-slate-500 hover:text-slate-700"
+                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                    className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-stone-500 hover:bg-stone-100 hover:text-stone-900"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -415,9 +441,9 @@ export default function Login() {
 
               {/* Error */}
               {error && (
-                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                <div className="flex items-center gap-3 rounded-lg border border-brand-300 bg-brand-50 p-4 text-brand-900">
+                  <AlertCircle className="h-5 w-5 shrink-0 text-brand-700" />
+                  <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
 
@@ -425,7 +451,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 disabled:opacity-50 text-white font-black rounded-xl transition-all flex items-center justify-center gap-2"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -441,10 +467,10 @@ export default function Login() {
 
               <div className="relative my-2">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
+                  <div className="w-full border-t border-stone-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-slate-400">أو</span>
+                  <span className="bg-white px-2 text-stone-500">أو</span>
                 </div>
               </div>
 
@@ -453,7 +479,7 @@ export default function Login() {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading || socialLoading !== null}
-                  className="w-full py-3 px-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-3 font-bold text-stone-800 transition-colors hover:bg-stone-50"
                 >
                   <Chrome className="w-4 h-4 text-red-500" />
                   تسجيل الدخول عبر Google
@@ -463,7 +489,7 @@ export default function Login() {
                 type="button"
                 onClick={handleAppleAuth}
                 disabled={loading || socialLoading !== null}
-                className="w-full py-3 px-4 border border-slate-200 bg-black hover:bg-slate-800 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-stone-800 bg-stone-900 px-4 py-3 font-bold text-white transition-colors hover:bg-stone-800"
               >
                 <Apple className="w-4 h-4" />
                 تسجيل الدخول باستخدام Apple
@@ -472,7 +498,7 @@ export default function Login() {
 
             {showGoogleConfirm && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 backdrop-blur-sm">
-                <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200">
+                <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
                   <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 mx-auto mb-4">
                     <Chrome className="w-7 h-7" />
                   </div>
@@ -484,7 +510,7 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => setShowGoogleConfirm(false)}
-                      className="flex-1 border border-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl hover:bg-slate-50 transition-colors"
+                      className="min-h-11 flex-1 rounded-lg border border-stone-300 px-4 py-3 font-bold text-stone-800 transition-colors hover:bg-stone-50"
                     >
                       إلغاء
                     </button>
@@ -492,7 +518,7 @@ export default function Login() {
                       type="button"
                       onClick={handleGoogleAuth}
                       disabled={socialLoading === "google"}
-                      className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-3 px-4 rounded-xl hover:from-brand-600 hover:to-brand-700 transition-colors disabled:opacity-70"
+                      className="min-h-11 flex-1 rounded-lg bg-brand-500 px-4 py-3 font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-70"
                     >
                       {socialLoading === "google" ? "جاري المعالجة..." : "متابعة"}
                     </button>
@@ -502,7 +528,7 @@ export default function Login() {
             )}
 
             {/* Footer */}
-            <p className="text-center text-xs text-slate-500 mt-6">
+            <p className="mt-6 text-center text-sm text-stone-600">
               {mode === "login" ? "ليس لديك حساب؟ " : "لديك حساب؟ "}
               <button
                 onClick={() => {
@@ -512,7 +538,7 @@ export default function Login() {
                   setPassword("");
                   setName("");
                 }}
-                className="text-brand-600 font-bold hover:text-brand-700"
+                className="min-h-11 text-brand-700 font-bold hover:text-brand-800"
               >
                 {mode === "login" ? "سجل الآن" : "ادخل هنا"}
               </button>
@@ -521,17 +547,18 @@ export default function Login() {
         </div>
 
         {/* Bottom Info */}
-        <div className="text-center text-xs text-slate-400 mt-8 space-y-2">
+        <div className="mt-6 space-y-2 text-center text-xs text-stone-600">
           <p>التطبيق آمن وموثوق • البيانات محفوظة بشكل آمن</p>
           <div className="flex items-center justify-center gap-4 text-xs">
-            <Link to="/" className="hover:text-slate-300">الصفحة الرئيسية</Link>
+            <Link to="/" className="hover:text-brand-700">الصفحة الرئيسية</Link>
             <span>•</span>
-            <Link to="/privacy" className="hover:text-slate-300">الخصوصية</Link>
+            <Link to="/privacy" className="hover:text-brand-700">الخصوصية</Link>
             <span>•</span>
-            <Link to="/contact" className="hover:text-slate-300">التواصل</Link>
+            <Link to="/contact" className="hover:text-brand-700">التواصل</Link>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

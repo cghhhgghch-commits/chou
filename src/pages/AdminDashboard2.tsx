@@ -32,6 +32,7 @@ import {
 import { SYRIAN_CITIES, SYRIAN_CATEGORY_ICONS } from "../lib/constants";
 import Image from "../components/ui/Image";
 import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
+import Skeleton from "../components/ui/Skeleton";
 
 interface PropertyListing {
   id: string;
@@ -517,31 +518,31 @@ export default function AdminDashboard2() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-lg border-b border-blue-900">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex items-center justify-between gap-3">
+      <header className="border-b border-stone-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:py-5">
           <div className="flex items-center gap-4">
-            <div className="bg-white rounded-2xl p-2.5 sm:p-3 shadow-md shrink-0">
-              <LayoutDashboard className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+              <LayoutDashboard className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-4xl font-black text-white">لوحة المدير</h1>
-              <p className="text-xs sm:text-sm text-blue-100">إدارة الإعلانات والمراجعة اليومية</p>
+              <h1 className="text-xl font-bold text-stone-900 sm:text-2xl">لوحة المدير</h1>
+              <p className="text-xs text-stone-600 sm:text-sm">إدارة الإعلانات والمراجعة اليومية</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={refreshDashboard}
               disabled={refreshing}
-              className="p-2.5 bg-white/15 hover:bg-white/25 disabled:opacity-60 text-white rounded-xl transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-stone-300 bg-white text-stone-700 transition-colors hover:bg-stone-50 disabled:opacity-60"
               title="تحديث البيانات"
             >
               <RefreshCw className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`} />
             </button>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors"
+              className="flex min-h-11 items-center gap-2 rounded-lg border border-brand-500 bg-white px-3 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50 sm:px-5"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">تسجيل الخروج</span>
@@ -550,28 +551,28 @@ export default function AdminDashboard2() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
           <div>
-            <p className="text-xs font-black text-emerald-800">صلاحيات المدير</p>
-            <p className="text-[11px] text-emerald-700">إضافة، تعديل، حذف، وتنظيم كل قسم من أقسام العقارات</p>
+            <p className="text-sm font-bold text-stone-900">صلاحيات المدير</p>
+            <p className="text-xs text-stone-600">إضافة، تعديل، حذف، وتنظيم كل قسم من أقسام العقارات</p>
           </div>
-          <div className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+          <div className="rounded-md border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-medium text-stone-700">
             {adminEmail || adminUser?.email || "مدير مسجل"}
           </div>
         </div>
 
         {loadError && (
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+          <div className="mb-6 flex flex-col justify-between gap-3 rounded-xl border border-brand-300 bg-brand-50 px-4 py-3 text-brand-900 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2 text-sm font-bold">
+              <AlertCircle className="h-5 w-5 shrink-0" />
               <span>{loadError}</span>
             </div>
-            <button onClick={refreshDashboard} className="rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white">إعادة المحاولة</button>
+            <button onClick={refreshDashboard} className="min-h-11 rounded-lg bg-brand-500 px-4 py-2 text-sm font-bold text-white">إعادة المحاولة</button>
           </div>
         )}
 
-        <nav className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm sm:grid-cols-4" aria-label="أقسام لوحة المدير">
+        <nav className="mb-6 grid grid-cols-2 gap-2 rounded-xl border border-stone-200 bg-white p-1.5 sm:grid-cols-4" aria-label="أقسام لوحة المدير">
           {[
             { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
             { id: "listings", label: "الإعلانات", icon: ClipboardList },
@@ -584,33 +585,33 @@ export default function AdminDashboard2() {
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id as typeof activeSection)}
-                className={`flex items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-xs sm:text-sm font-black transition-colors ${selected ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"}`}
+                className={`flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2 py-3 text-xs font-bold transition-colors sm:text-sm ${selected ? "bg-brand-500 text-white" : "text-stone-700 hover:bg-stone-50"}`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{section.label}</span>
-                {section.id === "leads" && pendingLeads.length > 0 && <span className={`min-w-5 rounded-full px-1.5 text-[10px] ${selected ? "bg-white text-blue-700" : "bg-amber-100 text-amber-700"}`}>{pendingLeads.length}</span>}
+                {section.id === "leads" && pendingLeads.length > 0 && <span className={`min-w-5 rounded-md px-1.5 text-xs ${selected ? "bg-white text-brand-700" : "bg-amber-100 text-amber-900"}`}>{pendingLeads.length}</span>}
               </button>
             );
           })}
         </nav>
 
         {activeSection === "notifications" && (
-          <section className="mb-8 max-w-3xl rounded-2xl border border-blue-200 bg-white p-5 shadow-sm sm:p-7">
+          <section className="mb-8 max-w-3xl rounded-xl border border-stone-200 bg-white p-5 sm:p-7">
             <div className="mb-6 flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                 <Bell className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-slate-900">إرسال إشعار للمستخدمين</h2>
-                <p className="mt-1 text-xs leading-5 text-slate-500">اكتب الرسالة وسيتم إرسالها إلى الأجهزة التي فعّلت إشعارات التطبيق.</p>
+                <h2 className="text-xl font-bold text-stone-900">إرسال إشعار للمستخدمين</h2>
+                <p className="mt-1 text-sm leading-7 text-stone-600">اكتب الرسالة وسيتم إرسالها إلى الأجهزة التي فعّلت إشعارات التطبيق.</p>
               </div>
             </div>
 
             <form onSubmit={sendAdminNotification} className="space-y-5">
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <label htmlFor="notification-title" className="text-sm font-bold text-slate-700">عنوان الإشعار</label>
-                  <span className="text-[11px] text-slate-400">{notificationTitle.length}/80</span>
+                  <label htmlFor="notification-title" className="text-sm font-bold text-stone-800">عنوان الإشعار</label>
+                  <span className="text-xs text-stone-500">{notificationTitle.length}/80</span>
                 </div>
                 <input
                   id="notification-title"
@@ -618,15 +619,15 @@ export default function AdminDashboard2() {
                   onChange={(event) => setNotificationTitle(event.target.value)}
                   maxLength={80}
                   placeholder="مثال: إعلان جديد بانتظارك"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   required
                 />
               </div>
 
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <label htmlFor="notification-message" className="text-sm font-bold text-slate-700">نص الإشعار</label>
-                  <span className="text-[11px] text-slate-400">{notificationMessage.length}/500</span>
+                  <label htmlFor="notification-message" className="text-sm font-bold text-stone-800">نص الإشعار</label>
+                  <span className="text-xs text-stone-500">{notificationMessage.length}/500</span>
                 </div>
                 <textarea
                   id="notification-message"
@@ -635,7 +636,7 @@ export default function AdminDashboard2() {
                   maxLength={500}
                   rows={5}
                   placeholder="اكتب تفاصيل الرسالة التي ستصل للمستخدمين..."
-                  className="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 text-sm leading-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full resize-none rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm leading-7 text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   required
                 />
               </div>
@@ -643,7 +644,7 @@ export default function AdminDashboard2() {
               <button
                 type="submit"
                 disabled={isSendingNotification || !notificationTitle.trim() || !notificationMessage.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-3.5 text-sm font-bold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 {isSendingNotification ? <Loader className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                 {isSendingNotification ? "جاري الإرسال..." : "إرسال الإشعار"}
@@ -656,10 +657,10 @@ export default function AdminDashboard2() {
           <section className="mb-8">
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>
-                <h2 className="text-xl font-black text-slate-900">ملخص المنصة</h2>
-                <p className="mt-1 text-xs text-slate-500">صورة سريعة عن الإعلانات التي تحتاج متابعة</p>
+                <h2 className="text-xl font-bold text-stone-900">ملخص المنصة</h2>
+                <p className="mt-1 text-sm text-stone-600">صورة سريعة عن الإعلانات التي تحتاج متابعة</p>
               </div>
-              <button onClick={() => setActiveSection("listings")} className="text-xs font-black text-blue-600 hover:text-blue-700">إدارة الإعلانات</button>
+              <button onClick={() => setActiveSection("listings")} className="min-h-11 text-sm font-bold text-brand-700 hover:text-brand-800">إدارة الإعلانات</button>
             </div>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[
@@ -670,7 +671,7 @@ export default function AdminDashboard2() {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div key={stat.label} className="rounded-xl border border-stone-200 bg-white p-4">
                     <div className="flex items-center justify-between gap-2">
                       <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.bg}`}><Icon className={`h-5 w-5 ${stat.color}`} /></div>
                       <TrendingUp className="h-4 w-4 text-slate-300" />
@@ -686,14 +687,14 @@ export default function AdminDashboard2() {
 
         {/* نموذج الإنشاء/التعديل */}
         {showForm && (
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-slate-200">
+          <div className="mb-8 rounded-xl border border-stone-200 bg-white p-4 sm:p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-stone-900">
                 {editingId ? "تعديل الإعلان" : "إنشاء إعلان جديد"}
               </h2>
               <button
                 onClick={handleCancel}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-lg transition-colors hover:bg-stone-100"
               >
                 <X className="w-6 h-6 text-slate-400" />
               </button>
@@ -711,7 +712,7 @@ export default function AdminDashboard2() {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="مثال: شقة فاخرة بإطلالة"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                     required
                   />
                 </div>
@@ -723,7 +724,7 @@ export default function AdminDashboard2() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -743,7 +744,7 @@ export default function AdminDashboard2() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     {DEAL_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>
@@ -760,7 +761,7 @@ export default function AdminDashboard2() {
                   <select
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     {SYRIAN_CITIES.map((city) => (
                       <option key={city} value={city}>
@@ -779,7 +780,7 @@ export default function AdminDashboard2() {
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="مثال: 950000000"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                     required
                   />
                 </div>
@@ -797,7 +798,7 @@ export default function AdminDashboard2() {
                     value={formData.area}
                     onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                     placeholder="185"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                     required
                   />
                 </div>
@@ -812,7 +813,7 @@ export default function AdminDashboard2() {
                     value={formData.bedrooms}
                     onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
                     placeholder="3"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
 
@@ -826,7 +827,7 @@ export default function AdminDashboard2() {
                     value={formData.bathrooms}
                     onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
                     placeholder="2"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
 
@@ -837,7 +838,7 @@ export default function AdminDashboard2() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   >
                     {DEAL_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>{type.label}</option>
@@ -861,7 +862,7 @@ export default function AdminDashboard2() {
                       })
                     }
                     placeholder="/images/property-photo.webp"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   />
                 </div>
 
@@ -895,7 +896,7 @@ export default function AdminDashboard2() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="أضف وصفاً جذاباً للعقار..."
                   rows={5}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full resize-none rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
 
@@ -904,7 +905,7 @@ export default function AdminDashboard2() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                  className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-brand-500 py-3 font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -921,7 +922,7 @@ export default function AdminDashboard2() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 bg-slate-300 hover:bg-slate-400 text-slate-900 font-bold py-3 rounded-xl transition-colors"
+                  className="min-h-11 flex-1 rounded-lg border border-stone-300 bg-white py-3 font-bold text-stone-800 transition-colors hover:bg-stone-50"
                 >
                   إلغاء
                 </button>
@@ -931,40 +932,40 @@ export default function AdminDashboard2() {
         )}
 
         {activeSection === "leads" && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-slate-200">
+          <div className="mb-8 rounded-xl border border-stone-200 bg-white p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-black text-slate-900">طلبات الواتساب الواردة</h2>
-                <p className="text-[11px] text-slate-500 mt-1">المدير يتواصل مع العميل أولاً، ثم يضيف الإعلان الاحترافي يدويًا في لوحة الإدارة</p>
+                <h2 className="text-lg font-bold text-stone-900">طلبات الواتساب الواردة</h2>
+                <p className="mt-1 text-sm leading-6 text-stone-600">المدير يتواصل مع العميل أولاً، ثم يضيف الإعلان الاحترافي يدويًا في لوحة الإدارة</p>
               </div>
               <span className="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-black text-amber-700">{pendingLeads.length} جديدة</span>
             </div>
 
             <div className="space-y-3">
               {pendingLeads.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-                  <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" />
-                  <p className="mt-2 text-sm font-black text-slate-700">لا توجد طلبات بانتظار المراجعة</p>
+                <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-8 text-center">
+                  <CheckCircle2 className="mx-auto h-8 w-8 text-green-700" />
+                  <p className="mt-2 text-sm font-bold text-stone-800">لا توجد طلبات بانتظار المراجعة</p>
                 </div>
               ) : pendingLeads.map((lead) => (
-                <div key={lead.id} className="border border-amber-200 bg-amber-50 rounded-2xl p-4">
+                <div key={lead.id} className="rounded-lg border border-stone-200 bg-white p-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex-1">
-                      <p className="text-xs font-black text-slate-700">{lead.parsedData?.title || "طلب جديد"}</p>
-                      <p className="mt-1 text-[11px] text-slate-600 whitespace-pre-wrap">{lead.message}</p>
+                      <p className="text-sm font-bold text-stone-900">{lead.parsedData?.title || "طلب جديد"}</p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-stone-700">{lead.message}</p>
                     </div>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => openLeadAsDraft(lead)}
-                        className="bg-slate-800 text-white px-3 py-2 rounded-xl text-[11px] font-bold"
+                        className="min-h-11 rounded-lg bg-brand-500 px-3 py-2 text-sm font-bold text-white"
                       >
                         استيراد إلى النموذج
                       </button>
                       <button
                         type="button"
                         onClick={() => rejectLead(lead.id)}
-                        className="bg-red-500 text-white px-3 py-2 rounded-xl text-[11px] font-bold"
+                        className="min-h-11 rounded-lg border border-brand-500 bg-white px-3 py-2 text-sm font-bold text-brand-700"
                       >
                         رفض
                       </button>
@@ -977,7 +978,7 @@ export default function AdminDashboard2() {
         )}
 
         {/* البحث والتصفية */}
-        {activeSection === "listings" && <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-8 border border-slate-200">
+        {activeSection === "listings" && <div className="mb-8 rounded-xl border border-stone-200 bg-white p-4 sm:p-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -986,14 +987,14 @@ export default function AdminDashboard2() {
                 placeholder="ابحث عن الإعلانات..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 py-2 pe-4 ps-10 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
             </div>
 
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="min-h-11 rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="all">جميع الأقسام</option>
               {CATEGORIES.map((cat) => (
@@ -1006,7 +1007,7 @@ export default function AdminDashboard2() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-              className="w-full md:w-auto px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="min-h-11 w-full rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand-400 md:w-auto"
               aria-label="فلترة حالة الإعلان"
             >
               <option value="all">كل الحالات</option>
@@ -1018,35 +1019,45 @@ export default function AdminDashboard2() {
             {!showForm && (
               <button
                 onClick={() => navigate("/place-ad")}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                className="flex min-h-11 items-center gap-2 rounded-lg bg-brand-500 px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-brand-600"
               >
                 <Plus className="w-5 h-5" />
                 إضافة إعلان متكاملة
               </button>
             )}
           </div>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-slate-500">
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm font-medium text-stone-600">
             <span>المعروض الآن: {filteredListings.length}</span>
-            <button onClick={() => { setSearchTerm(""); setCategoryFilter("all"); setStatusFilter("all"); }} className="text-blue-600 hover:underline">مسح الفلاتر</button>
+            <button onClick={() => { setSearchTerm(""); setCategoryFilter("all"); setStatusFilter("all"); }} className="min-h-11 text-brand-700 hover:underline">مسح الفلاتر</button>
           </div>
         </div>}
 
         {/* قائمة الإعلانات */}
         {activeSection === "listings" && (loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader className="w-8 h-8 animate-spin text-blue-500" />
+          <div className="grid gap-4">
+            {[0, 1, 2].map((item) => (
+              <div key={item} className="flex flex-col gap-4 rounded-xl border border-stone-200 bg-white p-4 sm:flex-row">
+                <Skeleton className="aspect-[4/3] w-full sm:w-64" />
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-6 w-3/5" />
+                  <Skeleton className="h-4 w-2/5" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredListings.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-md p-12 text-center border border-slate-200">
-            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <p className="text-slate-600 text-lg">لا توجد إعلانات حالياً</p>
+          <div className="rounded-xl border border-stone-200 bg-white p-12 text-center">
+            <AlertCircle className="mx-auto mb-4 h-12 w-12 text-stone-500" />
+            <p className="text-lg font-bold text-stone-800">لا توجد إعلانات حالياً</p>
           </div>
         ) : (
           <div className="grid gap-6">
             {filteredListings.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg border border-slate-200 overflow-hidden transition-shadow"
+                className="overflow-hidden rounded-xl border border-stone-200 bg-white transition-shadow hover:shadow-sm"
               >
                 <div className="flex flex-col md:flex-row">
                   {/* الصورة والفيديو */}
@@ -1078,17 +1089,17 @@ export default function AdminDashboard2() {
                   </div>
 
                   {/* المعلومات */}
-                  <div className="flex-1 p-6 flex flex-col justify-between">
+                  <div className="flex flex-1 flex-col justify-between p-4 sm:p-6">
                     <div>
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h3 className="text-xl font-bold text-slate-900">{item.title}</h3>
-                          <p className="text-sm text-slate-500 mt-1">
+                          <h3 className="text-lg font-bold text-stone-900">{item.title}</h3>
+                          <p className="mt-1 text-sm text-stone-600">
                             {CATEGORIES.find((c) => c.id === item.category)?.label ||
                               item.category}
                           </p>
                         </div>
-                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">
+                        <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${item.type === "sale" ? "bg-brand-500 text-white" : "bg-stone-800 text-white"}`}>
                           {item.type === "sale"
                             ? "بيع"
                             : item.type === "rent"
@@ -1097,38 +1108,38 @@ export default function AdminDashboard2() {
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-4">
+                      <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-stone-600">
                         <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-stone-500" />{item.city}</span>
                         <span className="inline-flex items-center gap-1.5"><Ruler className="h-4 w-4 text-stone-500" />{item.area} م²</span>
                         {item.bedrooms && <span className="inline-flex items-center gap-1.5"><BedDouble className="h-4 w-4 text-stone-500" />{item.bedrooms}</span>}
                         {item.bathrooms && <span className="inline-flex items-center gap-1.5"><Bath className="h-4 w-4 text-stone-500" />{item.bathrooms}</span>}
                       </div>
 
-                      <p className="text-lg font-bold text-green-600">
+                      <p className="text-lg font-bold text-stone-900">
                         {Number(item.price).toLocaleString()} ل.س
                       </p>
 
                       {item.description && (
-                        <p className="text-sm text-slate-600 mt-3 line-clamp-2">
+                        <p className="mt-3 line-clamp-2 text-sm leading-7 text-stone-700">
                           {item.description}
                         </p>
                       )}
                     </div>
 
                     {/* الأزرار */}
-                    <div className="flex gap-3 mt-4 pt-4 border-t border-slate-200">
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-stone-200 pt-4">
                       {item.status === "pending" && (
                         <>
                           <button
                             onClick={() => handleModerate(item.id, true)}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                            className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-green-800"
                           >
                             <Check className="w-4 h-4" />
                             موافقة
                           </button>
                           <button
                             onClick={() => handleModerate(item.id, false)}
-                            className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-500 bg-white px-4 py-2 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50"
                           >
                             <X className="w-4 h-4" />
                             رفض
@@ -1137,14 +1148,14 @@ export default function AdminDashboard2() {
                       )}
                       <button
                         onClick={() => handleEdit(item)}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white py-2 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
                       >
                         <Edit2 className="w-4 h-4" />
                         تعديل
                       </button>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-500 bg-white py-2 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50"
                       >
                         <Trash2 className="w-4 h-4" />
                         حذف

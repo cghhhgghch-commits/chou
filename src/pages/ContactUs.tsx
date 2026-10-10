@@ -61,45 +61,45 @@ export default function ContactUs() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 md:pb-12 text-slate-800">
+    <div className="min-h-screen bg-stone-50 pb-24 text-stone-800 md:pb-12">
       {/* Header Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="container mx-auto px-4 max-w-4xl h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-slate-700 hover:text-brand-600 font-bold text-sm">
+      <div className="sticky top-0 z-30 border-b border-stone-200 bg-white">
+        <div className="container mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
+          <Link to="/" className="flex min-h-11 items-center gap-2 text-sm font-bold text-stone-700 hover:text-brand-700">
             <ArrowRight className="w-5 h-5" />
             <span>العودة للرئيسية</span>
           </Link>
-          <span className="text-xs font-bold text-slate-400">مركز المساعدة والتواصل</span>
+          <span className="text-xs font-medium text-stone-500">مركز المساعدة والتواصل</span>
         </div>
       </div>
 
       <div className="container mx-auto px-4 max-w-4xl py-8 space-y-8">
         
         {/* Title Header */}
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xs space-y-2">
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+        <div className="space-y-2 rounded-xl border border-stone-200 bg-white p-5 md:p-7">
+          <h1 className="text-2xl font-bold leading-10 text-stone-900 md:text-3xl">
             تواصل معنا ومركز الدعم الفني
           </h1>
-          <p className="text-slate-600 text-sm leading-relaxed">
+          <p className="text-sm leading-8 text-stone-700">
             فريق خدمة العملاء متواجد على مدار الساعة للرد على استفساراتكم ومساعدتكم في نشر الإعلانات وطلب خدمات الصيانة.
           </p>
         </div>
 
         {/* Contact Methods Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <button
             type="button"
             onClick={() => void openExternalLink(getWhatsAppUrl("مرحباً، أود الاستفسار عن منصة لقطة"))}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-3xl shadow-sm transition-all flex flex-col justify-between group text-right"
+            className="flex min-h-48 flex-col justify-between rounded-xl bg-green-800 p-5 text-right text-white transition-colors hover:bg-green-900"
           >
             <div className="space-y-2">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                <MessageSquare className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white/15">
+                <MessageSquare className="h-5 w-5" />
               </div>
               <h3 className="font-black text-base">مراسلة واتساب فورية</h3>
-              <p className="text-xs text-emerald-100">استجابة سريعة وتواصل مباشر مع فريق الإدارة.</p>
+              <p className="text-sm leading-7 text-green-100">استجابة سريعة وتواصل مباشر مع فريق الإدارة.</p>
             </div>
-            <span className="text-xs font-extrabold mt-4 flex items-center gap-1">
+            <span className="mt-4 flex min-h-11 items-center gap-1 text-sm font-bold">
               <span>تحدث معنا الآن</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
@@ -108,16 +108,16 @@ export default function ContactUs() {
           <button
             type="button"
             onClick={() => void openExternalLink(`tel:${APP_CONFIG.adminPhone}`)}
-            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group text-right"
+            className="flex min-h-48 flex-col justify-between rounded-xl border border-stone-200 bg-white p-5 text-right transition-colors hover:bg-stone-50"
           >
             <div className="space-y-2">
-              <div className="w-12 h-12 bg-slate-100 text-slate-800 rounded-2xl flex items-center justify-center">
-                <Phone className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
+                <Phone className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-base">اتصال هاتفي مباشر</h3>
-              <p className="text-xs text-slate-500" dir="ltr">{APP_CONFIG.adminPhone}</p>
+              <h3 className="text-base font-bold text-stone-900">اتصال هاتفي مباشر</h3>
+              <p className="text-sm text-stone-600" dir="ltr">{APP_CONFIG.adminPhone}</p>
             </div>
-            <span className="text-xs font-bold text-brand-600 mt-4 flex items-center gap-1">
+            <span className="mt-4 flex min-h-11 items-center gap-1 text-sm font-bold text-brand-700">
               <span>اتصل الآن</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
@@ -126,16 +126,16 @@ export default function ContactUs() {
           <button
             type="button"
             onClick={() => void openExternalLink(`mailto:${APP_CONFIG.supportEmail}`)}
-            className="bg-white hover:bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col justify-between group text-right"
+            className="flex min-h-48 flex-col justify-between rounded-xl border border-stone-200 bg-white p-5 text-right transition-colors hover:bg-stone-50"
           >
             <div className="space-y-2">
-              <div className="w-12 h-12 bg-slate-100 text-slate-800 rounded-2xl flex items-center justify-center">
-                <Mail className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
+                <Mail className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-base">البريد الإلكتروني</h3>
-              <p className="text-xs text-slate-500" dir="ltr">{APP_CONFIG.supportEmail}</p>
+              <h3 className="text-base font-bold text-stone-900">البريد الإلكتروني</h3>
+              <p className="text-sm text-stone-600" dir="ltr">{APP_CONFIG.supportEmail}</p>
             </div>
-            <span className="text-xs font-bold text-brand-600 mt-4 flex items-center gap-1">
+            <span className="mt-4 flex min-h-11 items-center gap-1 text-sm font-bold text-brand-700">
               <span>أرسل إيميل</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </span>
@@ -146,17 +146,17 @@ export default function ContactUs() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Form */}
-          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-            <h2 className="font-black text-slate-900 text-base">أرسل لنا استفساراً أو اقتراحاً</h2>
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5 md:p-7">
+            <h2 className="text-base font-bold text-stone-900">أرسل لنا استفساراً أو اقتراحاً</h2>
             
             {sent ? (
-              <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl text-emerald-800 text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                <h3 className="font-bold text-sm">تم إرسال رسالتك بنجاح!</h3>
-                <p className="text-xs">سيقوم فريقنا بالتواصل معك في أقرب وقت.</p>
+              <div className="space-y-2 rounded-lg border border-green-200 bg-green-50 p-5 text-center text-green-900">
+                <CheckCircle2 className="mx-auto h-8 w-8 text-green-700" />
+                <h3 className="text-base font-bold">تم إرسال رسالتك بنجاح!</h3>
+                <p className="text-sm">سيقوم فريقنا بالتواصل معك في أقرب وقت.</p>
                 <button
                   onClick={() => setSent(false)}
-                  className="mt-2 text-xs font-bold text-emerald-700 underline"
+                  className="min-h-11 mt-2 text-sm font-bold text-green-800 underline"
                 >
                   إرسال رسالة أخرى
                 </button>
@@ -164,35 +164,35 @@ export default function ContactUs() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">الاسم الكامل *</label>
+                  <label className="mb-2 block text-sm font-bold text-stone-800">الاسم الكامل *</label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="مثال: أحمد العلي"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 outline-none focus:border-brand-500 focus:bg-white"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm font-medium text-stone-900 outline-none focus:border-brand-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف / واتساب</label>
+                  <label className="mb-2 block text-sm font-bold text-stone-800">رقم الهاتف / واتساب</label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+963 9xx xxx xxx"
                     dir="ltr"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 outline-none focus:border-brand-500 focus:bg-white"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm font-medium text-stone-900 outline-none focus:border-brand-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">الموضوع</label>
+                  <label className="mb-2 block text-sm font-bold text-stone-800">الموضوع</label>
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-800 outline-none focus:border-brand-500 focus:bg-white"
+                    className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm font-medium text-stone-900 outline-none focus:border-brand-500 focus:bg-white"
                   >
                     <option value="general">استفسار عام</option>
                     <option value="ad">طلب نشر أو تعديل إعلان عقاري</option>
@@ -202,20 +202,20 @@ export default function ContactUs() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">تفاصيل الرسالة *</label>
+                  <label className="mb-2 block text-sm font-bold text-stone-800">تفاصيل الرسالة *</label>
                   <textarea
                     required
                     rows={4}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="اكتب استفسارك بالتفصيل..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 outline-none focus:border-brand-500 focus:bg-white resize-none"
+                    className="w-full resize-none rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm font-medium text-stone-900 outline-none focus:border-brand-500 focus:bg-white"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-slate-900 hover:bg-brand-600 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-600"
                 >
                   <Send className="w-4 h-4" />
                   <span>إرسال الرسالة عبر واتساب</span>
@@ -225,9 +225,9 @@ export default function ContactUs() {
           </div>
 
           {/* FAQs Accordion */}
-          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 text-slate-900 font-black text-base">
-              <HelpCircle className="w-5 h-5 text-brand-600" />
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-5 md:p-7">
+            <div className="flex items-center gap-2 text-base font-bold text-stone-900">
+              <HelpCircle className="h-5 w-5 text-brand-700" />
               <h2>الأسئلة الشائعة</h2>
             </div>
 
@@ -235,10 +235,10 @@ export default function ContactUs() {
               {faqs.map((faq, idx) => {
                 const isOpen = openFaq === idx;
                 return (
-                  <div key={idx} className="border border-slate-200 rounded-2xl overflow-hidden">
+                  <div key={idx} className="overflow-hidden rounded-lg border border-stone-200">
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : idx)}
-                      className="w-full p-3.5 text-right font-bold text-xs text-slate-900 flex items-center justify-between gap-2 hover:bg-slate-50 transition-colors"
+                      className="flex min-h-12 w-full items-center justify-between gap-2 p-3.5 text-right text-sm font-bold text-stone-900 transition-colors hover:bg-stone-50"
                     >
                       <span>{faq.q}</span>
                       {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}

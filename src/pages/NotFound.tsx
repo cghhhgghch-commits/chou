@@ -3,16 +3,16 @@ import { Home, Building2, Wrench, PlusCircle, HelpCircle, ArrowRight } from "luc
 
 export default function NotFound() {
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 text-center bg-slate-50">
-      <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6">
+    <main className="flex min-h-[70vh] flex-col items-center justify-center bg-stone-50 px-4 py-12 text-center">
+      <div className="w-full max-w-lg space-y-6 rounded-xl border border-stone-200 bg-white p-6 sm:p-8">
         
-        <div className="w-16 h-16 rounded-3xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto border border-brand-100 font-black text-2xl">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-brand-50 text-xl font-bold text-brand-800">
           404
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-black text-slate-900">الصفحة المطلوبة غير موجودة</h1>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <h1 className="text-xl font-bold text-stone-900">الصفحة المطلوبة غير موجودة</h1>
+          <p className="text-sm leading-7 text-stone-600">
             عذراً، قد يكون تم نقل الرابط أو أن العنوان غير صحيح. يمكنك التوجه مباشرة للأقسام الرئيسية لمنصة لقطة:
           </p>
         </div>
@@ -20,7 +20,7 @@ export default function NotFound() {
         <div className="grid grid-cols-2 gap-2.5 pt-2">
           <Link
             to="/"
-            className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition-colors flex items-center justify-center gap-2 text-xs font-bold text-slate-800"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white p-3 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
           >
             <Home className="w-4 h-4 text-brand-600" />
             <span>الرئيسية</span>
@@ -28,7 +28,7 @@ export default function NotFound() {
 
           <Link
             to="/properties"
-            className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition-colors flex items-center justify-center gap-2 text-xs font-bold text-slate-800"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white p-3 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
           >
             <Building2 className="w-4 h-4 text-slate-600" />
             <span>تصفح العقارات</span>
@@ -36,7 +36,7 @@ export default function NotFound() {
 
           <Link
             to="/services"
-            className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition-colors flex items-center justify-center gap-2 text-xs font-bold text-slate-800"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white p-3 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
           >
             <Wrench className="w-4 h-4 text-slate-600" />
             <span>خدمات الصيانة</span>
@@ -44,7 +44,7 @@ export default function NotFound() {
 
           <Link
             to="/contact"
-            className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition-colors flex items-center justify-center gap-2 text-xs font-bold text-slate-800"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white p-3 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
           >
             <HelpCircle className="w-4 h-4 text-slate-600" />
             <span>مركز المساعدة</span>
@@ -54,7 +54,7 @@ export default function NotFound() {
         <div className="pt-2">
           <Link
             to="/"
-            className="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-600"
           >
             <span>العودة إلى الصفحة الرئيسية</span>
             <ArrowRight className="w-4 h-4 rotate-180" />
@@ -62,6 +62,6 @@ export default function NotFound() {
         </div>
 
       </div>
-    </div>
+    </main>
   );
 }

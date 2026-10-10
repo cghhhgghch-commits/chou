@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { MessageSquare, Loader2, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
+import Skeleton from "../components/ui/Skeleton";
 
 interface ConversationItem {
   id: string;
@@ -53,37 +54,48 @@ export default function Messages() {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 max-w-4xl py-8 pb-24 md:pb-8">
-        <div className="card p-12 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4">
-            <MessageSquare className="w-8 h-8" />
+      <div className="container mx-auto max-w-4xl px-4 py-8 pb-24 md:pb-8">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-stone-200 bg-white p-10 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
+            <MessageSquare className="h-7 w-7" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 mb-2">تحتاج إلى تسجيل الدخول</h2>
-          <p className="text-slate-500 mb-6">لرؤية محادثاتك ومتابعة الرسائل</p>
-          <Link to="/login" className="btn-primary">تسجيل الدخول</Link>
+          <p className="mb-6 text-sm text-stone-600">لرؤية محادثاتك ومتابعة الرسائل</p>
+          <Link to="/login" className="btn-primary inline-flex min-h-11 items-center">تسجيل الدخول</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 max-w-4xl py-8 pb-24 md:pb-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">الرسائل</h1>
+    <div className="container mx-auto max-w-4xl px-4 py-8 pb-24 md:pb-8">
+      <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-4">
+        <div>
+          <p className="text-xs font-bold text-brand-700">حسابي</p>
+          <h1 className="text-2xl font-bold text-stone-900">الرسائل</h1>
+        </div>
       </div>
 
       {loading ? (
-        <div className="card p-12 text-center flex flex-col items-center justify-center">
-          <Loader2 className="w-7 h-7 animate-spin text-brand-600" />
+        <div className="space-y-3">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className="flex min-h-16 items-center gap-3 rounded-xl border border-stone-200 bg-white p-4">
+              <Skeleton shape="circle" width={44} height={44} />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-2/5" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : conversations.length === 0 ? (
-        <div className="card p-12 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4">
-            <MessageSquare className="w-8 h-8" />
+        <div className="flex flex-col items-center justify-center rounded-xl border border-stone-200 bg-white p-10 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-stone-100 text-stone-500">
+            <MessageSquare className="h-7 w-7" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 mb-2">صندوق الرسائل فارغ</h2>
-          <p className="text-slate-500 mb-6">عندما تقوم بالتواصل مع المعلنين، ستظهر رسائلك هنا</p>
-          <Link to="/properties" className="btn-primary">تصفح العقارات</Link>
+          <p className="mb-6 text-sm text-stone-600">عندما تقوم بالتواصل مع المعلنين، ستظهر رسائلك هنا</p>
+          <Link to="/properties" className="btn-primary inline-flex min-h-11 items-center">تصفح العقارات</Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -92,15 +104,15 @@ export default function Messages() {
               key={conversation.id}
               type="button"
               onClick={() => navigate(`/messages/${conversation.id}`)}
-              className="flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-right shadow-xs transition hover:border-brand-200 hover:bg-brand-50/30"
+              className="flex min-h-16 w-full items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-4 text-right transition-colors hover:border-brand-300 hover:bg-stone-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
                   <MessageSquare className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-sm font-black text-slate-900">{conversation.listing_title}</div>
-                  <div className="mt-1 text-[11px] text-slate-500">{conversation.last_message}</div>
+                  <div className="text-sm font-bold text-stone-900">{conversation.listing_title}</div>
+                  <div className="mt-1 text-sm text-stone-600">{conversation.last_message}</div>
                 </div>
               </div>
               <ArrowLeft className="w-4 h-4 text-slate-400" />

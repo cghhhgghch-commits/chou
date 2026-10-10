@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { 
-  ArrowRight, Camera, MapPin, Tag, CheckCircle2, Loader2, 
+  ArrowRight, Camera, MapPin, Tag, CheckCircle2, Loader2, AlertCircle,
   Sun, Building2, Sparkles, X, Plus,
   MessageSquare, Phone, Link2
 } from "lucide-react";
@@ -10,6 +10,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import { useAdmin } from "../lib/AdminContext";
 import Image from "../components/ui/Image";
+import Skeleton from "../components/ui/Skeleton";
 import { 
   APP_CONFIG, 
   SYRIAN_CITIES,
@@ -677,10 +678,13 @@ ${imageSection}
 
   if (loadingExisting) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mx-auto" />
-          <p className="text-xs font-bold text-slate-500">جاري تحميل الإعلان...</p>
+      <div className="min-h-screen bg-stone-50 p-4 pb-24">
+        <div className="mx-auto max-w-4xl space-y-4 py-6">
+          <Skeleton className="h-12 w-2/3" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          {[0, 1, 2, 3].map((item) => (
+            <Skeleton key={item} className="h-40 w-full rounded-xl" />
+          ))}
         </div>
       </div>
     );
@@ -711,33 +715,59 @@ ${imageSection}
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 md:pb-12 text-slate-800">
+    <div className="min-h-screen bg-stone-50 pb-24 text-stone-800 md:pb-12">
+      <style>{`
+        .listing-form input:not([type="file"]),
+        .listing-form select,
+        .listing-form textarea {
+          min-height: 44px;
+          border-color: #d6d3d1;
+          border-radius: 8px;
+          background-color: #fafaf9;
+          color: #1c1917;
+          font-size: 14px;
+          font-weight: 500;
+          line-height: 1.8;
+          transition: border-color 175ms ease-out, background-color 175ms ease-out;
+        }
+        .listing-form input:focus,
+        .listing-form select:focus,
+        .listing-form textarea:focus {
+          border-color: #e4002b;
+          background-color: #fff;
+          outline: 2px solid #fb7185;
+          outline-offset: 2px;
+        }
+        .listing-form button[type="button"] {
+          min-height: 44px;
+        }
+      `}</style>
       
       {/* Top Bar */}
-      <div className="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-slate-700 hover:text-slate-900 transition-colors">
+          <button onClick={() => navigate(-1)} className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-700 transition-colors hover:bg-stone-100">
             <ArrowRight className="w-6 h-6" />
           </button>
           <div>
-            <h1 className="text-base font-black text-slate-900">{formTitle}</h1>
-            <p className="text-[11px] text-slate-500 font-medium">{formDescription}</p>
+            <h1 className="text-base font-bold text-stone-900">{formTitle}</h1>
+            <p className="text-xs font-medium text-stone-600">{formDescription}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2" />
       </div>
 
-      <div className="container mx-auto max-w-3xl p-3 sm:p-5 space-y-5 mt-1">
+      <div className="container mx-auto mt-1 max-w-4xl space-y-5 p-3 sm:p-5">
         
         {/* Real Estate Listing Banner */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 sm:p-5 rounded-3xl shadow-sm flex items-start gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 shadow-xs">
-            <Building2 className="w-6 h-6 text-white" />
+        <div className="flex items-start gap-3.5 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+            <Building2 className="h-6 w-6" />
           </div>
           <div className="flex-1">
             <h3 className="text-xs sm:text-sm font-black mb-1">إضافة عقار جديد في لقطة</h3>
-            <p className="text-[11px] sm:text-xs text-emerald-50 leading-relaxed">
+            <p className="text-sm leading-7 text-stone-600">
               {isAdmin
                 ? "أدخل بيانات العقار وصوره بدقة، ثم احفظه ليظهر مباشرة ضمن الإعلانات المنشورة."
                 : "اكتب تفاصيل العقار بدقة ووضوح، ثم أرسلها إلى الإدارة للمراجعة قبل النشر في القائمة العامة."}
@@ -746,15 +776,27 @@ ${imageSection}
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-xs font-bold border border-red-200">
+          <div className="flex items-start gap-2 rounded-lg border border-brand-300 bg-brand-50 p-4 text-sm font-bold text-brand-900">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <ol aria-label="أقسام نموذج الإعلان" className="grid grid-cols-3 gap-2 rounded-xl border border-stone-200 bg-white p-3 sm:grid-cols-6">
+          {["القسم", "الصور", "السعر", "الموقع", "المزايا", "الاتصال"].map((label, index) => (
+            <li key={label} className="flex items-center gap-2 text-xs font-medium text-stone-600">
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? "bg-brand-500 text-white" : "bg-stone-100 text-stone-600"}`}>
+                {index + 1}
+              </span>
+              <span>{label}</span>
+            </li>
+          ))}
+        </ol>
+
+        <form onSubmit={handleSubmit} className="listing-form space-y-4">
           
           {/* 1. Category Selector (The 8 requested core categories) */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-brand-600" />
@@ -846,7 +888,7 @@ ${imageSection}
           </div>
 
           {/* 2. Photos & Media Section */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Camera className="w-5 h-5 text-brand-600" />
@@ -919,7 +961,7 @@ ${imageSection}
           </div>
 
           {/* 3. Title, Price & Currency Details (Dubizzle Style) */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
               <Tag className="w-4 h-4 text-brand-600" />
               <span>3. عنوان الإعلان والتسعير</span>
@@ -1002,7 +1044,7 @@ ${imageSection}
           </div>
 
           {/* 4. Location & Legal Details (Syrian Realities) */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
               <MapPin className="w-4 h-4 text-brand-600" />
               <span>4. الموقع وسند الملكية (الطابو)</span>
@@ -1222,7 +1264,7 @@ ${imageSection}
           </div>
 
           {/* 5. Features & amenities */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <div className="flex items-center gap-2">
               <Sun className="w-5 h-5 text-amber-500" />
               <div>
@@ -1267,7 +1309,7 @@ ${imageSection}
           </div>
 
           {/* 6. Advertiser Info */}
-          <div className="bg-white p-5 rounded-3xl shadow-xs border border-slate-200 space-y-4">
+          <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
             <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
               <Phone className="w-4 h-4 text-emerald-600" />
               <span>6. بيانات الاتصال بالمعلن</span>
@@ -1319,7 +1361,7 @@ ${imageSection}
           <button 
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-brand-500 hover:bg-brand-600 text-white font-black text-base py-4 rounded-2xl shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] disabled:opacity-70"
+            className="flex min-h-12 w-full items-center justify-center gap-2.5 rounded-lg bg-brand-500 py-4 text-base font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-70"
           >
             {isSubmitting ? (
               <>

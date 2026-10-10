@@ -3,7 +3,7 @@ import {
   ChevronRight, Heart, Share2, BadgeCheck, MapPin, 
   BedDouble, Bath, Grid, Phone, ChevronLeft, ChevronRight as ChevronIcon,
   Sun, ShieldCheck, CheckCircle2, Building, Sparkles, MessageSquare,
-  AlertTriangle, Loader2, Compass, Home, Layers, Trees, Store, Factory
+  AlertTriangle, Compass, Home, Layers, Trees, Store, Factory
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
@@ -11,6 +11,7 @@ import { Property } from "../types";
 import { APP_CONFIG, formatSyrianPrice, getWhatsAppUrl } from "../lib/constants";
 import Image from "../components/ui/Image";
 import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
+import Skeleton from "../components/ui/Skeleton";
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -100,10 +101,14 @@ export default function PropertyDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-brand-600 animate-spin mx-auto" />
-          <p className="text-xs font-bold text-slate-500">جاري تحميل تفاصيل العقار...</p>
+      <div className="min-h-screen bg-stone-50 p-4 pb-24">
+        <div className="mx-auto max-w-6xl space-y-4 py-6">
+          <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+          <Skeleton className="h-9 w-1/3" />
+          <Skeleton className="h-6 w-2/3" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-20" />)}
+          </div>
         </div>
       </div>
     );
@@ -182,7 +187,7 @@ export default function PropertyDetails() {
   );
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-24 md:pb-12 text-slate-800">
+    <div className="min-h-screen bg-stone-50 pb-24 text-stone-800 md:pb-12">
       
       {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between p-3.5 bg-white sticky top-0 z-40 border-b border-slate-200 shadow-2xs">
@@ -200,7 +205,7 @@ export default function PropertyDetails() {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-5xl md:px-4 md:py-6">
+      <div className="container mx-auto max-w-6xl px-0 md:px-4 md:py-6">
         
         {/* Desktop Breadcrumb & Actions */}
         <div className="hidden md:flex justify-between items-center mb-4">
@@ -223,7 +228,7 @@ export default function PropertyDetails() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
           
           {/* Main Content Column */}
           <div className="md:col-span-2 space-y-4 md:space-y-6">
@@ -235,7 +240,7 @@ export default function PropertyDetails() {
             </div>
 
             {/* Image Gallery */}
-            <div className="relative bg-slate-900 md:rounded-3xl overflow-hidden aspect-[4/3] group border border-slate-200 shadow-xs">
+            <div className="group relative aspect-[4/3] overflow-hidden border-y border-stone-200 bg-stone-200 md:rounded-xl md:border">
               <Image
                 src={property.images[activeImage] || PROPERTY_IMAGE_FALLBACK}
                 alt={property.title}
@@ -244,11 +249,11 @@ export default function PropertyDetails() {
               
               {/* Badges on top of Image */}
               <div className="absolute top-4 right-4 flex flex-wrap gap-2 z-10">
-                <span className="px-3 py-1 rounded-xl text-xs font-black shadow-md bg-slate-900/90 backdrop-blur-xs text-white">
+                <span className="rounded-md bg-stone-950/85 px-3 py-1 text-xs font-bold text-white">
                   {getCategoryTitle()}
                 </span>
                 {property.isVerified && (
-                  <div className="bg-emerald-600 text-white px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md">
+                  <div className="flex items-center gap-1 rounded-md bg-green-700 px-2.5 py-1 text-xs font-bold text-white">
                     <BadgeCheck className="w-3.5 h-3.5" />
                     <span>عقار موثوق</span>
                   </div>
@@ -284,8 +289,8 @@ export default function PropertyDetails() {
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`relative w-16 aspect-[4/3] rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                      activeImage === i ? "border-brand-500 scale-95 ring-2 ring-brand-500/20" : "border-slate-200 opacity-60 hover:opacity-100"
+                    className={`relative w-20 aspect-[4/3] overflow-hidden rounded-lg border-2 transition-colors ${
+                      activeImage === i ? "border-brand-500" : "border-stone-200 opacity-70 hover:opacity-100"
                     }`}
                   >
                     <Image src={img} alt={`${property.title} - صورة ${i + 1}`} containerClassName="h-full w-full" />
@@ -295,11 +300,11 @@ export default function PropertyDetails() {
             )}
 
             {/* Price & Core Title */}
-            <div className="bg-white p-5 md:p-7 md:rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <div className="space-y-4 border-b border-stone-200 bg-white p-5 md:rounded-xl md:border md:p-6">
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                 <div className="flex items-baseline gap-2">
-                  <h1 className="text-2xl md:text-3xl font-black text-slate-900">{formattedPrice}</h1>
-                  <span className="text-sm font-bold text-slate-600">ليرة سورية</span>
+                  <h1 className="text-2xl font-bold text-stone-950 md:text-3xl">{formattedPrice}</h1>
+                  <span className="text-sm font-bold text-stone-700">ليرة سورية</span>
                   {property.pricePeriod && (
                     <span className="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">/ {property.pricePeriod}</span>
                   )}
@@ -313,7 +318,7 @@ export default function PropertyDetails() {
                 )}
               </div>
               
-              <h2 className="text-base md:text-xl font-black text-slate-900 leading-snug">
+                <h2 className="text-lg font-bold leading-8 text-stone-900 md:text-xl">
                 {property.title}
               </h2>
               
@@ -323,61 +328,61 @@ export default function PropertyDetails() {
               </div>
 
               {/* Core Metrics Grid */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 pt-4 border-t border-slate-100">
-                <div className="bg-slate-50 p-2.5 rounded-2xl text-center border border-slate-100">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-0.5">المساحة</span>
-                  <span className="font-black text-slate-900 text-xs sm:text-sm">{property.area} م²</span>
+              <div className="grid grid-cols-2 gap-2 border-t border-stone-200 pt-4 sm:grid-cols-3">
+                <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-start">
+                  <span className="mb-0.5 block text-xs font-medium text-stone-600">المساحة</span>
+                  <span className="text-sm font-bold text-stone-900">{property.area} م²</span>
                 </div>
 
                 {property.landArea && (
-                  <div className="bg-slate-50 p-2.5 rounded-2xl text-center border border-slate-100">
-                    <span className="text-[10px] text-slate-400 font-bold block mb-0.5">مساحة الأرض</span>
-                    <span className="font-black text-slate-900 text-xs sm:text-sm">{property.landArea} م²</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-start">
+                    <span className="mb-0.5 block text-xs font-medium text-stone-600">مساحة الأرض</span>
+                    <span className="text-sm font-bold text-stone-900">{property.landArea} م²</span>
                   </div>
                 )}
 
                 {property.bedrooms && (
-                  <div className="bg-slate-50 p-2.5 rounded-2xl text-center border border-slate-100">
-                    <span className="text-[10px] text-slate-400 font-bold block mb-0.5">الغرف</span>
-                    <span className="font-black text-slate-900 text-xs sm:text-sm truncate block">{property.bedrooms}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-start">
+                    <span className="mb-0.5 block text-xs font-medium text-stone-600">الغرف</span>
+                    <span className="block truncate text-sm font-bold text-stone-900">{property.bedrooms}</span>
                   </div>
                 )}
 
                 {property.bathrooms && (
-                  <div className="bg-slate-50 p-2.5 rounded-2xl text-center border border-slate-100">
-                    <span className="text-[10px] text-slate-400 font-bold block mb-0.5">الحمامات</span>
-                    <span className="font-black text-slate-900 text-xs sm:text-sm">{property.bathrooms}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-start">
+                    <span className="mb-0.5 block text-xs font-medium text-stone-600">الحمامات</span>
+                    <span className="text-sm font-bold text-stone-900">{property.bathrooms}</span>
                   </div>
                 )}
 
                 {property.floor && (
-                  <div className="bg-slate-50 p-2.5 rounded-2xl text-center border border-slate-100">
-                    <span className="text-[10px] text-slate-400 font-bold block mb-0.5">الطابق</span>
-                    <span className="font-black text-slate-900 text-xs sm:text-sm truncate block">{property.floor}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-start">
+                    <span className="mb-0.5 block text-xs font-medium text-stone-600">الطابق</span>
+                    <span className="block truncate text-sm font-bold text-stone-900">{property.floor}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Syrian Real Estate Specifications (Dubizzle Standard) */}
-            <div className="bg-white p-5 md:p-7 md:rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <div className="space-y-4 border-b border-stone-200 bg-white p-5 md:rounded-xl md:border md:p-6">
               <h3 className="text-sm md:text-base font-black text-slate-900 flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-brand-600" />
                 <span>المواصفات القانونية والتجهيز الكامل</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                 {property.ownershipType && (
-                  <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-2xl">
-                    <span className="text-slate-500 font-bold block text-[11px] mb-1">نوع سند الملكية والطابو:</span>
-                    <span className="font-black text-blue-900 text-xs leading-tight block">{property.ownershipType}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">نوع سند الملكية والطابو:</span>
+                    <span className="block text-sm font-bold leading-7 text-stone-900">{property.ownershipType}</span>
                   </div>
                 )}
 
                 {property.solarStatus && (
-                  <div className="p-3.5 bg-amber-50 border border-amber-200/80 rounded-2xl">
-                    <span className="text-amber-800 font-bold block text-[11px] mb-1">منظومة الكهرباء والطاقة:</span>
-                    <span className="font-black text-amber-950 text-xs flex items-center gap-1.5">
+                  <div className="rounded-lg border border-stone-200 bg-white p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">منظومة الكهرباء والطاقة:</span>
+                    <span className="flex items-center gap-1.5 text-sm font-bold text-stone-900">
                       <Sun className="w-4 h-4 text-amber-500 shrink-0" />
                       <span>{property.solarStatus}</span>
                     </span>
@@ -385,23 +390,23 @@ export default function PropertyDetails() {
                 )}
 
                 {property.finishing && (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <span className="text-slate-500 font-bold block text-[11px] mb-1">مستوى الكسوة:</span>
-                    <span className="font-black text-slate-900 text-xs">{property.finishing}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">مستوى الكسوة:</span>
+                    <span className="text-sm font-bold text-stone-900">{property.finishing}</span>
                   </div>
                 )}
 
                 {property.furnishing && (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <span className="text-slate-500 font-bold block text-[11px] mb-1">حالة الفرش:</span>
-                    <span className="font-black text-slate-900 text-xs">{property.furnishing}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">حالة الفرش:</span>
+                    <span className="text-sm font-bold text-stone-900">{property.furnishing}</span>
                   </div>
                 )}
 
                 {property.direction && (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <span className="text-slate-500 font-bold block text-[11px] mb-1">الاتجاه والواجهة:</span>
-                    <span className="font-black text-slate-900 text-xs flex items-center gap-1">
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">الاتجاه والواجهة:</span>
+                    <span className="flex items-center gap-1 text-sm font-bold text-stone-900">
                       <Compass className="w-3.5 h-3.5 text-brand-600" />
                       <span>{property.direction}</span>
                     </span>
@@ -409,16 +414,16 @@ export default function PropertyDetails() {
                 )}
 
                 {property.salons && (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <span className="text-slate-500 font-bold block text-[11px] mb-1">الصالونات والمضافات:</span>
-                    <span className="font-black text-slate-900 text-xs">{property.salons}</span>
+                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                    <span className="mb-1 block text-xs font-medium text-stone-600">الصالونات والمضافات:</span>
+                    <span className="text-sm font-bold text-stone-900">{property.salons}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Description */}
-            <div className="bg-white p-5 md:p-7 md:rounded-3xl border border-slate-200 shadow-xs space-y-3">
+            <div className="space-y-3 border-b border-stone-200 bg-white p-5 md:rounded-xl md:border md:p-6">
               <h3 className="text-sm md:text-base font-black text-slate-900">تفاصيل ووصف العقار</h3>
               <p className="text-slate-700 leading-relaxed text-xs md:text-sm whitespace-pre-line font-medium">
                 {property.description}
@@ -427,16 +432,16 @@ export default function PropertyDetails() {
 
             {/* Amenities */}
             {property.amenities && property.amenities.length > 0 && (
-              <div className="bg-white p-5 md:p-7 md:rounded-3xl border border-slate-200 shadow-xs space-y-4">
+              <div className="space-y-4 border-b border-stone-200 bg-white p-5 md:rounded-xl md:border md:p-6">
                 <h3 className="text-sm md:text-base font-black text-slate-900 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
                   <span>المميزات والخدمات المتاحة</span>
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {property.amenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs font-bold text-slate-800">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="truncate">{amenity}</span>
+                    <div key={index} className="flex min-h-11 items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 p-2.5 text-sm font-medium text-stone-800">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700" />
+                      <span>{amenity}</span>
                     </div>
                   ))}
                 </div>
@@ -446,9 +451,9 @@ export default function PropertyDetails() {
 
           {/* Sidebar (Desktop Contact Card) */}
           <div className="hidden md:block col-span-1">
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 sticky top-20 shadow-xs space-y-5">
+            <div className="sticky top-20 space-y-5 rounded-xl border border-stone-200 bg-white p-5">
               <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
-                <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg font-black border border-brand-100">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-stone-200 bg-stone-100 text-lg font-bold text-stone-800">
                   {property.agent.name.substring(0, 1)}
                 </div>
                 <div>
@@ -464,7 +469,7 @@ export default function PropertyDetails() {
                   href={`https://wa.me/${contactWhatsApp}?text=${whatsappMessage}`} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black transition-colors shadow-xs"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-700 py-3 text-sm font-bold text-white transition-colors hover:bg-green-800"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>تواصل فوري عبر واتساب</span>
@@ -472,14 +477,14 @@ export default function PropertyDetails() {
 
                 <a 
                   href={`tel:${contactPhone}`} 
-                  className="flex items-center justify-center gap-2 w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-3 text-xs font-bold transition-colors"
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-stone-800 py-3 text-sm font-bold text-white transition-colors hover:bg-stone-700"
                 >
                   <Phone className="w-4 h-4" />
                   <span>اتصال هاتفي مباشر</span>
                 </a>
               </div>
 
-              <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/70 text-center">
+              <div className="rounded-lg border border-amber-300 bg-amber-50 p-3.5">
                 <div className="flex items-start gap-2 text-start text-[10px] font-semibold leading-relaxed text-amber-900">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   <p>نصيحة أمان: لا تقم بتحويل أي دفعات أو مبالغ مسبقة قبل معاينة العقار شخصياً والتحقق من سندات الملكية.</p>
@@ -491,10 +496,10 @@ export default function PropertyDetails() {
       </div>
 
       {/* Mobile Sticky Bottom Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-3 z-40 flex items-center gap-2.5 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center gap-2.5 border-t border-stone-200 bg-white p-3 shadow-sm md:hidden">
         <a 
           href={`tel:${contactPhone}`} 
-          className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs"
+          className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-stone-800 py-3 text-sm font-bold text-white"
         >
           <Phone className="w-4 h-4" />
           <span>اتصال</span>
@@ -503,7 +508,7 @@ export default function PropertyDetails() {
           href={`https://wa.me/${contactWhatsApp}?text=${whatsappMessage}`} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="flex-[1.6] py-3 bg-emerald-600 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs"
+          className="flex min-h-11 flex-[1.6] items-center justify-center gap-1.5 rounded-lg bg-green-700 py-3 text-sm font-bold text-white"
         >
           <MessageSquare className="w-4 h-4" />
           <span>واتساب المعلن</span>

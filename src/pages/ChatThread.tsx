@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { supabase } from "../lib/supabase";
-import { ArrowLeft, Loader2, Send, MessageSquareText, Paperclip, X } from "lucide-react";
+import { ArrowLeft, Send, MessageSquareText, Paperclip, X } from "lucide-react";
 import { useAuth } from "../lib/AuthContext";
+import Skeleton from "../components/ui/Skeleton";
 
 interface ChatMessage {
   id: string;
@@ -136,35 +137,36 @@ export default function ChatThread() {
   if (!user) {
     return (
       <div className="container mx-auto max-w-3xl px-4 py-12">
-        <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center">
-          <p className="text-sm text-slate-600">يجب تسجيل الدخول لعرض المحادثة.</p>
-          <Link to="/login" className="mt-4 inline-block bg-brand-500 text-white rounded-xl px-4 py-2 text-xs font-bold">تسجيل الدخول</Link>
+        <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
+          <p className="text-sm text-stone-700">يجب تسجيل الدخول لعرض المحادثة.</p>
+          <Link to="/login" className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-bold text-white">تسجيل الدخول</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-5 pb-24 md:pb-10">
+    <div className="container mx-auto max-w-4xl px-3 py-5 pb-24 md:px-4 md:pb-10">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700">
+        <button onClick={() => navigate(-1)} className="flex min-h-11 items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 text-sm font-bold text-stone-700">
           <ArrowLeft className="w-4 h-4" />
           رجوع
         </button>
-        <h1 className="text-lg font-black text-slate-900">{conversationTitle}</h1>
+        <h1 className="text-base font-bold text-stone-900 sm:text-lg">{conversationTitle}</h1>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs">
-        <div className="border-b border-slate-100 bg-slate-50 px-4 py-3 flex items-center gap-2 text-xs font-bold text-slate-700">
-          <MessageSquareText className="w-4 h-4 text-brand-600" />
+      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div className="flex items-center gap-2 border-b border-stone-200 bg-stone-50 px-4 py-3 text-sm font-bold text-stone-800">
+          <MessageSquareText className="h-4 w-4 text-brand-700" />
           <span>محادثة مباشرة</span>
         </div>
 
-        <div className="min-h-[420px] max-h-[520px] overflow-y-auto p-4 space-y-3 bg-slate-50/60">
+        <div className="min-h-[420px] max-h-[60vh] space-y-3 overflow-y-auto bg-stone-50 p-4 sm:max-h-[65vh]">
           {loading ? (
-            <div className="flex items-center justify-center py-12 text-slate-500">
-              <Loader2 className="w-5 h-5 animate-spin ml-2" />
-              <span className="text-xs font-bold">جاري تحميل الرسائل...</span>
+            <div className="space-y-4 py-4">
+              <Skeleton className="h-16 w-3/4" />
+              <Skeleton className="ms-auto h-14 w-2/3" />
+              <Skeleton className="h-20 w-4/5" />
             </div>
           ) : sortedMessages.length === 0 ? (
             <div className="text-center py-12 text-slate-500 text-xs font-bold">لا توجد رسائل بعد.</div>
@@ -173,9 +175,9 @@ export default function ChatThread() {
               const isMine = message.sender_id === user.id;
               return (
                 <div key={message.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-3 py-2 ${isMine ? "bg-brand-500 text-white" : "bg-white text-slate-700 border border-slate-200"}`}>
+                  <div className={`max-w-[85%] rounded-xl px-4 py-3 ${isMine ? "bg-brand-500 text-white" : "border border-stone-200 bg-white text-stone-800"}`}>
                     <div className="text-[10px] font-bold opacity-80 mb-1">{isMine ? "أنت" : message.sender_name}</div>
-                    {message.text && <p className="text-xs leading-6 whitespace-pre-wrap">{message.text}</p>}
+                    {message.text && <p className="whitespace-pre-wrap text-sm leading-7">{message.text}</p>}
                     {message.attachment_url && (
                       <a
                         href={message.attachment_url}
@@ -193,9 +195,9 @@ export default function ChatThread() {
           )}
         </div>
 
-        {error && <p className="px-3 pt-3 text-xs font-bold text-red-600">{error}</p>}
+        {error && <p className="mx-3 mt-3 rounded-lg border border-brand-300 bg-brand-50 px-3 py-2 text-sm font-bold text-brand-900">{error}</p>}
         {attachment && (
-          <div className="flex items-center gap-2 px-3 pt-3 text-xs text-slate-600">
+          <div className="flex items-center gap-2 px-3 pt-3 text-sm text-stone-700">
             <Paperclip className="h-4 w-4" />
             <span className="min-w-0 flex-1 truncate">{attachment.name}</span>
             <button type="button" onClick={() => setAttachment(null)} aria-label="إزالة المرفق">
@@ -203,8 +205,8 @@ export default function ChatThread() {
             </button>
           </div>
         )}
-        <div className="border-t border-slate-100 p-3 flex items-center gap-2 bg-white">
-          <label className="cursor-pointer rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-50" title="إرفاق ملف">
+        <div className="flex items-center gap-2 border-t border-stone-200 bg-white p-3">
+          <label className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-stone-300 text-stone-600 hover:bg-stone-50" title="إرفاق ملف">
             <Paperclip className="h-4 w-4" />
             <input
               type="file"
@@ -218,7 +220,7 @@ export default function ChatThread() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="اكتب رسالتك..."
-            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-brand-500"
+            className="min-h-11 min-w-0 flex-1 rounded-lg border border-stone-300 bg-stone-50 px-3 py-2.5 text-sm font-medium text-stone-900 outline-none focus:border-brand-500"
             disabled={sending}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -231,7 +233,7 @@ export default function ChatThread() {
             type="button"
             onClick={sendMessage}
             disabled={sending}
-            className="bg-brand-500 hover:bg-brand-600 text-white rounded-xl px-4 py-2.5 text-xs font-black flex items-center gap-2"
+            className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-600"
           >
             <Send className="w-4 h-4" />
             {sending ? "جارٍ الإرسال..." : "إرسال"}

@@ -39,49 +39,49 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="bg-white max-w-md w-full rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+    <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4 py-8">
+      <div className="w-full max-w-lg space-y-6 rounded-xl border border-stone-200 bg-white p-5 shadow-sm sm:p-8">
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto border border-brand-100">
-            <KeyRound className="w-6 h-6" />
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg border border-brand-200 bg-brand-50 text-brand-700">
+            <KeyRound className="h-6 w-6" />
           </div>
-          <h1 className="text-xl font-black text-slate-900">استعادة كلمة المرور</h1>
-          <p className="text-xs text-slate-500">
+          <h1 className="text-2xl font-bold leading-9 text-stone-900">استعادة كلمة المرور</h1>
+          <p className="text-sm leading-7 text-stone-600">
             أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور فوراً.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl flex items-center gap-2 text-xs font-bold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+          <div className="flex items-center gap-2 rounded-lg border border-brand-300 bg-brand-50 p-3.5 text-sm font-bold text-brand-900">
+            <AlertCircle className="h-4 w-4 shrink-0 text-brand-700" />
             <p>{error}</p>
           </div>
         )}
 
         {sent ? (
-          <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl text-emerald-800 text-center space-y-3">
-            <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-            <h3 className="font-bold text-sm">تم إرسال الرابط بنجاح!</h3>
-            <p className="text-xs text-emerald-700 leading-relaxed">
+          <div className="space-y-3 rounded-lg border border-green-200 bg-green-50 p-5 text-center text-green-900">
+            <CheckCircle2 className="mx-auto h-10 w-10 text-green-700" />
+            <h3 className="text-base font-bold">تم إرسال الرابط بنجاح!</h3>
+            <p className="text-sm leading-7 text-green-900">
               يرجى فحص صندوق الوارد (أو مجلد الرسائل غير المرغوب فيها Spam) في بريدك الإلكتروني <span className="font-bold underline" dir="ltr">{email}</span> واتباع التعليمات.
             </p>
             <div className="pt-2">
               <Link
                 to="/login"
-                className="inline-block w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-stone-800 py-2.5 text-sm font-bold text-white transition-colors hover:bg-stone-700"
               >
                 العودة لتسجيل الدخول
               </Link>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleReset} className="space-y-4">
+          <form onSubmit={handleReset} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">البريد الإلكتروني</label>
+              <label className="mb-2 block text-sm font-bold text-stone-800">البريد الإلكتروني</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
                 <input
                   type="email"
                   required
@@ -89,7 +89,7 @@ export default function ForgotPassword() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   dir="ltr"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pr-10 pl-4 py-3 text-xs font-medium text-slate-900 outline-none focus:border-brand-500 focus:bg-white transition-colors"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 py-3 pe-10 ps-4 text-sm font-medium text-stone-900 outline-none transition-colors focus:border-brand-500 focus:bg-white"
                 />
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors shadow-xs disabled:opacity-60"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -109,7 +109,7 @@ export default function ForgotPassword() {
             <div className="text-center pt-2">
               <Link
                 to="/login"
-                className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1"
+                className="flex min-h-11 items-center justify-center gap-1 text-sm font-bold text-stone-600 hover:text-brand-700"
               >
                 <ArrowRight className="w-3.5 h-3.5" />
                 <span>العودة لصفحة الدخول</span>
@@ -119,6 +119,6 @@ export default function ForgotPassword() {
         )}
 
       </div>
-    </div>
+    </main>
   );
 }

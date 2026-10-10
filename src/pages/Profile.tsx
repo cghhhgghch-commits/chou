@@ -184,10 +184,10 @@ export default function Profile() {
   }
 
   return (
-    <div className="container mx-auto px-4 max-w-4xl py-6 pb-24 md:pb-12 bg-[#f8f9fa] space-y-6">
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="container mx-auto max-w-4xl space-y-6 bg-stone-50 px-4 py-6 pb-24 md:pb-12">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white p-5 sm:flex-row">
         <div className="flex items-center gap-4 text-center sm:text-right">
-          <div className="w-16 h-16 rounded-full bg-brand-50 border-2 border-brand-200 flex items-center justify-center text-brand-600 text-xl font-bold overflow-hidden">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-stone-200 bg-stone-100 text-xl font-bold text-stone-600">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -195,9 +195,9 @@ export default function Profile() {
             )}
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">{profile?.display_name || user.email?.split('@')[0] || "المستخدم"}</h1>
-            <p className="text-xs text-slate-500 font-medium" dir="ltr">{user.email}</p>
-            <span className="inline-flex items-center gap-1 mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <h1 className="text-xl font-bold text-stone-900">{profile?.display_name || user.email?.split('@')[0] || "المستخدم"}</h1>
+            <p className="text-sm font-medium text-stone-600" dir="ltr">{user.email}</p>
+            <span className="mt-1 inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2 py-1 text-xs font-bold text-green-800">
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
               حساب موثق
             </span>
@@ -206,126 +206,126 @@ export default function Profile() {
 
         <button
           onClick={signOut}
-          className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors"
+          className="flex min-h-11 items-center gap-1.5 rounded-lg border border-brand-500 bg-white px-4 py-2 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50"
         >
           <LogOut className="w-4 h-4" />
           <span>تسجيل الخروج</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Link to="/services" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center gap-2 group">
-          <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Link to="/services" className="group flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition-colors hover:border-brand-300">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <Wrench className="w-5 h-5" />
           </div>
-          <span className="text-xs font-bold text-slate-800">خدمات الصيانة</span>
-          <span className="text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full font-bold">12 خدمة</span>
+          <span className="text-sm font-bold text-stone-900">خدمات الصيانة</span>
+          <span className="text-xs text-stone-600">12 خدمة</span>
         </Link>
 
-        <Link to="/place-ad" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center gap-2 group">
-          <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <Link to="/place-ad" className="group flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition-colors hover:border-brand-300">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <PlusCircle className="w-5 h-5" />
           </div>
-          <span className="text-xs font-bold text-slate-800">إضافة إعلان</span>
-          <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full font-bold">مجاني</span>
+          <span className="text-sm font-bold text-stone-900">إضافة إعلان</span>
+          <span className="text-xs text-stone-600">مجاني</span>
         </Link>
 
-        <Link to="/favorites" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center gap-2 group">
-          <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <Link to="/favorites" className="group flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition-colors hover:border-brand-300">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <Heart className="w-5 h-5" />
           </div>
-          <span className="text-xs font-bold text-slate-800">المفضلة</span>
-          <span className="text-[10px] text-slate-500">العقارات المحفوظة</span>
+          <span className="text-sm font-bold text-stone-900">المفضلة</span>
+          <span className="text-xs text-stone-600">العقارات المحفوظة</span>
         </Link>
 
-        <Link to="/messages" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col items-center text-center gap-2 group">
-          <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <Link to="/messages" className="group flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition-colors hover:border-brand-300">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <MessageSquare className="w-5 h-5" />
           </div>
-          <span className="text-xs font-bold text-slate-800">المحادثات</span>
-          <span className="text-[10px] text-slate-500">الاستفسارات</span>
+          <span className="text-sm font-bold text-stone-900">المحادثات</span>
+          <span className="text-xs text-stone-600">الاستفسارات</span>
         </Link>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
-        <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <div className="flex items-center gap-3 border-b border-stone-200 p-5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <Settings className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">تعديل بيانات الحساب</h2>
-            <p className="text-xs text-slate-500">تحديث الاسم، رقم الهاتف، الصورة وكلمة المرور</p>
+            <h2 className="text-base font-bold text-stone-900">تعديل بيانات الحساب</h2>
+            <p className="text-sm text-stone-600">تحديث الاسم، رقم الهاتف، الصورة وكلمة المرور</p>
           </div>
         </div>
 
         <div className="p-6 md:p-8">
           <form onSubmit={handleUpdate} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl flex items-center gap-3 text-xs font-bold">
-                <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
+                <div className="flex items-center gap-3 rounded-lg border border-brand-300 bg-brand-50 p-4 text-sm font-bold text-brand-900">
+                <AlertCircle className="h-5 w-5 shrink-0 text-brand-700" />
                 <p>{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl flex items-center gap-3 text-xs font-bold">
+                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm font-bold text-green-900">
                 <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
                 <p>{success}</p>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">الاسم الكامل</label>
+                <div>
+                <label className="mb-2 block text-sm font-bold text-stone-800">الاسم الكامل</label>
                 <input
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium text-sm transition-all"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">رقم الهاتف</label>
+                <label className="mb-2 block text-sm font-bold text-stone-800">رقم الهاتف</label>
                 <input
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium text-sm transition-all"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   dir="ltr"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-2">رابط الصورة الشخصية</label>
+                <label className="mb-2 block text-sm font-bold text-stone-800">رابط الصورة الشخصية</label>
                 <input
                   type="url"
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium text-sm transition-all"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   dir="ltr"
                   placeholder="https://example.com/avatar.jpg"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">البريد الإلكتروني (غير قابل للتعديل)</label>
+                <label className="mb-2 block text-sm font-bold text-stone-800">البريد الإلكتروني (غير قابل للتعديل)</label>
                 <input
                   type="email"
                   value={user.email || ""}
                   disabled
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-400 rounded-xl py-3 px-4 font-medium text-sm cursor-not-allowed"
+                  className="min-h-11 w-full cursor-not-allowed rounded-lg border border-stone-200 bg-stone-100 px-4 py-3 text-sm font-medium text-stone-500"
                   dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">كلمة مرور جديدة (اتركه فارغاً إذا لم ترد تغييره)</label>
+                <label className="mb-2 block text-sm font-bold text-stone-800">كلمة مرور جديدة (اتركه فارغاً إذا لم ترد تغييره)</label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-medium text-sm transition-all"
+                  className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400"
                   dir="ltr"
                   placeholder="••••••••"
                   minLength={6}
@@ -351,17 +351,17 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-red-200 p-6 shadow-xs">
+      <div className="rounded-xl border border-brand-300 bg-white p-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-base font-bold text-red-700">حذف الحساب</h2>
-            <p className="text-xs text-slate-500 mt-1">سيتم حذف حسابك وبياناته نهائياً ولا يمكن التراجع عن هذا الإجراء.</p>
+            <h2 className="text-base font-bold text-brand-800">حذف الحساب</h2>
+            <p className="mt-1 text-sm text-stone-600">سيتم حذف حسابك وبياناته نهائياً ولا يمكن التراجع عن هذا الإجراء.</p>
           </div>
           <button
             type="button"
             onClick={handleDeleteAccount}
             disabled={deletingAccount}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex min-h-11 items-center gap-2 rounded-lg border border-brand-500 bg-white px-4 py-2.5 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {deletingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             حذف الحساب
@@ -369,10 +369,10 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="bg-slate-900 text-white rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-xl bg-stone-900 p-5 text-white md:flex-row">
         <div className="space-y-1 text-center md:text-right">
           <h3 className="font-bold text-base text-white">هل تحتاج مساعدة أو دعم فني؟</h3>
-          <p className="text-xs text-slate-300">فريق خدمة العملاء متواجد على مدار الساعة لمساعدتك في نشر الإعلانات وطلب الصيانة.</p>
+            <p className="text-sm leading-7 text-stone-200">فريق خدمة العملاء متواجد على مدار الساعة لمساعدتك في نشر الإعلانات وطلب الصيانة.</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -380,14 +380,14 @@ export default function Profile() {
             href="https://wa.me/963934888055?text=مرحباً، أحتاج مساعدة في تطبيق لقطة"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-green-800 md:flex-none"
           >
             <MessageSquare className="w-4 h-4" />
             <span>واتساب مباشر</span>
           </a>
           <a
             href="tel:+963934888055"
-            className="flex-1 md:flex-none bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-white/30 bg-transparent px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/10 md:flex-none"
           >
             <PhoneCall className="w-4 h-4" />
             <span>اتصال هاتفي</span>

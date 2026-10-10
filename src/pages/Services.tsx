@@ -58,17 +58,17 @@ export default function Services() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-24 md:pb-12">
+    <div className="min-h-screen bg-stone-50 pb-24 md:pb-12">
       
       {/* Top Mobile Header */}
-      <div className="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
         <div className="flex items-center gap-3">
-          <Link to="/" className="p-1 -mr-1 text-slate-700 hover:text-slate-900 transition-colors">
+          <Link to="/" className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-700 transition-colors hover:bg-stone-100">
             <ArrowRight className="w-6 h-6" />
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-slate-900 leading-tight">خدمات الصيانة والتشطيبات</h1>
-            <p className="text-[11px] text-slate-500">فنيون معتمدون • ضمان 30 يوماً • استجابة فورية</p>
+            <h1 className="text-lg font-bold leading-tight text-stone-900">خدمات الصيانة والتشطيبات</h1>
+            <p className="text-xs text-stone-600">فنيون معتمدون • ضمان 30 يوماً • استجابة فورية</p>
           </div>
         </div>
 
@@ -76,7 +76,7 @@ export default function Services() {
           href="https://wa.me/963934888055?text=مرحباً، أريد الاستفسار عن خدمات الصيانة في تطبيق لقطة"
           target="_blank" 
           rel="noopener noreferrer"
-          className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors"
+          className="flex min-h-11 items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-3 text-xs font-bold text-green-900 transition-colors hover:bg-green-100"
         >
           <MessageSquare className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">واتساب مباشر</span>
@@ -86,44 +86,44 @@ export default function Services() {
       <div className="container mx-auto px-4 max-w-6xl py-6 space-y-6">
 
         {/* Hero Section */}
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 text-white p-6 md:p-10 shadow-xl">
+        <div className="relative overflow-hidden rounded-xl border border-stone-200 bg-stone-900 p-6 text-white md:p-10">
           <div className="relative z-10 max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-brand-300 border border-white/10">
-              <BadgeCheck className="w-4 h-4 text-emerald-400" />
+            <div className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
+              <BadgeCheck className="h-4 w-4 text-green-300" />
               <span>خدمات معتمدة ومكفولة 100%</span>
             </div>
-            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-2xl font-bold leading-10 text-white md:text-3xl">
               صيانة منزلك وعقارك أصبحت أسهل بضغطة زر واحدة
             </h2>
-            <p className="text-sm md:text-base text-slate-300">
+            <p className="text-sm leading-7 text-stone-200 md:text-base">
               اختر الخدمة، وحدد موعدك، واستقبل نخبة الفنيين والمهندسين المعتمدين مع ضمان شامل على جميع الأعمال.
             </p>
 
             {/* Quick Guarantees */}
-            <div className="pt-3 grid grid-cols-3 gap-3 border-t border-white/10 max-w-lg">
+            <div className="grid max-w-lg grid-cols-1 gap-3 border-t border-white/15 pt-4 sm:grid-cols-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-xs font-bold text-slate-200">ضمان 30 يوماً</span>
+                <ShieldCheck className="h-5 w-5 shrink-0 text-green-300" />
+                <span className="text-xs font-bold text-stone-100">ضمان 30 يوماً</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-amber-400 shrink-0" />
-                <span className="text-xs font-bold text-slate-200">استجابة حسب التوفر</span>
+                <Clock className="h-5 w-5 shrink-0 text-amber-300" />
+                <span className="text-xs font-bold text-stone-100">استجابة حسب التوفر</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-400 shrink-0 fill-yellow-400" />
-                <span className="text-xs font-bold text-slate-200">تقييم 4.9/5</span>
+                <Star className="h-5 w-5 shrink-0 text-amber-300" />
+                <span className="text-xs font-bold text-stone-100">تقييم 4.9/5</span>
               </div>
             </div>
           </div>
 
           {/* Decorative background visual icon */}
-          <div className="absolute left-6 bottom-4 opacity-10 pointer-events-none hidden md:block">
-            <Wrench className="w-64 h-64 text-white" />
+          <div className="pointer-events-none absolute bottom-4 left-6 hidden opacity-[0.08] md:block">
+            <Wrench className="h-48 w-48 text-white" />
           </div>
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4">
           <div className="relative">
             <Search className="w-5 h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
             <input 
@@ -131,7 +131,7 @@ export default function Services() {
               placeholder="ابحث عن خدمة (مثلاً: تكييف، طاقة شمسية، دهان، كهرباء، بلاط...)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pr-11 pl-4 py-3 text-sm font-medium text-slate-800 outline-none focus:border-brand-500 focus:bg-white transition-colors"
+              className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 py-3 pe-11 ps-4 text-sm font-medium text-stone-900 outline-none transition-colors focus:border-brand-500 focus:bg-white"
             />
             {searchQuery && (
               <button 
@@ -154,10 +154,10 @@ export default function Services() {
               <button
                 key={tab.id}
                 onClick={() => setSelectedTab(tab.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-bold whitespace-nowrap transition-colors ${
                   selectedTab === tab.id
-                    ? "bg-brand-600 text-white shadow-md shadow-brand-500/20"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-brand-500 text-white"
+                    : "bg-stone-100 text-stone-700 hover:bg-stone-200"
                 }`}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -176,12 +176,12 @@ export default function Services() {
             return (
               <div 
                 key={service.id}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col group"
+                className="group flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition-shadow hover:shadow-sm"
               >
                 {/* Card Header */}
-                <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 border-b border-stone-200 p-5">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${service.bg} ${service.color} group-hover:scale-105 transition-transform shadow-xs`}>
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${service.bg} ${service.color}`}>
                       <Icon className="w-6 h-6" strokeWidth={2.2} />
                     </div>
                     <div>
@@ -202,7 +202,7 @@ export default function Services() {
                 </div>
 
                 {/* Card Body */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
                   <p className="text-xs text-slate-600 leading-relaxed">
                     {service.description}
                   </p>
@@ -232,7 +232,7 @@ export default function Services() {
                   {/* Action Button */}
                   <button
                     onClick={() => handleOpenBooking(service)}
-                    className="w-full bg-slate-900 hover:bg-brand-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors mt-2 shadow-xs group-hover:shadow-md"
+                    className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-600"
                   >
                     <span>طلب الخدمة وحجز موعد</span>
                     <ArrowRight className="w-4 h-4 rotate-180" />

@@ -235,8 +235,8 @@ export default function Properties() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 text-slate-800 md:pb-12" dir="rtl">
-      <div className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-2xs">
+    <div className="min-h-screen bg-stone-50 pb-24 text-stone-800 md:pb-12" dir="rtl">
+      <div className="sticky top-0 z-40 border-b border-stone-200 bg-white">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="relative flex flex-1 items-center">
@@ -246,7 +246,7 @@ export default function Properties() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="ابحث بالمنطقة أو الميزة (المالكي، المزة، الفرقان، طاقة شمسية...)"
-                className="w-full rounded-2xl border border-slate-200/80 bg-slate-100/90 py-2.5 pr-11 pl-4 text-xs font-medium outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20 md:text-sm"
+                className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 py-2.5 pe-11 ps-4 text-sm font-medium text-stone-900 outline-none transition-colors focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-400 md:text-base"
               />
               {searchQuery && (
                 <button
@@ -261,12 +261,12 @@ export default function Properties() {
 
             <button
               onClick={() => setShowFilters((current) => !current)}
-              className="relative flex shrink-0 items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-xs transition-colors hover:bg-slate-50"
+              className="relative flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3.5 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
             >
               <SlidersHorizontal className="h-4 w-4 text-brand-600" />
               <span>فلترة</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -left-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">
+                <span className="absolute -left-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold text-white">
                   {activeFilterCount}
                 </span>
               )}
@@ -281,10 +281,10 @@ export default function Properties() {
                 <button
                   key={tab.id}
                   onClick={() => handleCategorySelect(tab.id)}
-                  className={`shrink-0 whitespace-nowrap rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  className={`flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border px-3.5 text-sm font-bold transition-colors ${
                     isSelected
-                      ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      ? "border-brand-500 bg-brand-500 text-white"
+                      : "border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
                   }`}
                 >
                   <span className="inline-flex items-center gap-1.5">
@@ -298,7 +298,7 @@ export default function Properties() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto max-w-7xl px-4 py-6">
         <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h1 className="flex items-center gap-2 text-lg font-black text-slate-900">
@@ -328,9 +328,9 @@ export default function Properties() {
           ))}
 
           {filteredProperties.length === 0 && (
-            <div className="col-span-full rounded-3xl border border-slate-200 bg-white p-8 py-16 text-center shadow-xs">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-                <Search className="h-8 w-8 text-slate-400" />
+            <div className="col-span-full rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-stone-100">
+                <Search className="h-7 w-7 text-stone-500" />
               </div>
               <h3 className="mb-1 text-lg font-black text-slate-900">لم نجد عقارات تطابق هذا البحث حالياً</h3>
               <p className="mx-auto mb-5 max-w-sm text-xs text-slate-500">
@@ -338,7 +338,7 @@ export default function Properties() {
               </p>
               <button
                 onClick={resetAllFilters}
-                className="rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-brand-500"
+                className="min-h-11 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-600"
               >
                 عرض جميع العقارات المتاحة
               </button>
@@ -348,8 +348,8 @@ export default function Properties() {
       </div>
 
       {showFilters && (
-        <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-slate-50 animate-in slide-in-from-bottom-4 duration-200">
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 shadow-xs">
+        <div className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-stone-50 sm:inset-y-4 sm:mx-auto sm:max-h-[calc(100vh-2rem)] sm:max-w-2xl sm:rounded-xl sm:border sm:border-stone-200 sm:bg-white sm:shadow-xl">
+          <div className="sticky top-0 z-10 flex min-h-16 items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
             <button onClick={() => setShowFilters(false)} className="-ml-2 p-2 text-slate-500 transition-colors hover:text-slate-900" aria-label="إغلاق الفلاتر">
               <X className="h-6 w-6" />
             </button>
@@ -359,7 +359,7 @@ export default function Properties() {
             </button>
           </div>
 
-          <div className="flex-1 space-y-6 p-5 pb-28">
+          <div className="flex-1 space-y-6 p-5 pb-28 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-5 sm:gap-y-6 sm:space-y-0">
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-900">المنطقة</label>
               <div className="relative">
@@ -462,10 +462,10 @@ export default function Properties() {
             </div>
           </div>
 
-          <div className="fixed right-0 bottom-0 left-0 border-t border-slate-200 bg-white p-4 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+          <div className="fixed right-0 bottom-0 left-0 border-t border-stone-200 bg-white p-4 pb-safe sm:sticky sm:bottom-0 sm:mt-auto sm:shadow-none">
             <button
               onClick={() => setShowFilters(false)}
-              className="w-full rounded-xl bg-brand-600 py-3.5 text-base font-bold text-white shadow-lg shadow-brand-500/20 transition-all hover:bg-brand-500 active:scale-[0.98]"
+              className="min-h-11 w-full rounded-lg bg-brand-500 py-3.5 text-base font-bold text-white transition-colors hover:bg-brand-600"
             >
               تطبيق الفلاتر
             </button>

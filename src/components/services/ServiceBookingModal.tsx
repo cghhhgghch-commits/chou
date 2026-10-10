@@ -58,41 +58,42 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-100 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-stone-950/50 sm:items-center sm:p-4">
+      <div className="flex max-h-[94vh] w-full max-w-lg flex-col overflow-hidden rounded-t-xl border border-stone-200 bg-white shadow-sm sm:max-h-[92vh] sm:rounded-xl">
         
         {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-5 relative flex items-center justify-between">
+        <div className="relative flex items-center justify-between border-b border-stone-200 bg-white p-4 text-stone-900 sm:p-5">
           <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${service.bg} ${service.color} border border-white/20 shadow-sm`}>
+            <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${service.bg} ${service.color}`}>
               <ServiceIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg text-white">{service.name}</h3>
+                <h3 className="text-base font-bold text-stone-900">{service.name}</h3>
                 {service.badge && (
                   <span className="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {service.badge}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-300">خدمات صيانة معتمدة مع ضمان 30 يوماً</p>
+              <p className="text-xs text-stone-600">خدمات صيانة معتمدة مع ضمان 30 يوماً</p>
             </div>
           </div>
           
           <button 
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            aria-label="إغلاق نافذة طلب الخدمة"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-100 hover:text-stone-900"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSendWhatsApp} className="p-5 overflow-y-auto space-y-4 flex-1">
+        <form onSubmit={handleSendWhatsApp} className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
           
           {/* Trust Highlights */}
-          <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/60 text-center">
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3 text-center">
             <div className="flex flex-col items-center">
               <ShieldCheck className="w-4 h-4 text-emerald-600 mb-1" />
               <span className="text-[10px] font-bold text-slate-700">ضمان معتمد</span>
@@ -118,10 +119,10 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
                   type="button"
                   key={idx}
                   onClick={() => setSelectedSubService(sub)}
-                  className={`text-right p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                  className={`min-h-11 text-right p-2.5 rounded-lg border text-sm font-medium transition-colors ${
                     selectedSubService === sub
                       ? 'border-brand-500 bg-brand-50/50 text-brand-700 font-bold shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
+                      : 'border-stone-300 hover:border-stone-400 text-stone-700 bg-white'
                   }`}
                 >
                   {sub}
@@ -139,10 +140,10 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
               <button
                 type="button"
                 onClick={() => setUrgency('normal')}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+                  className={`flex min-h-20 flex-col items-center justify-center rounded-lg border p-2.5 text-center transition-colors ${
                   urgency === 'normal'
                     ? 'border-brand-500 bg-brand-50 text-brand-700 font-bold ring-1 ring-brand-400'
-                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    : 'border-stone-300 text-stone-700 hover:bg-stone-50'
                 }`}
               >
                 <Calendar className={`w-4 h-4 mb-1 ${urgency === 'normal' ? 'text-brand-600' : 'text-slate-400'}`} />
@@ -153,10 +154,10 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
               <button
                 type="button"
                 onClick={() => setUrgency('quote')}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+                  className={`flex min-h-20 flex-col items-center justify-center rounded-lg border p-2.5 text-center transition-colors ${
                   urgency === 'quote'
                     ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold ring-1 ring-blue-400'
-                    : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    : 'border-stone-300 text-stone-700 hover:bg-stone-50'
                 }`}
               >
                 <Clock className={`w-4 h-4 mb-1 ${urgency === 'quote' ? 'text-blue-600' : 'text-slate-400'}`} />
@@ -176,7 +177,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
               <select 
                 value={city} 
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-brand-500"
+                className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 py-2 text-sm font-medium text-stone-900 outline-none focus:border-brand-500"
               >
                 {[
                   "حلب",
@@ -204,7 +205,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
                 placeholder="مثال: المزة، أوتستراد..."
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-brand-500"
+                className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 py-2 text-sm font-medium text-stone-900 outline-none focus:border-brand-500"
               />
             </div>
           </div>
@@ -219,7 +220,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
               placeholder="09XXXXXXXX"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-brand-500"
+              className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 px-3 py-2 text-sm font-medium text-stone-900 outline-none focus:border-brand-500"
             />
           </div>
 
@@ -233,7 +234,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
               placeholder="اكتب تفاصيل إضافية لمساعدة الفني في تحضير الأدوات المناسبة..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 outline-none focus:border-brand-500 resize-none"
+              className="w-full resize-none rounded-lg border border-stone-300 bg-stone-50 p-3 text-sm font-medium text-stone-900 outline-none focus:border-brand-500"
             />
           </div>
 
@@ -241,7 +242,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
           <div className="pt-2 space-y-2">
             <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all text-sm"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-600"
             >
               <Send className="w-4 h-4" />
               <span>إرسال الطلب وحجز موعد عبر واتساب</span>
@@ -249,7 +250,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
 
             <a
               href="tel:+963934888055"
-              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
             >
               <PhoneCall className="w-3.5 h-3.5 text-brand-600" />
               <span>أو الاتصال المباشر بخدمة العملاء والدعم الفني</span>
