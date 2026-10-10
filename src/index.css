@@ -2,11 +2,36 @@
 
 @theme {
   --font-noto: "Noto Sans Arabic", sans-serif;
-  --color-brand-50: #fdf2f2;
-  --color-brand-100: #fbe5e5;
-  --color-brand-200: #f7cece;
-  --color-brand-300: #f2adad;
-  --color-brand-400: #ec8282;
+  --font-weight-light: 400;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 700;
+  --font-weight-black: 700;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 2.5rem;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --radius-3xl: 12px;
+  --shadow-xs: 0 1px 2px rgb(28 25 23 / 0.05);
+  --shadow-sm: 0 2px 6px rgb(28 25 23 / 0.07);
+  --shadow-md: 0 2px 6px rgb(28 25 23 / 0.07);
+  --shadow-lg: 0 2px 6px rgb(28 25 23 / 0.07);
+  --shadow-xl: 0 2px 6px rgb(28 25 23 / 0.07);
+  --shadow-2xl: 0 2px 6px rgb(28 25 23 / 0.07);
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe4e6;
+  --color-brand-200: #fecdd3;
+  --color-brand-300: #fda4af;
+  --color-brand-400: #fb7185;
   --color-brand-500: #e4002b;
   --color-brand-600: #c90022;
   --color-brand-700: #a9001b;
@@ -14,67 +39,103 @@
   --color-brand-900: #740a18;
   --color-brand-950: #3f0009;
 
+  --color-bg: #fafaf9;
   --color-surface: #ffffff;
-  --color-surface-light: #f8f9fa;
+  --color-surface-2: #f5f5f4;
+  --color-border: #e7e5e4;
+  --color-text-muted: #78716c;
+  --color-text: #1c1917;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-info: #2563eb;
+
+  --color-slate-50: #fafaf9;
+  --color-slate-100: #f5f5f4;
+  --color-slate-200: #e7e5e4;
+  --color-slate-300: #d6d3d1;
+  --color-slate-400: #a8a29e;
+  --color-slate-500: #78716c;
+  --color-slate-600: #57534e;
+  --color-slate-700: #44403c;
+  --color-slate-800: #292524;
+  --color-slate-900: #1c1917;
+  --color-slate-950: #0c0a09;
 }
 
 @layer base {
   body {
-    @apply font-noto bg-[#f8f9fa] text-slate-900;
+    @apply font-noto bg-bg text-text;
+    line-height: 1.8;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+
+  button,
+  input,
+  select,
+  textarea,
+  a {
+    transition-duration: 175ms;
+    transition-timing-function: ease-out;
   }
 }
 
 @layer components {
   .card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-xs);
   }
 
   .accent-text {
-    color: #e4002b;
+    color: var(--color-brand-500);
   }
 
   .btn-primary {
-    background: #e4002b;
+    background: var(--color-brand-500);
     color: #ffffff;
     font-weight: 700;
     padding: 10px 24px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s;
+    min-height: 44px;
+    transition: background-color 175ms ease-out;
   }
 
   .btn-primary:hover {
-    background: #c90022;
+    background: var(--color-brand-600);
   }
 
   .btn-outline {
-    background: #ffffff;
-    border: 1px solid #d1d5db;
-    color: #374151;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     font-weight: 700;
     padding: 10px 24px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    min-height: 44px;
+    transition: background-color 175ms ease-out;
   }
 
   .btn-outline:hover {
-    background: #f3f4f6;
+    background: var(--color-surface-2);
   }
 
   .card-img {
     width: 100%;
-    height: 160px;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: 12px 12px 0 0;
   }
 
   .badge-sale {
-    background: #e4002b;
+    background: var(--color-brand-500);
     color: #ffffff;
     padding: 2px 8px;
     border-radius: 4px;
@@ -83,6 +144,17 @@
   }
 }
 .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* iOS zooms focused controls below 16px and can place fixed controls under the home indicator. */
 .ios-device input,
