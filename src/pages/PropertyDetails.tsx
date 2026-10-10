@@ -478,9 +478,10 @@ export default function PropertyDetails() {
               </div>
 
               <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/70 text-center">
-                <p className="text-[10px] text-amber-900 leading-relaxed font-semibold">
-                  ⚠️ نصيحة أمان: لا تقم بتحويل أي دفعات أو مبالغ مسبقة قبل معاينة العقار شخصياً والتحقق من سندات الملكية.
-                </p>
+                <div className="flex items-start gap-2 text-start text-[10px] font-semibold leading-relaxed text-amber-900">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <p>نصيحة أمان: لا تقم بتحويل أي دفعات أو مبالغ مسبقة قبل معاينة العقار شخصياً والتحقق من سندات الملكية.</p>
+                </div>
               </div>
             </div>
           </div>

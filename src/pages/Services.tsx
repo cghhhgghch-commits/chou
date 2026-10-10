@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { 
   Zap, Sun, Droplets, Wind, Paintbrush, Grid, Hammer, Wrench, 
-  ShieldCheck, Sparkles, Truck, Building2, Search, ArrowRight, 
+  ShieldCheck, Sparkles, Truck, Building2, Home, Search, ArrowRight, 
   PhoneCall, Clock, CheckCircle2, Star, BadgeCheck, MessageSquare
 } from "lucide-react";
 import { maintenanceServices, ServiceCategory } from "../data/servicesData";
@@ -146,10 +146,10 @@ export default function Services() {
           {/* Category Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
             {[
-              { id: "all", label: "جميع الخدمات (11)" },
-              { id: "finishing", label: "🎨 تشطيب وديكور" },
-              { id: "tech", label: "☀️ طاقة وتكييف وأمان" },
-              { id: "home", label: "🧹 خدمات منزلية ونقل" },
+              { id: "all", label: "جميع الخدمات (11)", icon: Wrench },
+              { id: "finishing", label: "تشطيب وديكور", icon: Paintbrush },
+              { id: "tech", label: "طاقة وتكييف وأمان", icon: Sun },
+              { id: "home", label: "خدمات منزلية ونقل", icon: Home },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -160,7 +160,10 @@ export default function Services() {
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
-                {tab.label}
+                <span className="inline-flex items-center gap-1.5">
+                  <tab.icon className="h-4 w-4" aria-hidden="true" />
+                  {tab.label}
+                </span>
               </button>
             ))}
           </div>

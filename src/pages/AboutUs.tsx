@@ -3,6 +3,7 @@ import {
   ArrowRight, Building2, Home, ShieldCheck, Zap, Sparkles, 
   MapPin, Users, HeartHandshake, CheckCircle2, Phone, MessageSquare
 } from "lucide-react";
+import { SYRIAN_CATEGORY_ICONS } from "../lib/constants";
 
 export default function AboutUs() {
   return (
@@ -78,17 +79,20 @@ export default function AboutUs() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             {[
-              { label: "🏠 بيوت وشقق", desc: "شقق سكنية، بيوت عربية، دوبلكس" },
-              { label: "🏢 بنايات وأبراج", desc: "عمارات سكنية وتجارية واستثمارية" },
-              { label: "🌾 مزارع واستراحات", desc: "بساتين، مسابح واستراحات ريفية" },
-              { label: "🗺️ أراضي ومقاسم", desc: "مقاسم عمار وتنظيم وأراضي زراعية" },
-              { label: "🏬 محلات وتجاري", desc: "محلات، صالات عرض، حقوق فروغ" },
-              { label: "🏰 فلل وقصور", desc: "فلل مودرن ومستقلة وقصور فخمة" },
-              { label: "🏭 مصانع ومستودعات", desc: "منشآت صناعية، هناغر ومستودعات" },
-              { label: "✨ أخرى ومتنوعة", desc: "شاليهات مصايف، مكاتب وسكن شباب" },
+              { icon: SYRIAN_CATEGORY_ICONS.houses, label: "بيوت وشقق", desc: "شقق سكنية، بيوت عربية، دوبلكس" },
+              { icon: SYRIAN_CATEGORY_ICONS.buildings, label: "بنايات وأبراج", desc: "عمارات سكنية وتجارية واستثمارية" },
+              { icon: SYRIAN_CATEGORY_ICONS.farms, label: "مزارع واستراحات", desc: "بساتين، مسابح واستراحات ريفية" },
+              { icon: SYRIAN_CATEGORY_ICONS.lands, label: "أراضي ومقاسم", desc: "مقاسم عمار وتنظيم وأراضي زراعية" },
+              { icon: SYRIAN_CATEGORY_ICONS.shops, label: "محلات وتجاري", desc: "محلات، صالات عرض، حقوق فروغ" },
+              { icon: SYRIAN_CATEGORY_ICONS.villas, label: "فلل وقصور", desc: "فلل مودرن ومستقلة وقصور فخمة" },
+              { icon: SYRIAN_CATEGORY_ICONS.factories, label: "مصانع ومستودعات", desc: "منشآت صناعية، هناغر ومستودعات" },
+              { icon: SYRIAN_CATEGORY_ICONS.other, label: "أخرى ومتنوعة", desc: "شاليهات مصايف، مكاتب وسكن شباب" },
             ].map((item, idx) => (
-              <div key={idx} className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
-                <span className="font-black text-xs text-slate-900 block">{item.label}</span>
+              <div key={idx} className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center gap-2 text-brand-600">
+                  <item.icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="block text-xs font-black text-slate-900">{item.label}</span>
+                </div>
                 <span className="text-[11px] text-slate-500 leading-tight block">{item.desc}</span>
               </div>
             ))}

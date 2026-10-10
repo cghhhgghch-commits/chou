@@ -1,7 +1,22 @@
 import { useState } from "react";
-import { X, Send, PhoneCall, ShieldCheck, CheckCircle2, MapPin, Calendar, Clock, AlertTriangle } from "lucide-react";
+import { X, Send, PhoneCall, ShieldCheck, CheckCircle2, MapPin, Calendar, Clock, AlertTriangle, Wrench, Zap, Sun, Droplets, Wind, Paintbrush, Grid, Hammer, Sparkles, Truck, Building2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { ServiceCategory } from "../../data/servicesData";
 import { getWhatsAppUrl } from "../../lib/constants";
+
+const SERVICE_ICONS: Record<string, LucideIcon> = {
+  Zap,
+  Sun,
+  Droplets,
+  Wind,
+  Paintbrush,
+  Grid,
+  Hammer,
+  Wrench,
+  Sparkles,
+  Truck,
+  Building2,
+};
 
 interface ServiceBookingModalProps {
   service: ServiceCategory | null;
@@ -18,6 +33,8 @@ export default function ServiceBookingModal({ service, isOpen, onClose }: Servic
   const [phone, setPhone] = useState("");
 
   if (!isOpen || !service) return null;
+
+  const ServiceIcon = SERVICE_ICONS[service.iconName] || Wrench;
 
   const handleSendWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +65,7 @@ ${notes ? `📝 *تفاصيل العطل/الملاحظات:* ${notes}` : ''}
         <div className="bg-slate-900 text-white p-5 relative flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${service.bg} ${service.color} border border-white/20 shadow-sm`}>
-              <span className="font-bold text-lg">🛠️</span>
+              <ServiceIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">

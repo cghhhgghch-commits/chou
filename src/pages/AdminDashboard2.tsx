@@ -23,8 +23,13 @@ import {
   TrendingUp,
   Bell,
   Send,
+  BedDouble,
+  Bath,
+  Link2,
+  MapPin,
+  Ruler,
 } from "lucide-react";
-import { SYRIAN_CITIES } from "../lib/constants";
+import { SYRIAN_CITIES, SYRIAN_CATEGORY_ICONS } from "../lib/constants";
 
 interface PropertyListing {
   id: string;
@@ -77,14 +82,14 @@ interface WhatsAppLead {
 }
 
 const CATEGORIES = [
-  { id: "houses", label: "🏠 منازل" },
-  { id: "villas", label: "🏰 فلل" },
-  { id: "buildings", label: "🏢 بنايات" },
-  { id: "shops", label: "🏬 محلات" },
-  { id: "farms", label: "🌾 مزارع" },
-  { id: "lands", label: "🗺️ أراضي" },
-  { id: "factories", label: "🏭 مصانع" },
-  { id: "other", label: "✨ أخرى" },
+  { id: "houses", label: "منازل" },
+  { id: "villas", label: "فلل" },
+  { id: "buildings", label: "بنايات" },
+  { id: "shops", label: "محلات" },
+  { id: "farms", label: "مزارع" },
+  { id: "lands", label: "أراضي" },
+  { id: "factories", label: "مصانع" },
+  { id: "other", label: "أخرى" },
 ];
 
 const DEAL_TYPES = [
@@ -197,7 +202,7 @@ export default function AdminDashboard2() {
       if (leadError) {
         if (String(leadError.message).includes("does not exist") || String(leadError.message).includes("relation \"whatsapp_leads\"")) {
           setPendingLeads((prev) => prev);
-          alert("⚠️ جدول طلبات الواتساب غير مفعّل بعد، لكن النموذج ما زال يعمل بشكل آمن.");
+          alert("جدول طلبات الواتساب غير مفعّل بعد، لكن النموذج ما زال يعمل بشكل آمن.");
           return;
         }
         throw leadError;
@@ -221,10 +226,10 @@ export default function AdminDashboard2() {
         description: "",
       }));
 
-      alert("✅ تم حفظ رسالة الواتساب في قائمة الطلبات الجديدة");
+      alert("تم حفظ رسالة الواتساب في قائمة الطلبات الجديدة");
     } catch (error) {
       console.error("Failed to save whatsapp lead:", error);
-      alert("❌ فشل حفظ رسالة الواتساب");
+      alert("فشل حفظ رسالة الواتساب");
     }
   };
 
@@ -249,10 +254,10 @@ export default function AdminDashboard2() {
       const { error } = await supabase.from("whatsapp_leads").update({ status: "rejected" }).eq("id", leadId);
       if (error) throw error;
       setPendingLeads((prev) => prev.filter((item) => item.id !== leadId));
-      alert("✅ تم رفض الطلب واستبعاده من قائمة المراجعة");
+      alert("تم رفض الطلب واستبعاده من قائمة المراجعة");
     } catch (error) {
       console.error("Failed to reject lead:", error);
-      alert("❌ فشل في رفض الطلب");
+      alert("فشل في رفض الطلب");
     }
   };
 
@@ -386,10 +391,10 @@ export default function AdminDashboard2() {
       if (error) throw error;
       if (!deleted) throw new Error("لم يتم العثور على الإعلان أو لا تملك صلاحية حذفه");
       setListings((prev) => prev.filter((item) => item.id !== id));
-      alert("✅ تم حذف الإعلان بنجاح");
+      alert("تم حذف الإعلان بنجاح");
     } catch (error) {
       console.error("خطأ في الحذف:", error);
-      alert("❌ فشل حذف الإعلان");
+      alert("فشل حذف الإعلان");
     }
   };
 
@@ -403,10 +408,10 @@ export default function AdminDashboard2() {
       setListings((current) => current.map((item) => (
         item.id === id ? { ...item, status: approved ? "active" : "rejected" } : item
       )));
-      alert(approved ? "✅ تمت الموافقة على الإعلان" : "✅ تم رفض الإعلان");
+      alert(approved ? "تمت الموافقة على الإعلان" : "تم رفض الإعلان");
     } catch (error) {
       console.error("Failed to moderate listing:", error);
-      alert("❌ تعذرت معالجة الإعلان");
+      alert("تعذرت معالجة الإعلان");
     }
   };
 
@@ -415,7 +420,7 @@ export default function AdminDashboard2() {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.price || !formData.area) {
-      alert("⚠️ يرجى ملء عنوان الإعلان والسعر والمساحة قبل الحفظ");
+      alert("يرجى ملء عنوان الإعلان والسعر والمساحة قبل الحفظ");
       return;
     }
 
@@ -443,7 +448,7 @@ export default function AdminDashboard2() {
         const { error } = await supabase.from("listings").update(payload).eq("id", editingId);
         if (error) throw error;
         setListings((prev) => prev.map((item) => (item.id === editingId ? normalizeListing({ ...item, ...payload, id: editingId }) : item)));
-        alert("✅ تم تحديث الإعلان بنجاح");
+        alert("تم تحديث الإعلان بنجاح");
       } else {
         const { data, error } = await supabase.from("listings").insert({
           ...payload,
@@ -452,7 +457,7 @@ export default function AdminDashboard2() {
         if (error) throw error;
         setListings((prev) => [...prev, normalizeListing(data)]);
 
-        alert("✅ تم إنشاء الإعلان بنجاح");
+        alert("تم إنشاء الإعلان بنجاح");
       }
 
       setFormData({
@@ -473,7 +478,7 @@ export default function AdminDashboard2() {
       setShowForm(false);
     } catch (error) {
       console.error("خطأ في الحفظ:", error);
-      alert("❌ فشل في حفظ الإعلان. تأكد من أن الجداول والحقول في Supabase متطابقة مع المشروع.");
+      alert("فشل في حفظ الإعلان. تأكد من أن الجداول والحقول في Supabase متطابقة مع المشروع.");
     } finally {
       setIsSubmitting(false);
     }
@@ -682,7 +687,7 @@ export default function AdminDashboard2() {
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-slate-200">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-slate-900">
-                {editingId ? "✏️ تعديل الإعلان" : "➕ إنشاء إعلان جديد"}
+                {editingId ? "تعديل الإعلان" : "إنشاء إعلان جديد"}
               </h2>
               <button
                 onClick={handleCancel}
@@ -860,7 +865,7 @@ export default function AdminDashboard2() {
 
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">
-                    🔗 رابط الفيديو (YouTube / Vimeo / Embed)
+                    <span className="inline-flex items-center gap-2"><Link2 className="h-4 w-4" />رابط الفيديو (YouTube / Vimeo / Embed)</span>
                   </label>
                   <input
                     type="url"
@@ -874,7 +879,7 @@ export default function AdminDashboard2() {
                     placeholder="https://www.youtube.com/embed/..."
                     className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <p className="text-xs text-slate-500 mt-1">💡 استخدم رابط embed للحصول على preview احترافي داخل العقار.</p>
+                  <p className="text-xs text-slate-500 mt-1">استخدم رابط embed للحصول على preview داخل العقار.</p>
                 </div>
               </div>
 
@@ -1096,11 +1101,11 @@ export default function AdminDashboard2() {
                         </span>
                       </div>
 
-                      <div className="flex gap-4 text-sm text-slate-600 mb-4">
-                        <span>📍 {item.city}</span>
-                        <span>📐 {item.area} م²</span>
-                        {item.bedrooms && <span>🛏️ {item.bedrooms}</span>}
-                        {item.bathrooms && <span>🚿 {item.bathrooms}</span>}
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-4">
+                        <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-stone-500" />{item.city}</span>
+                        <span className="inline-flex items-center gap-1.5"><Ruler className="h-4 w-4 text-stone-500" />{item.area} م²</span>
+                        {item.bedrooms && <span className="inline-flex items-center gap-1.5"><BedDouble className="h-4 w-4 text-stone-500" />{item.bedrooms}</span>}
+                        {item.bathrooms && <span className="inline-flex items-center gap-1.5"><Bath className="h-4 w-4 text-stone-500" />{item.bathrooms}</span>}
                       </div>
 
                       <p className="text-lg font-bold text-green-600">

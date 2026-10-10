@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
 import {
   User, Settings, Save, Loader2, AlertCircle, CheckCircle2,
-  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall, Trash2
+  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall, Trash2, BadgeCheck
 } from "lucide-react";
 
 export default function Profile() {
@@ -197,8 +197,9 @@ export default function Profile() {
           <div>
             <h1 className="text-xl font-bold text-slate-900">{profile?.display_name || user.email?.split('@')[0] || "المستخدم"}</h1>
             <p className="text-xs text-slate-500 font-medium" dir="ltr">{user.email}</p>
-            <span className="inline-block mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
-              حساب موثق ✓
+            <span className="inline-flex items-center gap-1 mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              حساب موثق
             </span>
           </div>
         </div>

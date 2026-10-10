@@ -14,6 +14,7 @@ import {
   SYRIAN_CITIES,
   SYRIAN_GOVERNORATES, 
   SYRIAN_CATEGORIES, 
+  SYRIAN_CATEGORY_ICONS,
   OWNERSHIP_TYPES, 
   FINISHING_TYPES, 
   AMENITIES_LIST, 
@@ -615,7 +616,7 @@ ${imageSection}
 
       if (isAdmin) {
         setShowSuccessModal(false);
-        alert(editingId ? "✅ تم تحديث الإعلان ونشره بنجاح" : "✅ تم إضافة الإعلان ونشره بنجاح");
+        alert(editingId ? "تم تحديث الإعلان ونشره بنجاح" : "تم إضافة الإعلان ونشره بنجاح");
         navigate("/admin/dashboard");
         return;
       }
@@ -766,6 +767,7 @@ ${imageSection}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {SYRIAN_CATEGORIES.map(cat => {
                 const isSelected = selectedCategory === cat.id;
+                const CategoryIcon = SYRIAN_CATEGORY_ICONS[cat.id as keyof typeof SYRIAN_CATEGORY_ICONS];
                 return (
                   <button
                     key={cat.id}
@@ -778,7 +780,7 @@ ${imageSection}
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xl">{cat.icon}</span>
+                      <CategoryIcon className="h-5 w-5 text-stone-500" aria-hidden="true" />
                       {isSelected && <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />}
                     </div>
                     <div>

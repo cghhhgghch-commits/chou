@@ -18,13 +18,18 @@ import {
   SYRIAN_CATEGORIES,
   APP_CONFIG,
   SYRIAN_GOVERNORATES,
+  SYRIAN_CATEGORY_ICONS,
   formatSyrianPrice,
 } from "../lib/constants";
 import { filterProperties, getAvailableAreas } from "../lib/propertyFilters";
 
 export const CATEGORY_TABS = [
-  { id: "all", label: "الكل" },
-  ...SYRIAN_CATEGORIES.map((c) => ({ id: c.id, label: `${c.icon} ${c.label}` })),
+  { id: "all", label: "الكل", icon: null },
+  ...SYRIAN_CATEGORIES.map((c) => ({
+    id: c.id,
+    label: c.label,
+    icon: SYRIAN_CATEGORY_ICONS[c.id as keyof typeof SYRIAN_CATEGORY_ICONS],
+  })),
 ];
 
 const BEDROOM_OPTIONS = [
@@ -270,6 +275,7 @@ export default function Properties() {
           <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
             {CATEGORY_TABS.map((tab) => {
               const isSelected = activeCategory === tab.id;
+              const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
@@ -280,7 +286,10 @@ export default function Properties() {
                       : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  {tab.label}
+                  <span className="inline-flex items-center gap-1.5">
+                    {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
+                    {tab.label}
+                  </span>
                 </button>
               );
             })}

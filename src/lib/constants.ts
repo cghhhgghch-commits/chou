@@ -1,3 +1,5 @@
+import { Building2, Castle, Factory, Home, LandPlot, LayoutGrid, Sprout, Store } from "lucide-react";
+
 export const WHATSAPP_NUMBER = "963934888055";
 
 export const APP_CONFIG = {
@@ -62,6 +64,17 @@ export const SYRIAN_CATEGORIES = [
   { id: "factories", label: "مصانع", subtitle: "هناغر ومستودعات ومنشآت صناعية", icon: "🏭" },
   { id: "other", label: "أخرى", subtitle: "شاليهات واستوديوهات وسكن طلاب", icon: "✨" },
 ];
+
+export const SYRIAN_CATEGORY_ICONS = {
+  houses: Home,
+  buildings: Building2,
+  farms: Sprout,
+  lands: LandPlot,
+  shops: Store,
+  villas: Castle,
+  factories: Factory,
+  other: LayoutGrid,
+};
 
 export const OWNERSHIP_TYPES = [
   "طابو أخضر 2400 سهم (سجل عقاري نظامي)",
