@@ -13,7 +13,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary: "bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700",
   secondary: "border border-stone-300 bg-white text-stone-800 hover:bg-stone-50",
   ghost: "bg-transparent text-stone-700 hover:bg-stone-100",
-  "danger-outline": "border border-red-700 bg-white text-red-800 hover:bg-red-50",
+  "danger-outline": "border border-brand-500 bg-white text-brand-700 hover:bg-brand-50",
 };
 
 export default function Button({

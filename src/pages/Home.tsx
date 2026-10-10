@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { 
-  ArrowLeft, Bell, Building2, Wrench, Sun, Droplets, Wind, Paintbrush,
+  ArrowLeft, Bell, Building2, Wrench, Sun, Droplets, Wind, Paintbrush, Search,
   Hammer, Zap, ShieldCheck, Home as HomeIcon, MapPin, Store, Sparkles,
   Factory, Landmark, Trees, Truck, MessageSquare
 } from "lucide-react";
@@ -195,10 +195,8 @@ export default function Home() {
       <div className="bg-white sticky top-0 z-40 shadow-xs border-b border-slate-100 px-4 py-3">
         <div className="flex items-center gap-3 max-w-7xl mx-auto">
           <div className="flex-1 relative flex items-center cursor-pointer" onClick={handleSearchClick}>
-            <div className="absolute left-3.5 text-brand-500">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 md:w-5 md:h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
+            <div className="absolute left-3.5 text-brand-600">
+              <Search className="h-4 w-4 md:h-5 md:w-5" aria-hidden="true" />
             </div>
             <div className="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200/90 rounded-2xl py-2.5 pl-10 pr-4 text-xs md:text-sm font-medium text-slate-400 transition-colors">
               ابحث عن عقارات، مناطق، وأحياء تناسب احتياجك...
@@ -212,9 +210,25 @@ export default function Home() {
       </div>
 
       <main className="flex-1 flex flex-col px-3 md:px-8 py-5 max-w-7xl mx-auto w-full">
+        <section className="mb-6 border-b border-stone-200 pb-5">
+          <p className="mb-1 text-xs font-bold text-brand-700">لقطة | عقارات وخدمات</p>
+          <h1 className="text-2xl font-bold leading-10 text-stone-900 md:text-3xl">ابحث عن عقار يناسبك</h1>
+          <p className="mt-1 text-sm leading-7 text-stone-600">عقارات للبيع والإيجار وخدمات للمنزل في المحافظات السورية.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
+              <ShieldCheck className="h-4 w-4 text-green-700" /> إعلانات موثّقة
+            </span>
+            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
+              <MapPin className="h-4 w-4 text-stone-500" /> محافظات متعددة
+            </span>
+            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
+              <MessageSquare className="h-4 w-4 text-stone-500" /> تواصل مباشر
+            </span>
+          </div>
+        </section>
         
         {/* Real Estate Categories (8 Explicit Categories) */}
-        <section className="mb-6 bg-white p-4 md:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+        <section className="mb-8 space-y-4 rounded-xl border border-stone-200 bg-white p-4 md:p-6">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
               <div className="flex items-center gap-2">
@@ -243,7 +257,7 @@ export default function Home() {
                 <Link 
                   key={cat.id} 
                   to={cat.link} 
-                  className="bg-white hover:bg-slate-50/80 rounded-2xl border border-slate-200/90 overflow-hidden flex flex-col relative hover:shadow-lg hover:border-brand-400/80 transition-all group duration-300 transform hover:-translate-y-0.5"
+                   className="relative flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition-colors duration-175 hover:border-stone-400 hover:bg-stone-50 group"
                 >
                   {/* Photo Container with subtle gradient & tag */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
@@ -253,18 +267,18 @@ export default function Home() {
                       containerClassName="h-full w-full"
                       className="transition-transform duration-200 group-hover:scale-[1.02]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    <div className="absolute inset-0 bg-black/20" />
                     
                     {/* Category Tag Badge */}
                     <div className="absolute top-2 right-2 z-10">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg shadow-xs ${cat.tagBg}`}>
+                      <span className="rounded-md border border-white/70 bg-white/95 px-2 py-0.5 text-[9px] font-bold text-stone-800">
                         {cat.tag}
                       </span>
                     </div>
 
                     {/* Category Icon Badge */}
                     <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-lg shadow-xs border border-white/40">
-                      <IconComp className={`w-3.5 h-3.5 ${cat.iconColor}`} />
+                       <IconComp className="h-3.5 w-3.5 text-stone-700" />
                       <span className="text-[11px] font-black text-slate-900">{cat.label}</span>
                     </div>
                   </div>
@@ -290,15 +304,15 @@ export default function Home() {
         </section>
 
         {/* Maintenance & Services Section */}
-        <section className="mb-8 bg-gradient-to-br from-orange-50 to-amber-50 p-4 md:p-6 rounded-3xl border border-amber-200/50 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-amber-200/30">
+        <section className="mb-8 space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-4 md:p-6">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-2">
             <div>
               <h2 className="text-lg font-bold text-slate-900">خدمات الصيانة والتشطيبات</h2>
               <p className="text-xs text-slate-600 mt-0.5">خدمات متخصصة لصيانة وتطوير العقارات</p>
             </div>
             <Link 
               to="/services" 
-              className="text-xs text-orange-600 font-bold hover:text-orange-700 flex items-center gap-1 bg-white px-3 py-1.5 rounded-xl border border-orange-200 transition-colors"
+              className="flex min-h-11 items-center gap-1 rounded-lg border border-stone-300 bg-white px-3 text-xs font-bold text-stone-700 transition-colors hover:border-brand-300 hover:text-brand-700"
             >
               <span>عرض الكل</span>
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -318,9 +332,9 @@ export default function Home() {
                 <Link 
                   key={service.id}
                   to={`/services?service=${service.id}`}
-                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl hover:bg-white/80 transition-all group text-center"
+                  className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-lg p-2.5 text-center transition-colors hover:bg-white group"
                 >
-                  <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center ${service.bg} ${service.color} group-hover:scale-105 transition-transform shadow-xs`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${service.bg} ${service.color} md:h-14 md:w-14`}>
                     <Icon className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2} />
                   </div>
                   <span className="text-[11px] font-bold text-slate-700 leading-tight">
@@ -334,15 +348,15 @@ export default function Home() {
 
         <Link
           to="/contact"
-          className="mb-8 flex items-center justify-between gap-4 rounded-3xl border border-brand-200 bg-brand-50 px-5 py-4 text-brand-900 transition-colors hover:bg-brand-100"
+          className="mb-8 flex min-h-16 items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white px-4 py-3 text-stone-900 transition-colors hover:border-brand-300"
         >
           <span className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-500 text-white">
               <MessageSquare className="h-5 w-5" />
             </span>
             <span>
               <span className="block text-sm font-black">اتصل بنا</span>
-              <span className="block text-xs text-brand-700">فريق الدعم جاهز لمساعدتك</span>
+              <span className="block text-xs text-stone-600">فريق الدعم جاهز لمساعدتك</span>
             </span>
           </span>
           <ArrowLeft className="h-5 w-5 shrink-0 text-brand-600" />
@@ -354,8 +368,8 @@ export default function Home() {
           <div className="flex gap-4 overflow-x-auto pb-3 hide-scrollbar snap-x">
             <Link to="/properties?category=chalet" className="relative aspect-[4/3] min-w-[240px] overflow-hidden rounded-2xl shadow-sm snap-center group">
               <Image src={FEATURED_CHALET_IMAGE} alt="شاليه" containerClassName="absolute inset-0 h-full w-full" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent"></div>
-              <div className="absolute bottom-3.5 left-3.5 right-3.5">
+              <div className="absolute inset-0 bg-stone-950/45"></div>
+              <div className="absolute inset-x-3 bottom-3.5">
                 <h3 className="text-white font-bold text-base leading-tight mb-0.5">شاليهات ومنازل خارج المدينة</h3>
                 <p className="text-slate-200 text-xs">مواقع هادئة ومناسبة للراحة والاستثمار</p>
               </div>
@@ -380,6 +394,45 @@ export default function Home() {
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
+        </section>
+
+        <section className="mt-10 border-t border-stone-200 py-7">
+          <h2 className="text-xl font-bold text-stone-900">كيف تعمل المنصة</h2>
+          <div className="mt-4 grid gap-5 sm:grid-cols-3">
+            <div className="border-s-2 border-brand-500 ps-3">
+              <span className="text-xs font-bold text-brand-700">01</span>
+              <h3 className="mt-1 text-sm font-bold text-stone-900">اختر القسم</h3>
+              <p className="text-sm leading-7 text-stone-600">ابدأ بنوع العقار أو الخدمة التي تبحث عنها.</p>
+            </div>
+            <div className="border-s-2 border-stone-300 ps-3">
+              <span className="text-xs font-bold text-stone-500">02</span>
+              <h3 className="mt-1 text-sm font-bold text-stone-900">راجع التفاصيل</h3>
+              <p className="text-sm leading-7 text-stone-600">قارن الموقع والسعر والمواصفات المعروضة.</p>
+            </div>
+            <div className="border-s-2 border-stone-300 ps-3">
+              <span className="text-xs font-bold text-stone-500">03</span>
+              <h3 className="mt-1 text-sm font-bold text-stone-900">تواصل مباشرة</h3>
+              <p className="text-sm leading-7 text-stone-600">اتصل بالمعلن أو أرسل طلب الخدمة.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-stone-200 py-7">
+          <h2 className="text-xl font-bold text-stone-900">أسئلة شائعة</h2>
+          <dl className="mt-4 divide-y divide-stone-200">
+            <div className="py-3">
+              <dt className="text-sm font-bold text-stone-900">كيف أضيف إعلاناً؟</dt>
+              <dd className="text-sm leading-7 text-stone-600">ابدأ من «أضف إعلان» واتبع حقول العقار والاتصال.</dd>
+            </div>
+            <div className="py-3">
+              <dt className="text-sm font-bold text-stone-900">أين أجد خدمات الصيانة؟</dt>
+              <dd className="text-sm leading-7 text-stone-600">افتح قسم الخدمات واختر نوع العمل المطلوب.</dd>
+            </div>
+            <div className="py-3">
+              <dt className="text-sm font-bold text-stone-900">كيف أتواصل بشأن عقار؟</dt>
+              <dd className="text-sm leading-7 text-stone-600">استخدم الاتصال أو WhatsApp في بطاقة العقار أو تفاصيله.</dd>
+            </div>
+          </dl>
         </section>
       </main>
     </div>
