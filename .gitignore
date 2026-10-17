@@ -8,3 +8,5 @@ coverage/
 !.env.example
 android/laqta-upload-key.jks
 android/keystore.properties
+
+.vercel
