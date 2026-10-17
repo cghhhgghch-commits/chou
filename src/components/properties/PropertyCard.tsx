@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { Link } from "react-router";
-import { Heart, BadgeCheck, Phone, MapPin, Grid, BedDouble, Bath, Sun, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router";
+import { Heart, BadgeCheck, Phone, MapPin, Grid, BedDouble, Bath, ShieldCheck } from "lucide-react";
 import { Property } from "../../types";
 import Image from "../ui/Image";
+import { useAuth } from "../../lib/AuthContext";
+import { useFavorites } from "../../lib/FavoritesContext";
 
 export default function PropertyCard({ property }: { property: Property }) {
+  const { user } = useAuth();
+  const { isFavorite, loading, toggleFavorite } = useFavorites();
+  const navigate = useNavigate();
+  const [savingFavorite, setSavingFavorite] = useState(false);
+  const favorite = isFavorite(property.id);
+
   // Format price smartly for Syrian currency (Millions / Billions)
   const formatSyrianPrice = (price: number) => {
     if (price >= 1_000_000_000) {
@@ -60,43 +70,39 @@ export default function PropertyCard({ property }: { property: Property }) {
       ? { label: "على العظم", className: "bg-stone-700 text-white" }
       : { label: "للبيع", className: "bg-brand-500 text-white" };
 
+  const handleFavoriteClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setSavingFavorite(true);
+    try {
+      await toggleFavorite(property.id);
+    } catch (error) {
+      console.warn("Failed to update favorite:", error);
+    } finally {
+      setSavingFavorite(false);
+    }
+  };
+
   return (
-    <div className="card group flex flex-col overflow-hidden rounded-xl bg-white transition-shadow duration-175 hover:shadow-sm">
+    <div className="card group relative flex flex-col overflow-hidden rounded-lg bg-white transition-colors duration-175 hover:border-stone-400">
       <Link to={`/property/${property.id}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
         <Image
           src={property.images[0]}
           alt={property.title}
           containerClassName="h-full w-full"
-          className="transition-transform duration-200 group-hover:scale-[1.02]"
+          className="transition-transform duration-500 group-hover:scale-[1.04]"
         />
         
         {/* Top Badges */}
-        <div className="absolute top-2.5 right-2.5 flex flex-wrap gap-1.5 z-10">
-          <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${catInfo.bg}`}>
-            {catInfo.label}
-          </span>
-
+        <div className="absolute right-2.5 top-2.5 z-10 flex flex-wrap gap-1.5">
           <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${dealInfo.className}`}>
             {dealInfo.label}
           </span>
-
-          {property.isVerified && (
-            <div className="flex items-center gap-1 rounded-md bg-green-700 px-2 py-0.5 text-[10px] font-bold text-white">
-              <BadgeCheck className="w-3 h-3" />
-              <span>موثوق</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="absolute top-2.5 left-2.5 z-10">
-          <button 
-            type="button" 
-            onClick={(e) => { e.preventDefault(); }} 
-            aria-label="إضافة إلى المفضلة"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white/95 text-stone-500 shadow-xs transition-colors hover:text-brand-600"
-          >
-            <Heart className="w-4 h-4" />
-          </button>
         </div>
 
         <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 z-10">
@@ -114,8 +120,27 @@ export default function PropertyCard({ property }: { property: Property }) {
         </div>
       </Link>
 
+      <button
+        type="button"
+        onClick={handleFavoriteClick}
+        disabled={loading || savingFavorite}
+        aria-label={favorite ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
+        aria-pressed={favorite}
+        className={`absolute left-2.5 top-2.5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white/95 shadow-xs transition-colors disabled:opacity-60 ${favorite ? "text-brand-600" : "text-stone-600 hover:text-brand-600"}`}
+      >
+        <Heart className="h-4 w-4" fill={favorite ? "currentColor" : "none"} />
+      </button>
+
       <div className="p-3.5 flex flex-col flex-1">
         <Link to={`/property/${property.id}`} className="block">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${catInfo.bg}`}>{catInfo.label}</span>
+              {property.isVerified && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800">
+                  <BadgeCheck className="h-3.5 w-3.5" /> إعلان موثوق
+                </span>
+              )}
+            </div>
             <div className="mb-1 flex items-baseline justify-between gap-1">
             <div className="flex items-baseline gap-1">
               <span className="text-base md:text-lg font-black text-brand-600">

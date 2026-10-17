@@ -1,5 +1,13 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from "@tanstack/react-table";
 import { useAdmin } from "../lib/AdminContext";
 import { supabase } from "../lib/supabase";
 import {
@@ -28,11 +36,13 @@ import {
   Link2,
   MapPin,
   Ruler,
+  ArrowUpDown,
 } from "lucide-react";
 import { SYRIAN_CITIES, SYRIAN_CATEGORY_ICONS } from "../lib/constants";
 import Image from "../components/ui/Image";
 import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 import Skeleton from "../components/ui/Skeleton";
+import NumberTicker from "../components/ui/NumberTicker";
 
 interface PropertyListing {
   id: string;
@@ -113,6 +123,7 @@ export default function AdminDashboard2() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "active" | "rejected">("all");
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads" | "notifications">("overview");
   
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -517,6 +528,92 @@ export default function AdminDashboard2() {
     navigate("/login");
   };
 
+  const listingColumns = useMemo<ColumnDef<PropertyListing>[]>(() => [
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <button type="button" onClick={column.getToggleSortingHandler()} className="inline-flex items-center gap-2">
+          العقار <ArrowUpDown className="h-3.5 w-3.5 text-stone-400" />
+        </button>
+      ),
+      cell: ({ row }) => (
+        <div className="flex min-w-56 items-center gap-3">
+          <Image src={row.original.images?.[0]} alt="" containerClassName="h-12 w-16 shrink-0 rounded-md" className="h-full w-full object-cover" />
+          <span className="min-w-0">
+            <span className="block max-w-64 truncate font-bold text-stone-900">{row.original.title}</span>
+            <span className="mt-1 block text-xs text-stone-500">{CATEGORIES.find((category) => category.id === row.original.category)?.label || row.original.category}</span>
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "city",
+      header: ({ column }) => (
+        <button type="button" onClick={column.getToggleSortingHandler()} className="inline-flex items-center gap-2">
+          المحافظة <ArrowUpDown className="h-3.5 w-3.5 text-stone-400" />
+        </button>
+      ),
+      cell: ({ getValue }) => <span className="whitespace-nowrap">{getValue<string>()}</span>,
+    },
+    {
+      accessorKey: "price",
+      header: ({ column }) => (
+        <button type="button" onClick={column.getToggleSortingHandler()} className="inline-flex items-center gap-2">
+          السعر <ArrowUpDown className="h-3.5 w-3.5 text-stone-400" />
+        </button>
+      ),
+      sortingFn: (rowA, rowB, columnId) => Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId)),
+      cell: ({ getValue }) => <span className="whitespace-nowrap font-bold text-stone-900">{Number(getValue()).toLocaleString()} ل.س</span>,
+    },
+    {
+      accessorKey: "area",
+      header: "المساحة",
+      sortingFn: (rowA, rowB, columnId) => Number(rowA.getValue(columnId)) - Number(rowB.getValue(columnId)),
+      cell: ({ getValue }) => <span className="whitespace-nowrap">{getValue<string>()} م²</span>,
+    },
+    {
+      accessorKey: "status",
+      header: "الحالة",
+      cell: ({ getValue }) => {
+        const status = String(getValue() || "pending");
+        const labels: Record<string, string> = { pending: "قيد المراجعة", active: "منشور", approved: "منشور", rejected: "مرفوض" };
+        const styles: Record<string, string> = {
+          pending: "bg-amber-50 text-amber-800",
+          active: "bg-emerald-50 text-emerald-800",
+          approved: "bg-emerald-50 text-emerald-800",
+          rejected: "bg-rose-50 text-rose-800",
+        };
+        return <span className={`whitespace-nowrap rounded-sm px-2 py-1 text-xs font-bold ${styles[status] || "bg-stone-100 text-stone-700"}`}>{labels[status] || status}</span>;
+      },
+    },
+    {
+      id: "actions",
+      header: "إجراءات",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          {row.original.status === "pending" && (
+            <>
+              <button type="button" onClick={() => handleModerate(row.original.id, true)} aria-label="موافقة على الإعلان" title="موافقة" className="flex h-9 w-9 items-center justify-center rounded-md text-emerald-800 hover:bg-emerald-50"><Check className="h-4 w-4" /></button>
+              <button type="button" onClick={() => handleModerate(row.original.id, false)} aria-label="رفض الإعلان" title="رفض" className="flex h-9 w-9 items-center justify-center rounded-md text-brand-700 hover:bg-brand-50"><X className="h-4 w-4" /></button>
+            </>
+          )}
+          <button type="button" onClick={() => handleEdit(row.original)} aria-label="تعديل الإعلان" title="تعديل" className="flex h-9 w-9 items-center justify-center rounded-md text-stone-700 hover:bg-stone-100"><Edit2 className="h-4 w-4" /></button>
+          <button type="button" onClick={() => handleDelete(row.original.id)} aria-label="حذف الإعلان" title="حذف" className="flex h-9 w-9 items-center justify-center rounded-md text-brand-700 hover:bg-brand-50"><Trash2 className="h-4 w-4" /></button>
+        </div>
+      ),
+    },
+  ], [handleDelete, handleEdit, handleModerate]);
+
+  const listingsTable = useReactTable({
+    data: filteredListings,
+    columns: listingColumns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Header */}
@@ -677,7 +774,7 @@ export default function AdminDashboard2() {
                       <TrendingUp className="h-4 w-4 text-slate-300" />
                     </div>
                     <p className="mt-4 text-[11px] font-bold text-slate-500">{stat.label}</p>
-                    <p className={`mt-1 text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                    <p className={`mt-1 text-2xl font-black ${stat.color}`}><NumberTicker value={stat.value} /></p>
                   </div>
                 );
               })}
@@ -1053,118 +1150,31 @@ export default function AdminDashboard2() {
             <p className="text-lg font-bold text-stone-800">لا توجد إعلانات حالياً</p>
           </div>
         ) : (
-          <div className="grid gap-6">
-            {filteredListings.map((item) => (
-              <div
-                key={item.id}
-                className="overflow-hidden rounded-xl border border-stone-200 bg-white transition-shadow hover:shadow-sm"
-              >
-                <div className="flex flex-col md:flex-row">
-                  {/* الصورة والفيديو */}
-                  <div className="w-full md:w-64 flex-shrink-0">
-                    {/* الفيديو */}
-                    {item.videos?.[0] && item.videos[0].trim() ? (
-                      <div className="w-full h-64 md:h-auto">
-                        <iframe
-                          width="100%"
-                          height="256"
-                          src={item.videos[0]}
-                          title={item.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full"
-                        ></iframe>
-                      </div>
-                    ) : (
-                      /* الصورة */
-                      <div className="w-full">
-                        <Image
-                          src={item.images?.[0]}
-                          alt={item.title}
-                          containerClassName="w-full"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* المعلومات */}
-                  <div className="flex flex-1 flex-col justify-between p-4 sm:p-6">
-                    <div>
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="text-lg font-bold text-stone-900">{item.title}</h3>
-                          <p className="mt-1 text-sm text-stone-600">
-                            {CATEGORIES.find((c) => c.id === item.category)?.label ||
-                              item.category}
-                          </p>
-                        </div>
-                        <span className={`rounded-md px-2.5 py-1 text-xs font-bold ${item.type === "sale" ? "bg-brand-500 text-white" : "bg-stone-800 text-white"}`}>
-                          {item.type === "sale"
-                            ? "بيع"
-                            : item.type === "rent"
-                              ? "إيجار"
-                              : "على العظم"}
-                        </span>
-                      </div>
-
-                      <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-stone-600">
-                        <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-stone-500" />{item.city}</span>
-                        <span className="inline-flex items-center gap-1.5"><Ruler className="h-4 w-4 text-stone-500" />{item.area} م²</span>
-                        {item.bedrooms && <span className="inline-flex items-center gap-1.5"><BedDouble className="h-4 w-4 text-stone-500" />{item.bedrooms}</span>}
-                        {item.bathrooms && <span className="inline-flex items-center gap-1.5"><Bath className="h-4 w-4 text-stone-500" />{item.bathrooms}</span>}
-                      </div>
-
-                      <p className="text-lg font-bold text-stone-900">
-                        {Number(item.price).toLocaleString()} ل.س
-                      </p>
-
-                      {item.description && (
-                        <p className="mt-3 line-clamp-2 text-sm leading-7 text-stone-700">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* الأزرار */}
-                    <div className="mt-4 flex flex-wrap gap-2 border-t border-stone-200 pt-4">
-                      {item.status === "pending" && (
-                        <>
-                          <button
-                            onClick={() => handleModerate(item.id, true)}
-                            className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-green-800"
-                          >
-                            <Check className="w-4 h-4" />
-                            موافقة
-                          </button>
-                          <button
-                            onClick={() => handleModerate(item.id, false)}
-                            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-brand-500 bg-white px-4 py-2 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50"
-                          >
-                            <X className="w-4 h-4" />
-                            رفض
-                          </button>
-                        </>
-                      )}
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white py-2 text-sm font-bold text-stone-800 transition-colors hover:bg-stone-50"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                        تعديل
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-500 bg-white py-2 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        حذف
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+            <table className="w-full min-w-[850px] border-collapse text-sm" aria-label="إعلانات العقارات">
+              <thead className="bg-stone-50 text-xs font-bold text-stone-600">
+                {listingsTable.getHeaderGroups().map((group) => (
+                  <tr key={group.id} className="border-b border-stone-200">
+                    {group.headers.map((header) => (
+                      <th key={header.id} scope="col" className="px-4 py-3 text-start">
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {listingsTable.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="border-b border-stone-100 transition-colors last:border-0 hover:bg-stone-50">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-3 align-middle text-stone-700">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ))}
 

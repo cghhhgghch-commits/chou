@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
+import { maintenanceServices } from "../data/servicesData";
+import { profileUpdateSchema } from "../lib/validation";
+import FadeContent from "../components/ui/FadeContent";
 import {
   User, Settings, Save, Loader2, AlertCircle, CheckCircle2,
-  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall, Trash2, BadgeCheck
+  Wrench, PlusCircle, Heart, MessageSquare, LogOut, PhoneCall, Trash2
 } from "lucide-react";
 
 export default function Profile() {
@@ -36,36 +39,13 @@ export default function Profile() {
     e.preventDefault();
     if (!user) return;
 
-    const trimmedName = displayName.trim();
-    const trimmedPhone = phoneNumber.trim();
-    const trimmedAvatar = avatarUrl.trim();
-
-    if (!trimmedName || trimmedName.length < 2) {
-      setError("يرجى إدخال اسم كامل صحيح.");
+    const validation = profileUpdateSchema.safeParse({ displayName, phoneNumber, avatarUrl, newPassword });
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message || "تحقق من بيانات الحساب وحاول مجدداً.");
       return;
     }
 
-    if (trimmedPhone && !/^[+0-9\s()-]{7,20}$/.test(trimmedPhone)) {
-      setError("رقم الهاتف غير صالح. استخدم أرقام أو + أو مسافات فقط.");
-      return;
-    }
-
-    if (trimmedAvatar) {
-      try {
-        const url = new URL(trimmedAvatar);
-        if (!['http:', 'https:'].includes(url.protocol)) {
-          throw new Error("Unsupported protocol");
-        }
-      } catch {
-        setError("رابط الصورة غير صالح. أدخل رابط URL صحيحًا يبدأ بـ http أو https.");
-        return;
-      }
-    }
-
-    if (newPassword && newPassword.length < 6) {
-      setError("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.");
-      return;
-    }
+    const { displayName: trimmedName, phoneNumber: trimmedPhone, avatarUrl: trimmedAvatar } = validation.data;
 
     setSaving(true);
     setError("");
@@ -184,10 +164,10 @@ export default function Profile() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 bg-stone-50 px-4 py-6 pb-24 md:pb-12">
-      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white p-5 sm:flex-row">
+    <FadeContent className="container mx-auto max-w-5xl space-y-6 bg-stone-50 px-4 py-6 pb-24 md:py-8 md:pb-12" trigger="mount" stagger={0.07}>
+      <div className="flex flex-col items-center justify-between gap-4 rounded-lg border border-stone-200 border-s-4 border-s-brand-500 bg-white p-5 sm:flex-row">
         <div className="flex items-center gap-4 text-center sm:text-right">
-          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-stone-200 bg-stone-100 text-xl font-bold text-stone-600">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-stone-200 bg-stone-100 text-xl font-bold text-stone-600">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -195,11 +175,12 @@ export default function Profile() {
             )}
           </div>
           <div>
+            <p className="mb-1 text-xs font-bold text-brand-700">إدارة الحساب</p>
             <h1 className="text-xl font-bold text-stone-900">{profile?.display_name || user.email?.split('@')[0] || "المستخدم"}</h1>
             <p className="text-sm font-medium text-stone-600" dir="ltr">{user.email}</p>
-            <span className="mt-1 inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2 py-1 text-xs font-bold text-green-800">
-              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              حساب موثق
+            <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-stone-500">
+              <User className="h-3.5 w-3.5" aria-hidden="true" />
+              حساب شخصي
             </span>
           </div>
         </div>
@@ -219,7 +200,7 @@ export default function Profile() {
             <Wrench className="w-5 h-5" />
           </div>
           <span className="text-sm font-bold text-stone-900">خدمات الصيانة</span>
-          <span className="text-xs text-stone-600">12 خدمة</span>
+          <span className="text-xs text-stone-600">{maintenanceServices.length} مجالات</span>
         </Link>
 
         <Link to="/place-ad" className="group flex min-h-32 flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white p-4 text-center transition-colors hover:border-brand-300">
@@ -247,7 +228,7 @@ export default function Profile() {
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white">
+      <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
         <div className="flex items-center gap-3 border-b border-stone-200 p-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-stone-100 text-stone-700">
             <Settings className="w-5 h-5" />
@@ -276,8 +257,9 @@ export default function Profile() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                <label className="mb-2 block text-sm font-bold text-stone-800">الاسم الكامل</label>
+                <label htmlFor="profile-name" className="mb-2 block text-sm font-bold text-stone-800">الاسم الكامل</label>
                 <input
+                  id="profile-name"
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
@@ -286,8 +268,9 @@ export default function Profile() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-bold text-stone-800">رقم الهاتف</label>
+                <label htmlFor="profile-phone" className="mb-2 block text-sm font-bold text-stone-800">رقم الهاتف</label>
                 <input
+                  id="profile-phone"
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
@@ -297,8 +280,9 @@ export default function Profile() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-bold text-stone-800">رابط الصورة الشخصية</label>
+                <label htmlFor="profile-avatar" className="mb-2 block text-sm font-bold text-stone-800">رابط الصورة الشخصية</label>
                 <input
+                  id="profile-avatar"
                   type="url"
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
@@ -309,8 +293,9 @@ export default function Profile() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-bold text-stone-800">البريد الإلكتروني (غير قابل للتعديل)</label>
+                <label htmlFor="profile-email" className="mb-2 block text-sm font-bold text-stone-800">البريد الإلكتروني (غير قابل للتعديل)</label>
                 <input
+                  id="profile-email"
                   type="email"
                   value={user.email || ""}
                   disabled
@@ -320,8 +305,9 @@ export default function Profile() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-bold text-stone-800">كلمة مرور جديدة (اتركه فارغاً إذا لم ترد تغييره)</label>
+                <label htmlFor="profile-password" className="mb-2 block text-sm font-bold text-stone-800">كلمة مرور جديدة (اتركه فارغاً إذا لم ترد تغييره)</label>
                 <input
+                  id="profile-password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -395,7 +381,7 @@ export default function Profile() {
         </div>
       </div>
 
-    </div>
+    </FadeContent>
   );
 }
 

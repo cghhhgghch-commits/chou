@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import { useAdmin } from "../lib/AdminContext";
-import { Home, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, Chrome, Apple } from "lucide-react";
+import { Home, Mail, Lock, Heart, Eye, EyeOff, Loader2, AlertCircle, Chrome, Apple } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
-import Image from "../components/ui/Image";
-import { AUTH_PANEL_IMAGE } from "../config/images";
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 const nativeAuthCallbackUrl = "com.laqta.syria://auth/callback";
@@ -313,23 +311,24 @@ export default function Login() {
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-6 md:px-6 md:py-10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <aside className="relative hidden min-h-[680px] overflow-hidden rounded-xl bg-stone-900 lg:block">
-          <Image
-            src={AUTH_PANEL_IMAGE}
-            alt="واجهة منزل"
-            containerClassName="absolute inset-0 h-full w-full"
-          />
-          <div className="absolute inset-0 bg-stone-950/45" />
-          <div className="absolute inset-x-8 top-8 flex items-center gap-3 text-white">
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-500">
-              <Home className="h-6 w-6" />
+        <aside className="hidden min-h-[560px] flex-col justify-between border-e border-stone-200 pe-8 lg:flex">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-md bg-brand-600 text-white">
+              <Home className="h-5 w-5" />
             </span>
-            <span className="text-xl font-bold">لقطة</span>
+            <div>
+              <p className="text-xl font-bold text-stone-900">لقطة</p>
+              <p className="text-[10px] font-medium text-stone-500">LAQTA</p>
+            </div>
           </div>
-          <div className="absolute inset-x-8 bottom-10 max-w-md text-white">
-            <p className="mb-2 text-sm font-medium text-white/80">لقطة للعقارات والخدمات</p>
-            <h2 className="text-3xl font-bold leading-[1.8]">مكانك القادم يبدأ بخطوة واضحة</h2>
-            <p className="mt-2 text-base leading-8 text-white/85">تابع إعلاناتك ورسائلك وخدماتك من حساب واحد.</p>
+          <div className="max-w-md">
+            <p className="mb-2 text-xs font-bold text-brand-700">حسابك على لقطة</p>
+            <h2 className="text-3xl font-bold leading-relaxed text-stone-900">تابع إعلاناتك وتواصلك من مكان واحد</h2>
+            <ul className="mt-6 space-y-3 border-t border-stone-200 pt-5 text-sm text-stone-600">
+              <li className="flex items-center gap-2"><Home className="h-4 w-4 text-brand-700" /> أدر إعلانات عقاراتك</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brand-700" /> تابع رسائلك واستفساراتك</li>
+              <li className="flex items-center gap-2"><Heart className="h-4 w-4 text-brand-700" /> احفظ خياراتك في حسابك</li>
+            </ul>
           </div>
         </aside>
 
@@ -548,7 +547,7 @@ export default function Login() {
 
         {/* Bottom Info */}
         <div className="mt-6 space-y-2 text-center text-xs text-stone-600">
-          <p>التطبيق آمن وموثوق • البيانات محفوظة بشكل آمن</p>
+          <p>سجّل الدخول لمتابعة إعلاناتك ورسائلك وخدماتك.</p>
           <div className="flex items-center justify-center gap-4 text-xs">
             <Link to="/" className="hover:text-brand-700">الصفحة الرئيسية</Link>
             <span>•</span>

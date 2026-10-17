@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   MapPin,
@@ -6,23 +7,19 @@ import {
   ChevronDown,
   X,
   Building2,
-  BadgeDollarSign,
-  Filter,
 } from "lucide-react";
 import { useSearchParams } from "react-router";
-import { supabase } from "../lib/supabase";
 import PropertyCard from "../components/properties/PropertyCard";
-import { Property } from "../types";
+import { fetchVerifiedListings } from "../lib/listings";
 import {
-  SYRIAN_CITIES,
   SYRIAN_CATEGORIES,
-  APP_CONFIG,
   SYRIAN_GOVERNORATES,
   SYRIAN_CATEGORY_ICONS,
-  formatSyrianPrice,
 } from "../lib/constants";
-import { filterProperties, getAvailableAreas } from "../lib/propertyFilters";
-import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
+import { filterProperties, normalizePropertyCategory } from "../lib/propertyFilters";
+import FadeContent from "../components/ui/FadeContent";
+import SegmentedControl from "../components/ui/SegmentedControl";
+import Dialog from "../components/ui/Dialog";
 
 export const CATEGORY_TABS = [
   { id: "all", label: "الكل", icon: null },
@@ -46,16 +43,7 @@ export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rawCategory = searchParams.get("category") || searchParams.get("type") || "all";
 
-  const normalizeCat = (cat: string) => {
-    if (["sale", "rent", "furnished", "damascene_house"].includes(cat)) return "houses";
-    if (["commercial"].includes(cat)) return "shops";
-    if (["land"].includes(cat)) return "lands";
-    if (["villa_farm"].includes(cat)) return "farms";
-    if (["chalet", "student", "offplan"].includes(cat)) return "other";
-    return cat;
-  };
-
-  const initialCategory = normalizeCat(rawCategory);
+  const initialCategory = normalizePropertyCategory(rawCategory);
   const initialCity = searchParams.get("city") || "";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,78 +55,20 @@ export default function Properties() {
   const [priceCurrency, setPriceCurrency] = useState<"SYP" | "USD">("SYP");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [firestoreProperties, setFirestoreProperties] = useState<Property[]>([]);
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      const { data, error } = await supabase
-        .from("listings")
-        .select("*")
-        .eq("status", "active")
-        .eq("is_verified", true)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.warn("Supabase listing fetch note:", error);
-        setFirestoreProperties([]);
-        return;
-      }
-
-      const liveList: Property[] = (data || []).map((item) => ({
-        id: item.id,
-        title: item.title || "عقار جديد",
-        price: item.price || 0,
-        pricePeriod: item.price_period || undefined,
-        priceInUSD: item.price_in_usd || undefined,
-        location: `${item.city_id || ""} ${item.area_id ? `- ${item.area_id}` : ""}`.trim() || "حلب",
-        city: item.city_id || "حلب",
-        areaName: item.area_id || "",
-        type: item.type || "sale",
-        category: item.category || "houses",
-        categoryType: item.category || "houses",
-        propertyType: item.property_type || "apartment",
-        ownershipType: item.ownership_type || "طابو أخضر",
-        finishing: item.finishing || "سوبر ديلوكس",
-        solarStatus: item.solar_status || "منظومة طاقة شمسية كاملة",
-        direction: item.direction || "قبلي",
-        floor: item.floor || "الطابق الثاني",
-        totalFloors: item.total_floors || "",
-        bedrooms: item.bedrooms || "3",
-        bathrooms: item.bathrooms || 2,
-        salons: item.salons || "صالون",
-        area: item.area || 120,
-        landArea: item.land_area || undefined,
-        furnishing: item.furnishing || "غير مفروش",
-        hasSolarPower: Boolean(item.has_solar_power),
-        hasWaterWell: Boolean(item.has_water_well),
-        hasElevator: Boolean(item.has_elevator),
-        hasGenerator: Boolean(item.has_generator),
-        description: item.description || "",
-        amenities: Array.isArray(item.amenities) ? item.amenities : ["طاقة شمسية", "سند طابو"],
-        images: Array.isArray(item.images) && item.images.length > 0
-          ? item.images
-          : [PROPERTY_IMAGE_FALLBACK],
-        isVerified: item.is_verified ?? true,
-        isFeatured: item.is_featured ?? true,
-        advertiserType: item.advertiser_type || "owner",
-        agent: {
-          name: item.advertiser_name || "معلن موثوق",
-          phone: item.phone || APP_CONFIG.adminPhone,
-          whatsapp: item.whatsapp || item.phone || APP_CONFIG.adminPhone,
-          avatar: "",
-        },
-        postedAt: "جديد اليوم",
-      }));
-      setFirestoreProperties(liveList);
-    };
-
-    fetchListings();
-  }, []);
+  const {
+    data: firestoreProperties = [],
+    isPending: isLoadingListings,
+    isError: listingsError,
+    refetch: refetchListings,
+  } = useQuery({
+    queryKey: ["verified-listings", "all"],
+    queryFn: () => fetchVerifiedListings(),
+  });
 
   useEffect(() => {
     const cat = searchParams.get("category") || searchParams.get("type") || "all";
     const city = searchParams.get("city") || "";
-    setActiveCategory(normalizeCat(cat));
+    setActiveCategory(normalizePropertyCategory(cat));
     setSelectedGovernorate(city);
   }, [searchParams]);
 
@@ -156,36 +86,16 @@ export default function Properties() {
     }
   }, [availableAreas, selectedArea, selectedGovernorate]);
 
-  const filteredProperties = useMemo(() => {
-    const searchText = searchQuery.trim().toLowerCase();
-    const minAmount = Number(minPrice) || 0;
-    const maxAmount = Number(maxPrice) || 0;
-    const bedroomMinimum = Number(selectedBedrooms) || 0;
-
-    return firestoreProperties.filter((property) => {
-      if (selectedGovernorate && property.city !== selectedGovernorate) return false;
-      if (selectedArea && property.areaName !== selectedArea) return false;
-      if (bedroomMinimum && Number(property.bedrooms) < bedroomMinimum) return false;
-
-      const propertyPrice = priceCurrency === "USD"
-        ? Number(property.priceInUSD ?? property.price ?? 0)
-        : Number(property.price ?? 0);
-
-      if (minAmount > 0 && propertyPrice < minAmount) return false;
-      if (maxAmount > 0 && propertyPrice > maxAmount) return false;
-
-      if (!searchText) return true;
-
-      const matchesTitle = property.title.toLowerCase().includes(searchText);
-      const matchesLocation = property.location.toLowerCase().includes(searchText);
-      const matchesDescription = property.description.toLowerCase().includes(searchText);
-      const matchesAmenities = property.amenities?.some((amenity) =>
-        amenity.toLowerCase().includes(searchText),
-      );
-
-      return matchesTitle || matchesLocation || matchesDescription || matchesAmenities;
-    });
-  }, [firestoreProperties, searchQuery, selectedGovernorate, selectedArea, selectedBedrooms, priceCurrency, minPrice, maxPrice]);
+  const filteredProperties = useMemo(() => filterProperties(firestoreProperties, {
+    selectedCity: selectedGovernorate,
+    selectedArea,
+    bedrooms: selectedBedrooms,
+    priceCurrency,
+    minPrice,
+    maxPrice,
+    selectedCategory: activeCategory,
+    searchQuery,
+  }), [firestoreProperties, searchQuery, selectedGovernorate, selectedArea, selectedBedrooms, priceCurrency, minPrice, maxPrice, activeCategory]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -273,27 +183,13 @@ export default function Properties() {
             </button>
           </div>
 
-          <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
-            {CATEGORY_TABS.map((tab) => {
-              const isSelected = activeCategory === tab.id;
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleCategorySelect(tab.id)}
-                  className={`flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border px-3.5 text-sm font-bold transition-colors ${
-                    isSelected
-                      ? "border-brand-500 bg-brand-500 text-white"
-                      : "border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
-                    {tab.label}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="mt-3 overflow-x-auto pb-1 hide-scrollbar">
+            <SegmentedControl
+              label="اختر نوع العقار"
+              options={CATEGORY_TABS}
+              value={activeCategory}
+              onChange={handleCategorySelect}
+            />
           </div>
         </div>
       </div>
@@ -301,8 +197,8 @@ export default function Properties() {
       <div className="container mx-auto max-w-7xl px-4 py-6">
         <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h1 className="flex items-center gap-2 text-lg font-black text-slate-900">
-              <span>{filteredProperties.length} عقار متاح</span>
+            <h1 className="flex flex-wrap items-center gap-2 text-lg font-bold text-stone-900">
+              <span aria-live="polite">{isLoadingListings ? "جارٍ تحميل العقارات" : `${filteredProperties.length} عقار متاح`}</span>
               {selectedGovernorate && <span className="text-brand-600">في {selectedGovernorate}</span>}
               {firestoreProperties.length > 0 && (
                 <span className="rounded-full border border-emerald-200 bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800">
@@ -311,44 +207,62 @@ export default function Properties() {
               )}
             </h1>
             <p className="mt-0.5 text-xs text-slate-500">
-              عقارات معتمدة بمواصفات حقيقية وسندات ملكية موثقة
+              تصفّح حسب النوع والموقع والسعر، وتواصل مع المعلن مباشرة.
             </p>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto">
-            <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-slate-600">
-              عروض حقيقية ومحدثة
-            </span>
+            <span className="text-xs text-stone-500">إعلانات متاحة من المعلنين</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-
-          {filteredProperties.length === 0 && (
-            <div className="col-span-full rounded-xl border border-stone-200 bg-white px-6 py-14 text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-stone-100">
-                <Search className="h-7 w-7 text-stone-500" />
+        {isLoadingListings ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="جارٍ تحميل العقارات">
+            {Array.from({ length: 8 }, (_, index) => (
+              <div key={index} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+                <div className="aspect-[4/3] animate-pulse bg-stone-200" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-stone-200" />
+                  <div className="h-3 w-4/5 animate-pulse rounded bg-stone-100" />
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-stone-100" />
+                </div>
               </div>
-              <h3 className="mb-1 text-lg font-black text-slate-900">لم نجد عقارات تطابق هذا البحث حالياً</h3>
-              <p className="mx-auto mb-5 max-w-sm text-xs text-slate-500">
-                جرب تغيير خيارات التصفية أو اختيار قسم عقاري آخر لعرض كافة العقارات المعروضة.
-              </p>
-              <button
-                onClick={resetAllFilters}
-                className="min-h-11 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-600"
-              >
-                عرض جميع العقارات المتاحة
-              </button>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <FadeContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" stagger={0.045}>
+            {filteredProperties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
+
+            {filteredProperties.length === 0 && (
+              <div className="col-span-full rounded-lg border border-stone-200 bg-white px-6 py-14 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-stone-100">
+                  <Search className="h-6 w-6 text-stone-500" />
+                </div>
+                <h3 className="mb-1 text-lg font-bold text-stone-900">{listingsError ? "تعذر تحميل العقارات" : "لم نجد عقارات تطابق هذا البحث"}</h3>
+                <p className="mx-auto mb-5 max-w-sm text-sm text-stone-600">
+                  {listingsError ? "تحقق من اتصالك ثم أعد المحاولة." : "جرّب تغيير كلمات البحث أو خيارات التصفية."}
+                </p>
+                <button
+                  onClick={() => listingsError ? void refetchListings() : resetAllFilters()}
+                  className="min-h-11 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-600"
+                >
+                  {listingsError ? "إعادة المحاولة" : "مسح الفلاتر"}
+                </button>
+              </div>
+            )}
+          </FadeContent>
+        )}
       </div>
 
-      {showFilters && (
-        <div className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-stone-50 sm:inset-y-4 sm:mx-auto sm:max-h-[calc(100vh-2rem)] sm:max-w-2xl sm:rounded-xl sm:border sm:border-stone-200 sm:bg-white sm:shadow-xl">
+      <Dialog
+        open={showFilters}
+        onOpenChange={setShowFilters}
+        title="تصفية العقارات"
+        description="اختر المحافظة والمنطقة وعدد الغرف وحدود السعر لتصفية النتائج."
+        contentClassName="flex max-h-[94dvh] w-full flex-col overflow-y-auto bg-stone-50 sm:max-h-[calc(100dvh-2rem)] sm:max-w-2xl sm:rounded-lg sm:border sm:border-stone-200 sm:bg-white"
+      >
           <div className="sticky top-0 z-10 flex min-h-16 items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
             <button onClick={() => setShowFilters(false)} className="-ml-2 p-2 text-slate-500 transition-colors hover:text-slate-900" aria-label="إغلاق الفلاتر">
               <X className="h-6 w-6" />
@@ -421,20 +335,13 @@ export default function Properties() {
 
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-900">السعر</label>
-              <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
-                {(["SYP", "USD"] as const).map((currency) => (
-                  <button
-                    key={currency}
-                    type="button"
-                    onClick={() => setPriceCurrency(currency)}
-                    className={`rounded-lg py-2 text-xs font-extrabold transition-colors ${
-                      priceCurrency === currency ? "bg-white text-brand-700 shadow-xs" : "text-slate-600"
-                    }`}
-                  >
-                    {currency === "SYP" ? "ل.س" : "$"}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                label="عملة السعر"
+                options={[{ id: "SYP", label: "ل.س" }, { id: "USD", label: "$" }]}
+                value={priceCurrency}
+                onChange={(currency) => setPriceCurrency(currency as "SYP" | "USD")}
+                className="mb-3 w-full justify-center"
+              />
               <div className="grid grid-cols-2 gap-2">
                 <label className="flex flex-col gap-1 text-xs font-bold text-slate-600">
                   من
@@ -462,7 +369,7 @@ export default function Properties() {
             </div>
           </div>
 
-          <div className="fixed right-0 bottom-0 left-0 border-t border-stone-200 bg-white p-4 pb-safe sm:sticky sm:bottom-0 sm:mt-auto sm:shadow-none">
+          <div className="sticky bottom-0 border-t border-stone-200 bg-white p-4 pb-safe">
             <button
               onClick={() => setShowFilters(false)}
               className="min-h-11 w-full rounded-lg bg-brand-500 py-3.5 text-base font-bold text-white transition-colors hover:bg-brand-600"
@@ -470,8 +377,7 @@ export default function Properties() {
               تطبيق الفلاتر
             </button>
           </div>
-        </div>
-      )}
+      </Dialog>
     </div>
   );
 }

@@ -1,17 +1,32 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router";
 import { 
   Zap, Sun, Droplets, Wind, Paintbrush, Grid, Hammer, Wrench, 
-  ShieldCheck, Sparkles, Truck, Building2, Home, Search, ArrowRight, 
-  PhoneCall, Clock, CheckCircle2, Star, BadgeCheck, MessageSquare
+  ShieldCheck, Sparkles, Truck, Building2, Home, Search, ArrowRight,
+  CheckCircle2, MessageSquare
 } from "lucide-react";
 import { maintenanceServices, ServiceCategory } from "../data/servicesData";
 import ServiceBookingModal from "../components/services/ServiceBookingModal";
+import FadeContent from "../components/ui/FadeContent";
+import SegmentedControl from "../components/ui/SegmentedControl";
+
+const maintenancePhotos = [
+  {
+    src: "/images/editorial/home-electrician.jpg",
+    alt: "يدان تصلحان مقبسًا كهربائيًا منزليًا باستخدام كماشة",
+    title: "كهرباء منزلية",
+  },
+  {
+    src: "/images/editorial/home-plumbing.jpg",
+    alt: "سباك يرتدي زي العمل ويصلح وصلة أنبوب داخل المنزل",
+    title: "تمديدات وصيانة مياه",
+  },
+];
 
 export default function Services() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState<string>("all");
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<ServiceCategory | null>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   // Icon mapper helper
   const getIcon = (iconName: string) => {
@@ -55,83 +70,71 @@ export default function Services() {
 
   const handleOpenBooking = (service: ServiceCategory) => {
     setSelectedServiceForModal(service);
+    setBookingOpen(true);
   };
+
+  const serviceTabs = [
+    { id: "all", label: `كل الخدمات · ${maintenanceServices.length}`, icon: Wrench },
+    { id: "finishing", label: "تشطيب وديكور", icon: Paintbrush },
+    { id: "tech", label: "طاقة وتكييف", icon: Sun },
+    { id: "home", label: "منزل ونقل", icon: Home },
+  ];
 
   return (
     <div className="min-h-screen bg-stone-50 pb-24 md:pb-12">
-      
-      {/* Top Mobile Header */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Link to="/" className="flex h-11 w-11 items-center justify-center rounded-lg text-stone-700 transition-colors hover:bg-stone-100">
-            <ArrowRight className="w-6 h-6" />
-          </Link>
+      <main className="container mx-auto max-w-6xl space-y-8 px-4 py-6 md:py-8">
+        <FadeContent className="flex flex-col gap-5 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between" trigger="mount" stagger={0}>
           <div>
-            <h1 className="text-lg font-bold leading-tight text-stone-900">خدمات الصيانة والتشطيبات</h1>
-            <p className="text-xs text-stone-600">فنيون معتمدون • ضمان 30 يوماً • استجابة فورية</p>
-          </div>
-        </div>
-
-        <a 
-          href="https://wa.me/963934888055?text=مرحباً، أريد الاستفسار عن خدمات الصيانة في تطبيق لقطة"
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="flex min-h-11 items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-3 text-xs font-bold text-green-900 transition-colors hover:bg-green-100"
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">واتساب مباشر</span>
-        </a>
-      </div>
-
-      <div className="container mx-auto px-4 max-w-6xl py-6 space-y-6">
-
-        {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-xl border border-stone-200 bg-stone-900 p-6 text-white md:p-10">
-          <div className="relative z-10 max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
-              <BadgeCheck className="h-4 w-4 text-green-300" />
-              <span>خدمات معتمدة ومكفولة 100%</span>
-            </div>
-            <h2 className="text-2xl font-bold leading-10 text-white md:text-3xl">
-              صيانة منزلك وعقارك أصبحت أسهل بضغطة زر واحدة
-            </h2>
-            <p className="text-sm leading-7 text-stone-200 md:text-base">
-              اختر الخدمة، وحدد موعدك، واستقبل نخبة الفنيين والمهندسين المعتمدين مع ضمان شامل على جميع الأعمال.
+            <p className="mb-2 text-xs font-bold text-brand-700">دليل الخدمات</p>
+            <h1 className="text-2xl font-bold leading-tight text-stone-900 md:text-3xl">الصيانة والتشطيبات</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-stone-600">
+              ابحث عن نوع العمل، ثم أرسل تفاصيله وموقعك عبر نموذج الطلب.
             </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-4">
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-stone-600">
+              <Wrench className="h-4 w-4 text-brand-700" /> {maintenanceServices.length} مجالات
+            </span>
+            <a
+              href="https://wa.me/963934888055?text=مرحباً، أريد الاستفسار عن خدمات الصيانة في تطبيق لقطة"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-10 items-center gap-2 border-s border-stone-300 ps-4 text-sm font-bold text-stone-800 transition-colors hover:text-brand-700"
+            >
+              <MessageSquare className="h-4 w-4" /> واتساب
+            </a>
+          </div>
+        </FadeContent>
 
-            {/* Quick Guarantees */}
-            <div className="grid max-w-lg grid-cols-1 gap-3 border-t border-white/15 pt-4 sm:grid-cols-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 shrink-0 text-green-300" />
-                <span className="text-xs font-bold text-stone-100">ضمان 30 يوماً</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 shrink-0 text-amber-300" />
-                <span className="text-xs font-bold text-stone-100">استجابة حسب التوفر</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 shrink-0 text-amber-300" />
-                <span className="text-xs font-bold text-stone-100">تقييم 4.9/5</span>
-              </div>
+        <section aria-label="صور لأعمال صيانة منزلية" className="grid grid-cols-2 gap-3 md:gap-4">
+          {maintenancePhotos.map((photo) => (
+            <figure key={photo.src} className="min-w-0 overflow-hidden rounded-md border border-stone-200 bg-white">
+              <img src={photo.src} alt={photo.alt} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+              <figcaption className="px-3 py-2">
+                <span className="text-xs font-bold text-stone-800">{photo.title}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </section>
+
+        <section id="service-list" className="space-y-4 scroll-mt-28">
+          <div className="flex flex-col gap-4 border-b border-stone-200 pb-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mb-1 text-xs font-bold text-brand-700">دليل الخدمات</p>
+              <h2 className="text-xl font-bold text-stone-900 md:text-2xl">ما العمل الذي تحتاجه؟</h2>
             </div>
+            <span className="text-xs text-stone-500" aria-live="polite">{filteredServices.length} خدمات متاحة</span>
           </div>
 
-          {/* Decorative background visual icon */}
-          <div className="pointer-events-none absolute bottom-4 left-6 hidden opacity-[0.08] md:block">
-            <Wrench className="h-48 w-48 text-white" />
-          </div>
-        </div>
-
-        {/* Search & Filter Bar */}
-        <div className="space-y-4 rounded-xl border border-stone-200 bg-white p-4">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
           <div className="relative">
-            <Search className="w-5 h-5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" />
             <input 
               type="text"
-              placeholder="ابحث عن خدمة (مثلاً: تكييف، طاقة شمسية، دهان، كهرباء، بلاط...)"
+              placeholder="ابحث عن خدمة أو نوع عمل"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="min-h-11 w-full rounded-lg border border-stone-300 bg-stone-50 py-3 pe-11 ps-4 text-sm font-medium text-stone-900 outline-none transition-colors focus:border-brand-500 focus:bg-white"
+              className="min-h-12 w-full rounded-md border border-stone-300 bg-white py-3 pe-11 ps-4 text-sm font-medium text-stone-900 outline-none transition-colors focus:border-brand-500"
             />
             {searchQuery && (
               <button 
@@ -143,114 +146,68 @@ export default function Services() {
             )}
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
-            {[
-              { id: "all", label: "جميع الخدمات (11)", icon: Wrench },
-              { id: "finishing", label: "تشطيب وديكور", icon: Paintbrush },
-              { id: "tech", label: "طاقة وتكييف وأمان", icon: Sun },
-              { id: "home", label: "خدمات منزلية ونقل", icon: Home },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedTab(tab.id)}
-                className={`flex min-h-11 items-center rounded-lg px-4 text-sm font-bold whitespace-nowrap transition-colors ${
-                  selectedTab === tab.id
-                    ? "bg-brand-500 text-white"
-                    : "bg-stone-100 text-stone-700 hover:bg-stone-200"
-                }`}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  <tab.icon className="h-4 w-4" aria-hidden="true" />
-                  {tab.label}
-                </span>
-              </button>
-            ))}
+          <div className="hide-scrollbar overflow-x-auto">
+            <SegmentedControl
+              label="تصفية الخدمات حسب المجال"
+              options={serviceTabs}
+              value={selectedTab}
+              onChange={setSelectedTab}
+            />
           </div>
         </div>
+        </section>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredServices.map(service => {
+        <FadeContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" stagger={0.07}>
+          {filteredServices.map((service) => {
             const Icon = getIcon(service.iconName);
             return (
-              <div 
+              <article
                 key={service.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition-shadow hover:shadow-sm"
+                className="group flex flex-col overflow-hidden rounded-lg border border-stone-200 bg-white transition-colors hover:border-stone-400"
               >
-                {/* Card Header */}
-                <div className="flex items-start justify-between gap-3 border-b border-stone-200 p-5">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${service.bg} ${service.color}`}>
-                      <Icon className="w-6 h-6" strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-base group-hover:text-brand-600 transition-colors">
-                        {service.shortName}
-                      </h3>
-                      <span className="text-[11px] text-slate-400 font-medium">
-                        {service.startingPrice}
-                      </span>
-                    </div>
+                <header className="flex items-start gap-3 border-b border-stone-200 p-4">
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-md ${service.bg} ${service.color}`}>
+                    <Icon className="h-6 w-6" strokeWidth={2.2} />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-bold text-stone-900 transition-colors group-hover:text-brand-700">{service.shortName}</h3>
+                    <span className="text-xs font-medium text-stone-500">{service.startingPrice}</span>
                   </div>
+                </header>
 
-                  {service.badge && (
-                    <span className="bg-brand-50 text-brand-600 border border-brand-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {service.badge}
-                    </span>
-                  )}
-                </div>
-
-                {/* Card Body */}
-                <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {service.description}
-                  </p>
-
-                  {/* Sub Services */}
+                <div className="flex flex-1 flex-col gap-4 p-4">
+                  <p className="line-clamp-3 text-sm leading-6 text-stone-600">{service.description}</p>
                   <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-slate-800 block">أبرز الأعمال المتوفرة:</span>
-                    <div className="space-y-1">
-                      {service.popularServices.slice(0, 3).map((sub, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-xs text-slate-600">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <span className="truncate">{sub}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Trust Highlights */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {service.features.map((feat, idx) => (
-                      <span key={idx} className="bg-slate-50 text-slate-600 text-[10px] font-medium px-2 py-1 rounded-md border border-slate-200/60">
-                        {feat}
-                      </span>
+                    <span className="block text-xs font-bold text-stone-800">أعمال متاحة</span>
+                    {service.popularServices.slice(0, 2).map((sub) => (
+                      <p key={sub} className="flex items-start gap-2 text-xs leading-5 text-stone-600">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                        <span>{sub}</span>
+                      </p>
                     ))}
                   </div>
 
-                  {/* Action Button */}
                   <button
                     onClick={() => handleOpenBooking(service)}
-                    className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-600"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 border-t border-stone-200 pt-3 text-sm font-bold text-brand-700 transition-colors hover:text-brand-900"
                   >
-                    <span>طلب الخدمة وحجز موعد</span>
-                    <ArrowRight className="w-4 h-4 rotate-180" />
+                    <span>تفاصيل الخدمة وطلبها</span>
+                    <ArrowRight className="h-4 w-4 rotate-180" />
                   </button>
                 </div>
-              </div>
+              </article>
             );
           })}
-        </div>
+        </FadeContent>
 
         {filteredServices.length === 0 && (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-3">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+          <div className="rounded-lg border border-stone-200 bg-white px-6 py-12 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-stone-100 text-stone-500">
               <Search className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">لم نجد أي خدمة مطابقة لبحثك</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              يمكنك التواصل مباشرة مع فريق الدعم الفني لطلب أي خدمة صيانة مخصصة.
+            <h3 className="text-lg font-bold text-stone-900">لم نجد خدمة مطابقة</h3>
+            <p className="mx-auto mt-1 max-w-sm text-sm text-stone-600">
+              جرّب كلمات أخرى أو أعد ضبط البحث والتصنيف.
             </p>
             <button 
               onClick={() => { setSearchQuery(""); setSelectedTab("all"); }}
@@ -261,55 +218,18 @@ export default function Services() {
           </div>
         )}
 
-        {/* Why Choose Laqta Maintenance */}
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="text-center max-w-xl mx-auto space-y-2">
-            <h3 className="text-xl font-bold text-slate-900">لماذا تختار خدمات الصيانة عبر "لقطة"؟</h3>
-            <p className="text-xs text-slate-500">نحن لا نوفر مجرد فنيين، بل نضمن لك راحة البال وجودة العمل بأعلى المعايير.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-slate-900">ضمان كتابي 30 يوماً</h4>
-              <p className="text-xs text-slate-600">أي ملاحظة أو تكرار للعطل يتم إعادة صيانته مجاناً خلال فترة الضمان.</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                <BadgeCheck className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-slate-900">فنيون مفحوصون ومعتمدون</h4>
-              <p className="text-xs text-slate-600">تدقيق خلفيات وخبرات جميع الفنيين والمهندسين لضمان الأمان والكفاءة.</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-                <Star className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-slate-900">تسعير شفاف ومعلن</h4>
-              <p className="text-xs text-slate-600">كشف وتحديد التكلفة مسبقاً وبدون أي رسوم خفية أو مبالغ فيها.</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
-                <Clock className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-slate-900">التزام دقيق بالمواعيد</h4>
-              <p className="text-xs text-slate-600">نحترم وقتك، ونلتزم بالحضور في الموعد المحدد الذي تم الاتفاق عليه.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
+        <FadeContent className="grid gap-5 border-t border-stone-200 pt-7 sm:grid-cols-3" stagger={0.08}>
+          <div><span className="text-xs font-bold text-brand-700">01</span><h3 className="mt-1 text-sm font-bold text-stone-900">اختر المجال</h3><p className="mt-1 text-xs leading-5 text-stone-600">حدد الخدمة الأقرب للعمل الذي تحتاجه.</p></div>
+          <div><span className="text-xs font-bold text-brand-700">02</span><h3 className="mt-1 text-sm font-bold text-stone-900">أضف التفاصيل</h3><p className="mt-1 text-xs leading-5 text-stone-600">اختر العمل، واكتب موقعك وشرحًا مختصرًا.</p></div>
+          <div><span className="text-xs font-bold text-brand-700">03</span><h3 className="mt-1 text-sm font-bold text-stone-900">أرسل الطلب</h3><p className="mt-1 text-xs leading-5 text-stone-600">راجع المعلومات ثم أرسلها عبر واتساب.</p></div>
+        </FadeContent>
+      </main>
 
       {/* Booking Modal */}
       <ServiceBookingModal 
         service={selectedServiceForModal}
-        isOpen={Boolean(selectedServiceForModal)}
-        onClose={() => setSelectedServiceForModal(null)}
+        isOpen={bookingOpen}
+        onClose={() => setBookingOpen(false)}
       />
 
     </div>

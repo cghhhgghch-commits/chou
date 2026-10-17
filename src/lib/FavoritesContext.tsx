@@ -65,14 +65,23 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
     const match = favorites.find((item) => item.listing_id === listingId);
     if (match) {
-      await supabase.from("favorites").delete().eq("id", match.id);
+      const { error } = await supabase.from("favorites").delete().eq("id", match.id);
+      if (error) throw error;
+      setFavorites((current) => current.filter((item) => item.listing_id !== listingId));
       return;
     }
 
-    await supabase.from("favorites").insert({
-      user_id: user.id,
-      listing_id: listingId,
-    });
+    const { data, error } = await supabase
+      .from("favorites")
+      .insert({ user_id: user.id, listing_id: listingId })
+      .select("id, listing_id, user_id")
+      .single();
+    if (error) throw error;
+    if (data) {
+      setFavorites((current) => current.some((item) => item.listing_id === listingId)
+        ? current
+        : [...current, data]);
+    }
   };
 
   return (

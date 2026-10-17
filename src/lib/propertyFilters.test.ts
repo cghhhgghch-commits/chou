@@ -102,4 +102,28 @@ assert.deepEqual(
   "يجب تطبيق فلتر المنطقة",
 );
 
+assert.deepEqual(
+  filterProperties(properties, { selectedCategory: "buildings" }),
+  [],
+  "يجب تطبيق التصنيف المختار بدل تجاهله",
+);
+
+assert.deepEqual(
+  filterProperties(properties, { bedrooms: "2", minPrice: "60000000" }),
+  [properties[1], properties[2]],
+  "يجب اعتبار عدد الغرف حدًا أدنى وتطبيق السعر الأدنى",
+);
+
+assert.deepEqual(
+  filterProperties(properties, { priceCurrency: "USD", minPrice: "3000" }),
+  [properties[1], properties[2]],
+  "يجب تطبيق الحد الأدنى باستخدام السعر بالدولار",
+);
+
+assert.deepEqual(
+  filterProperties(properties, { searchQuery: "المالكي" }),
+  [properties[0]],
+  "يجب تصفية النتائج بنص البحث",
+);
+
 console.log("property filter tests passed");

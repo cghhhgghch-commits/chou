@@ -1,73 +1,60 @@
-import { useEffect, useState } from "react";
-import { 
-  ArrowLeft, Bell, Building2, Wrench, Sun, Droplets, Wind, Paintbrush, Search,
-  Hammer, Zap, ShieldCheck, Home as HomeIcon, MapPin, Store, Sparkles,
-  Factory, Landmark, Trees, Truck, MessageSquare
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowLeft, Building2, Wrench, Sun, Droplets, Wind, Paintbrush, Search,
+  Hammer, Zap, Home as HomeIcon, MapPin, Store, Factory, Landmark, Trees,
+  LayoutGrid, MessageSquare
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import PropertyCard from "../components/properties/PropertyCard";
-import Image from "../components/ui/Image";
-import { supabase } from "../lib/supabase";
-import { Property } from "../types";
+import { fetchVerifiedListings } from "../lib/listings";
 import { maintenanceServices } from "../data/servicesData";
 import { SYRIAN_CITIES } from "../lib/constants";
-import { CATEGORY_IMAGES, FEATURED_CHALET_IMAGE, PROPERTY_IMAGE_FALLBACK } from "../config/images";
+
+const categoryPhotos: Record<string, { src: string; alt: string }> = {
+  houses: {
+    src: "/images/editorial/home-exterior.jpg",
+    alt: "منزل معاصر بواجهة بيضاء وحديقة وأشجار",
+  },
+  buildings: {
+    src: "/images/editorial/apartment-building.jpg",
+    alt: "مبنى سكني متعدد الطوابق بشرفات على شارع حضري",
+  },
+  farms: {
+    src: "/images/editorial/farm.jpg",
+    alt: "منزل ريفي تحيط به الحقول والأشجار",
+  },
+  lands: {
+    src: "/images/editorial/land.jpg",
+    alt: "حقول زراعية وقطع أراضٍ من منظور جوي",
+  },
+  shops: {
+    src: "/images/editorial/shop.jpg",
+    alt: "مدخل محل تجاري في شارع محلي",
+  },
+  villas: {
+    src: "/images/editorial/villa.jpg",
+    alt: "فيلا سكنية مع فناء ومسبح",
+  },
+  factories: {
+    src: "/images/editorial/factory.jpg",
+    alt: "مبنى صناعي بواجهة معدنية",
+  },
+  other: {
+    src: "/images/editorial/chalet.jpg",
+    alt: "شاليه خشبي وسط طبيعة جبلية",
+  },
+};
 
 export default function Home() {
   const navigate = useNavigate();
-  const [recentProperties, setRecentProperties] = useState<Property[]>([]);
-  
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("listings")
-          .select("*")
-          .eq("status", "active")
-          .eq("is_verified", true)
-          .order("created_at", { ascending: false })
-          .limit(4);
-
-        if (error) throw error;
-
-        const fetchedProps: Property[] = (data || []).map((item) => ({
-          id: item.id,
-          title: item.title,
-          price: item.price || 0,
-          pricePeriod: item.price_period || "",
-          location: item.city_id || "حلب",
-          city: item.city_id || "حلب",
-          type: item.type || "sale",
-          propertyType: item.property_type || (item.category === "commercial" ? "commercial_shop" : item.category === "land" ? "land_plot" : "apartment"),
-          category: item.category || "sale",
-          ownershipType: item.ownership_type || "طابو أخضر 2400 سهم (سجل عقاري)",
-          finishing: item.finishing,
-          floor: item.floor,
-          hasSolarPower: Boolean(item.has_solar_power),
-          bedrooms: item.bedrooms || 0,
-          bathrooms: item.bathrooms || 0,
-          area: item.area || 0,
-          furnishing: item.furnishing || "",
-          description: item.description || "",
-          amenities: Array.isArray(item.amenities) ? item.amenities : [],
-          images: Array.isArray(item.images) && item.images.length > 0 ? item.images : [PROPERTY_IMAGE_FALLBACK],
-          isVerified: Boolean(item.is_verified),
-          agent: {
-            name: item.advertiser_name || "معلن معتمد",
-            phone: item.phone || "+963912345678",
-            whatsapp: item.whatsapp || "+963912345678"
-          },
-          postedAt: item.created_at || new Date().toISOString()
-        }));
-
-        setRecentProperties(fetchedProps.slice(0, 4));
-      } catch (err) {
-        console.error("Error fetching listings:", err);
-      }
-    };
-    
-    fetchListings();
-  }, []);
+  const {
+    data: recentProperties = [],
+    isError: listingsError,
+    refetch: refetchListings,
+  } = useQuery({
+    queryKey: ["verified-listings", 4],
+    queryFn: () => fetchVerifiedListings(4),
+  });
 
   // 8 Exact Syrian Real Estate Categories (بيوت، بنايات، مزارع، أراضي، محلات، فلل، مصانع، أخرى)
   const syrianCategories = [
@@ -75,114 +62,75 @@ export default function Home() {
       id: 'houses', 
       label: 'بيوت', 
       sublabel: 'شقق سكنية وبيوت عربية ودوبلكس',
-      tag: 'بيوت وشقق',
-      tagBg: 'bg-blue-600 text-white',
       icon: HomeIcon,
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-50',
-      image: CATEGORY_IMAGES.houses,
       link: '/properties?category=houses' 
     },
     { 
       id: 'buildings', 
       label: 'بنايات', 
       sublabel: 'أبنية سكنية وعمارات استثمارية',
-      tag: 'عمارات وأبراج',
-      tagBg: 'bg-slate-800 text-white',
       icon: Building2,
       iconColor: 'text-slate-800',
       iconBg: 'bg-slate-100',
-      image: CATEGORY_IMAGES.buildings,
       link: '/properties?category=buildings' 
     },
     { 
       id: 'farms', 
       label: 'مزارع', 
       sublabel: 'بساتين زيتون واستراحات ريفية',
-      tag: 'مزارع واستراحات',
-      tagBg: 'bg-emerald-700 text-white',
       icon: Trees,
       iconColor: 'text-emerald-700',
       iconBg: 'bg-emerald-50',
-      image: CATEGORY_IMAGES.farms,
       link: '/properties?category=farms' 
     },
     { 
       id: 'lands', 
       label: 'أراضي', 
       sublabel: 'مقاسم سكنية وأراض زراعية',
-      tag: 'مقاسم وأراضي',
-      tagBg: 'bg-stone-700 text-white',
       icon: MapPin,
       iconColor: 'text-stone-700',
       iconBg: 'bg-stone-100',
-      image: CATEGORY_IMAGES.lands,
       link: '/properties?category=lands' 
     },
     { 
       id: 'shops', 
       label: 'محلات', 
       sublabel: 'محلات وفروغ وصالات تجارية',
-      tag: 'تجاري وفروغ',
-      tagBg: 'bg-purple-700 text-white',
       icon: Store,
       iconColor: 'text-purple-700',
       iconBg: 'bg-purple-50',
-      image: CATEGORY_IMAGES.shops,
       link: '/properties?category=shops' 
     },
     { 
       id: 'villas', 
       label: 'فلل', 
       sublabel: 'فلل مستقلة وبيوت ريفية',
-      tag: 'فلل فاخرة',
-      tagBg: 'bg-amber-600 text-white',
-      icon: Sparkles,
+      icon: Landmark,
       iconColor: 'text-amber-600',
       iconBg: 'bg-amber-50',
-      image: CATEGORY_IMAGES.villas,
       link: '/properties?category=villas' 
     },
     { 
       id: 'factories', 
       label: 'مصانع', 
       sublabel: 'هناغر ومستودعات ومنشآت صناعية',
-      tag: 'صناعي ومستودعات',
-      tagBg: 'bg-orange-700 text-white',
       icon: Factory,
       iconColor: 'text-orange-700',
       iconBg: 'bg-orange-50',
-      image: CATEGORY_IMAGES.factories,
       link: '/properties?category=factories' 
     },
     { 
       id: 'other', 
       label: 'أخرى', 
       sublabel: 'شاليهات، استوديوهات وسكن طلاب',
-      tag: 'عقارات متنوعة',
-      tagBg: 'bg-indigo-600 text-white',
-      icon: Landmark,
+      icon: LayoutGrid,
       iconColor: 'text-indigo-600',
       iconBg: 'bg-indigo-50',
-      image: CATEGORY_IMAGES.other,
       link: '/properties?category=other' 
     },
   ];
-
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case "Zap": return Zap;
-      case "Sun": return Sun;
-      case "Droplets": return Droplets;
-      case "Wind": return Wind;
-      case "Paintbrush": return Paintbrush;
-      case "Hammer": return Hammer;
-      case "ShieldCheck": return ShieldCheck;
-      case "Sparkles": return Sparkles;
-      case "Truck": return Truck;
-      default: return Wrench;
-    }
-  };
 
   const handleSearchClick = () => {
     navigate('/properties');
@@ -209,93 +157,77 @@ export default function Home() {
 
       </div>
 
-      <main className="flex-1 flex flex-col px-3 md:px-8 py-5 max-w-7xl mx-auto w-full">
-        <section className="mb-6 border-b border-stone-200 pb-5">
-          <p className="mb-1 text-xs font-bold text-brand-700">لقطة | عقارات وخدمات</p>
-          <h1 className="text-2xl font-bold leading-10 text-stone-900 md:text-3xl">ابحث عن عقار يناسبك</h1>
-          <p className="mt-1 text-sm leading-7 text-stone-600">عقارات للبيع والإيجار وخدمات للمنزل في المحافظات السورية.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
-              <ShieldCheck className="h-4 w-4 text-green-700" /> إعلانات موثّقة
-            </span>
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
-              <MapPin className="h-4 w-4 text-stone-500" /> محافظات متعددة
-            </span>
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-xs font-medium text-stone-700">
-              <MessageSquare className="h-4 w-4 text-stone-500" /> تواصل مباشر
-            </span>
+      <div className="mx-auto w-full max-w-7xl px-3 py-5 md:px-8 md:py-8">
+        <section className="mb-10 border-b border-stone-200 pb-7 md:mb-12 md:pb-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-2 text-xs font-bold text-brand-700">لقطة للعقارات والخدمات</p>
+              <h1 className="text-2xl font-bold leading-tight text-stone-900 md:text-3xl">عقارك القادم في سوريا</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-stone-600">
+                تصفّح إعلانات البيع والإيجار، أو أضف عقارك وتواصل مباشرة مع المهتمين.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Link to="/properties" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-brand-600 px-4 text-sm font-bold text-white transition-colors hover:bg-brand-700">
+                تصفح العقارات <ArrowLeft className="h-4 w-4" />
+              </Link>
+              <Link to="/place-ad" className="inline-flex min-h-11 items-center rounded-md border border-stone-300 bg-white px-4 text-sm font-bold text-stone-800 transition-colors hover:border-stone-500">
+                أضف إعلاناً
+              </Link>
+            </div>
+          </div>
+          <div className="mt-6 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-center sm:gap-4">
+            <span className="shrink-0 text-xs font-bold text-stone-600">تصفح حسب المحافظة</span>
+            <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">
+              {SYRIAN_CITIES.slice(0, 8).map((city) => (
+                <Link key={city} to={`/properties?city=${encodeURIComponent(city)}`} className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-md border border-stone-200 bg-white px-3 text-xs font-medium text-stone-700 transition-colors hover:border-brand-300 hover:text-brand-700">
+                  <MapPin className="h-3.5 w-3.5 text-stone-400" /> {city}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
         
         {/* Real Estate Categories (8 Explicit Categories) */}
-        <section className="mb-8 space-y-4 rounded-xl border border-stone-200 bg-white p-4 md:p-6">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+        <section className="mb-14 space-y-5">
+          <div className="flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base md:text-lg font-black text-slate-900">أقسام العقارات</h2>
-                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                  8 أقسام رئيسية
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">تصفح العقارات حسب النوع المتاح</p>
+              <p className="mb-1 text-xs font-bold text-brand-700">اختر ما تبحث عنه</p>
+              <h2 className="text-xl font-bold text-stone-900 md:text-2xl">أقسام العقارات</h2>
             </div>
 
             <Link 
               to="/properties" 
-              className="text-xs text-brand-600 font-bold hover:text-brand-700 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-xl border border-brand-100 transition-colors shrink-0"
+              className="flex min-h-10 shrink-0 items-center gap-1 text-xs font-bold text-brand-700 transition-colors hover:text-brand-900"
             >
               <span>تصفح الكل</span>
               <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Clean 8-Category Grid with Realistic Architecture Photos & Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4 pt-1">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-5">
             {syrianCategories.map((cat) => {
               const IconComp = cat.icon;
+              const photo = categoryPhotos[cat.id];
               return (
                 <Link 
                   key={cat.id} 
                   to={cat.link} 
-                   className="relative flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition-colors duration-175 hover:border-stone-400 hover:bg-stone-50 group"
+                  className="group flex min-w-0 flex-col overflow-hidden rounded-md border border-stone-200 bg-white transition-colors hover:border-stone-400"
                 >
-                  {/* Photo Container with subtle gradient & tag */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
-                    <Image
-                      src={cat.image}
-                      alt={cat.label}
-                      containerClassName="h-full w-full"
-                      className="transition-transform duration-200 group-hover:scale-[1.02]"
-                    />
-                    <div className="absolute inset-0 bg-black/20" />
-                    
-                    {/* Category Tag Badge */}
-                    <div className="absolute top-2 right-2 z-10">
-                      <span className="rounded-md border border-white/70 bg-white/95 px-2 py-0.5 text-[9px] font-bold text-stone-800">
-                        {cat.tag}
-                      </span>
-                    </div>
-
-                    {/* Category Icon Badge */}
-                    <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-lg shadow-xs border border-white/40">
-                       <IconComp className="h-3.5 w-3.5 text-stone-700" />
-                      <span className="text-[11px] font-black text-slate-900">{cat.label}</span>
-                    </div>
-                  </div>
-
-                  {/* Text Details */}
-                  <div className="p-3 flex flex-col justify-between flex-1 bg-white">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs md:text-sm font-black text-slate-900 leading-tight group-hover:text-brand-600 transition-colors">
-                          {cat.label}
-                        </span>
-                        <ArrowLeft className="w-3.5 h-3.5 text-slate-300 group-hover:text-brand-500 group-hover:-translate-x-1 transition-all" />
-                      </div>
-                      <p className="text-[10px] md:text-[11px] text-slate-500 font-medium line-clamp-1 mt-1">
-                        {cat.sublabel}
-                      </p>
-                    </div>
+                  <span className={`relative block aspect-[4/3] w-full overflow-hidden ${photo ? "bg-stone-200" : cat.iconBg + " " + cat.iconColor}`}>
+                    {photo ? (
+                      <img src={photo.src} alt={photo.alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
+                    ) : (
+                      <IconComp className="absolute inset-0 m-auto h-8 w-8" strokeWidth={1.5} />
+                    )}
+                  </span>
+                  <div className="flex min-h-16 min-w-0 items-center justify-between gap-2 px-3 py-2">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-bold text-stone-900 group-hover:text-brand-700">{cat.label}</span>
+                      <span className="mt-0.5 block truncate text-[11px] text-stone-500">{cat.sublabel}</span>
+                    </span>
+                    <ArrowLeft className="h-4 w-4 shrink-0 text-stone-400 transition-transform group-hover:-translate-x-1 group-hover:text-brand-600" />
                   </div>
                 </Link>
               );
@@ -304,15 +236,15 @@ export default function Home() {
         </section>
 
         {/* Maintenance & Services Section */}
-        <section className="mb-8 space-y-4 rounded-xl border border-stone-200 bg-stone-50 p-4 md:p-6">
-          <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+        <section className="mb-10 space-y-4 border-t border-stone-200 pt-7">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900">خدمات الصيانة والتشطيبات</h2>
               <p className="text-xs text-slate-600 mt-0.5">خدمات متخصصة لصيانة وتطوير العقارات</p>
             </div>
             <Link 
               to="/services" 
-              className="flex min-h-11 items-center gap-1 rounded-lg border border-stone-300 bg-white px-3 text-xs font-bold text-stone-700 transition-colors hover:border-brand-300 hover:text-brand-700"
+              className="flex min-h-10 items-center gap-1 text-xs font-bold text-brand-700 transition-colors hover:text-brand-900"
             >
               <span>عرض الكل</span>
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -332,7 +264,7 @@ export default function Home() {
                 <Link 
                   key={service.id}
                   to={`/services?service=${service.id}`}
-                  className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-lg p-2.5 text-center transition-colors hover:bg-white group"
+                  className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-md p-2.5 text-center transition-colors hover:bg-stone-100 group"
                 >
                   <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${service.bg} ${service.color} md:h-14 md:w-14`}>
                     <Icon className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2} />
@@ -346,43 +278,11 @@ export default function Home() {
           </div>
         </section>
 
-        <Link
-          to="/contact"
-          className="mb-8 flex min-h-16 items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white px-4 py-3 text-stone-900 transition-colors hover:border-brand-300"
-        >
-          <span className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-500 text-white">
-              <MessageSquare className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block text-sm font-black">اتصل بنا</span>
-              <span className="block text-xs text-stone-600">فريق الدعم جاهز لمساعدتك</span>
-            </span>
-          </span>
-          <ArrowLeft className="h-5 w-5 shrink-0 text-brand-600" />
-        </Link>
-
-        {/* Real Estate Highlights / What's New */}
-        <section className="mb-8">
-          <h2 className="text-lg font-bold text-slate-900 mb-3.5">الخيارات المميزة</h2>
-          <div className="flex gap-4 overflow-x-auto pb-3 hide-scrollbar snap-x">
-            <Link to="/properties?category=chalet" className="relative aspect-[4/3] min-w-[240px] overflow-hidden rounded-2xl shadow-sm snap-center group">
-              <Image src={FEATURED_CHALET_IMAGE} alt="شاليه" containerClassName="absolute inset-0 h-full w-full" />
-              <div className="absolute inset-0 bg-stone-950/45"></div>
-              <div className="absolute inset-x-3 bottom-3.5">
-                <h3 className="text-white font-bold text-base leading-tight mb-0.5">شاليهات ومنازل خارج المدينة</h3>
-                <p className="text-slate-200 text-xs">مواقع هادئة ومناسبة للراحة والاستثمار</p>
-              </div>
-            </Link>
-          </div>
-        </section>
-
-        {/* Featured Properties */}
-        <section className="flex-1 mt-2">
+        <section className="mb-10 border-t border-stone-200 pt-7">
           <div className="flex justify-between items-end mb-4">
             <div>
               <h2 className="text-xl font-bold text-slate-900">أحدث الإعلانات العقارية</h2>
-              <p className="text-xs text-slate-500">عقارات موثقة ومحدثة في المحافظات</p>
+              <p className="text-xs text-slate-500">صور ومعلومات أضافها أصحاب الإعلانات</p>
             </div>
             <Link to="/properties" className="text-sm text-brand-500 font-bold hover:text-brand-600 transition-colors flex items-center gap-1">
               عرض الكل <ArrowLeft className="w-3 h-3" />
@@ -394,47 +294,30 @@ export default function Home() {
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
+          {recentProperties.length === 0 && (
+            <div className="flex flex-col items-start gap-3 border-y border-stone-200 py-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-stone-600">
+                {listingsError ? "تعذر تحميل الإعلانات. تحقق من الاتصال ثم أعد المحاولة." : "لا توجد إعلانات جديدة لعرضها الآن."}
+              </p>
+              {listingsError ? (
+                <button onClick={() => void refetchListings()} className="min-h-10 text-sm font-bold text-brand-700 hover:text-brand-900">إعادة المحاولة</button>
+              ) : (
+                <Link to="/place-ad" className="inline-flex min-h-10 items-center gap-2 text-sm font-bold text-brand-700 hover:text-brand-900">
+                  أضف أول إعلان <ArrowLeft className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          )}
         </section>
 
-        <section className="mt-10 border-t border-stone-200 py-7">
-          <h2 className="text-xl font-bold text-stone-900">كيف تعمل المنصة</h2>
-          <div className="mt-4 grid gap-5 sm:grid-cols-3">
-            <div className="border-s-2 border-brand-500 ps-3">
-              <span className="text-xs font-bold text-brand-700">01</span>
-              <h3 className="mt-1 text-sm font-bold text-stone-900">اختر القسم</h3>
-              <p className="text-sm leading-7 text-stone-600">ابدأ بنوع العقار أو الخدمة التي تبحث عنها.</p>
-            </div>
-            <div className="border-s-2 border-stone-300 ps-3">
-              <span className="text-xs font-bold text-stone-500">02</span>
-              <h3 className="mt-1 text-sm font-bold text-stone-900">راجع التفاصيل</h3>
-              <p className="text-sm leading-7 text-stone-600">قارن الموقع والسعر والمواصفات المعروضة.</p>
-            </div>
-            <div className="border-s-2 border-stone-300 ps-3">
-              <span className="text-xs font-bold text-stone-500">03</span>
-              <h3 className="mt-1 text-sm font-bold text-stone-900">تواصل مباشرة</h3>
-              <p className="text-sm leading-7 text-stone-600">اتصل بالمعلن أو أرسل طلب الخدمة.</p>
-            </div>
+        <section className="flex items-center justify-between gap-4 border-t border-stone-200 py-5">
+          <div className="flex items-center gap-3">
+            <MessageSquare className="h-5 w-5 text-brand-700" />
+            <span className="text-sm font-bold text-stone-900">تحتاج مساعدة؟</span>
           </div>
+          <Link to="/contact" className="text-sm font-bold text-brand-700 hover:text-brand-900">تواصل معنا</Link>
         </section>
-
-        <section className="border-t border-stone-200 py-7">
-          <h2 className="text-xl font-bold text-stone-900">أسئلة شائعة</h2>
-          <dl className="mt-4 divide-y divide-stone-200">
-            <div className="py-3">
-              <dt className="text-sm font-bold text-stone-900">كيف أضيف إعلاناً؟</dt>
-              <dd className="text-sm leading-7 text-stone-600">ابدأ من «أضف إعلان» واتبع حقول العقار والاتصال.</dd>
-            </div>
-            <div className="py-3">
-              <dt className="text-sm font-bold text-stone-900">أين أجد خدمات الصيانة؟</dt>
-              <dd className="text-sm leading-7 text-stone-600">افتح قسم الخدمات واختر نوع العمل المطلوب.</dd>
-            </div>
-            <div className="py-3">
-              <dt className="text-sm font-bold text-stone-900">كيف أتواصل بشأن عقار؟</dt>
-              <dd className="text-sm leading-7 text-stone-600">استخدم الاتصال أو WhatsApp في بطاقة العقار أو تفاصيله.</dd>
-            </div>
-          </dl>
-        </section>
-      </main>
+      </div>
     </div>
   );
 }
