@@ -1,6 +1,28 @@
 import assert from "node:assert/strict";
 import { filterProperties } from "./propertyFilters.js";
+import { SYRIAN_CITIES, SYRIAN_GOVERNORATES } from "./constants.js";
 import type { Property } from "../types";
+
+assert.equal(SYRIAN_GOVERNORATES[0]?.name, "حلب", "يجب إظهار حلب أولاً في قائمة المحافظات");
+assert.deepEqual(
+  SYRIAN_GOVERNORATES.map((governorate) => governorate.name),
+  SYRIAN_CITIES,
+  "يجب أن تشمل قائمة الفلتر المحافظات السورية كلها",
+);
+assert.ok(
+  (SYRIAN_GOVERNORATES.find((governorate) => governorate.name === "حلب")?.popularAreas.length ?? 0) >= 100,
+  "يجب توفير قائمة أحياء وبلدات حلب التفصيلية",
+);
+assert.equal(
+  SYRIAN_GOVERNORATES.find((governorate) => governorate.name === "دمشق")?.popularAreas.length,
+  0,
+  "يجب عدم عرض قائمة أحياء طويلة لبقية المحافظات",
+);
+assert.equal(
+  SYRIAN_GOVERNORATES.find((governorate) => governorate.name === "حلب")?.popularAreas.includes("المزة"),
+  false,
+  "يجب عدم إظهار حي من دمشق ضمن أحياء حلب",
+);
 
 const properties: Property[] = [
   {

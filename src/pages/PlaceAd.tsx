@@ -1055,7 +1055,10 @@ ${imageSection}
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">المحافظة السورية *</label>
                 <select 
                   value={cityId} 
-                  onChange={(e) => setCityId(e.target.value)} 
+                  onChange={(e) => {
+                    setCityId(e.target.value);
+                    setAreaName("");
+                  }}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none"
                 >
                   {SYRIAN_CITIES.map(city => (
@@ -1065,14 +1068,22 @@ ${imageSection}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">المنطقة / الحي / الشارع</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">الحي / المنطقة / الشارع</label>
                 <input 
                   type="text" 
+                  list={cityId === "حلب" ? "aleppo-area-suggestions" : undefined}
                   value={areaName}
                   onChange={(e) => setAreaName(e.target.value)}
-                  placeholder="مثال: المزة فيلات غربية، الفرقان، حي البعث، الصليبة..." 
+                  placeholder={cityId === "حلب" ? "ابحث عن حي حلب أو اكتب اسم المنطقة" : "اكتب اسم المنطقة أو الحي"}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:bg-white outline-none" 
                 />
+                {cityId === "حلب" && (
+                  <datalist id="aleppo-area-suggestions">
+                    {SYRIAN_GOVERNORATES.find((governorate) => governorate.name === "حلب")?.popularAreas.map((area) => (
+                      <option key={area} value={area} />
+                    ))}
+                  </datalist>
+                )}
               </div>
             </div>
 

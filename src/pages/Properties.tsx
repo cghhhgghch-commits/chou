@@ -70,7 +70,8 @@ export default function Properties() {
     const city = searchParams.get("city") || "";
     setActiveCategory(normalizePropertyCategory(cat));
     setSelectedGovernorate(city);
-  }, [searchParams]);
+    if (city !== selectedGovernorate) setSelectedArea("");
+  }, [searchParams, selectedGovernorate]);
 
   const availableAreas = useMemo(() => {
     const selectedGovernorateName = selectedGovernorate.trim();
@@ -79,12 +80,6 @@ export default function Properties() {
       (governorate) => governorate.name === selectedGovernorateName,
     )?.popularAreas ?? [];
   }, [selectedGovernorate]);
-
-  useEffect(() => {
-    if (selectedGovernorate && selectedArea && !availableAreas.includes(selectedArea)) {
-      setSelectedArea("");
-    }
-  }, [availableAreas, selectedArea, selectedGovernorate]);
 
   const filteredProperties = useMemo(() => filterProperties(firestoreProperties, {
     selectedCity: selectedGovernorate,
@@ -275,10 +270,11 @@ export default function Properties() {
 
           <div className="flex-1 space-y-6 p-5 pb-28 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-5 sm:gap-y-6 sm:space-y-0">
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-900">المنطقة</label>
+              <label htmlFor="property-governorate" className="mb-2 block text-sm font-bold text-slate-900">المحافظة</label>
               <div className="relative">
                 <MapPin className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <select
+                  id="property-governorate"
                   value={selectedGovernorate}
                   onChange={(event) => handleGovernorateSelect(event.target.value)}
                   className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white py-3 pr-12 pl-10 text-sm font-bold text-slate-900 outline-none shadow-xs focus:border-brand-500"
@@ -295,22 +291,32 @@ export default function Properties() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-900">المنطقة</label>
+              <label htmlFor="property-area" className="mb-2 block text-sm font-bold text-slate-900">الحي أو المنطقة (اختياري)</label>
               <div className="relative">
                 <Building2 className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <select
+                <input
+                  id="property-area"
+                  list="property-area-suggestions"
                   value={selectedArea}
                   onChange={(event) => setSelectedArea(event.target.value)}
-                  disabled={!selectedGovernorate || availableAreas.length === 0}
-                  className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white py-3 pr-12 pl-10 text-sm font-bold text-slate-900 outline-none shadow-xs focus:border-brand-500 disabled:cursor-not-allowed disabled:bg-slate-100"
-                >
-                  <option value="">كل المناطق</option>
+                  disabled={!selectedGovernorate}
+                  placeholder={selectedGovernorate === "حلب"
+                    ? "ابحث عن حي حلب أو اختره"
+                    : selectedGovernorate
+                      ? "اكتب اسم الحي أو البلدة"
+                      : "اختر المحافظة أولاً"}
+                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pr-12 pl-10 text-sm font-bold text-slate-900 outline-none shadow-xs placeholder:text-slate-400 focus:border-brand-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  autoComplete="off"
+                />
+                <datalist id="property-area-suggestions">
                   {availableAreas.map((area) => (
-                    <option key={area} value={area}>{area}</option>
+                    <option key={area} value={area} />
                   ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                </datalist>
               </div>
+              <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                أحياء وبلدات حلب تظهر كاقتراحات؛ في المحافظات الأخرى اكتب اسم الحي أو البلدة.
+              </p>
             </div>
 
             <div>

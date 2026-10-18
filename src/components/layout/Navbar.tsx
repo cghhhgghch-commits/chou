@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { KeyRound, Home, User, PlusCircle, LogOut, Wrench, Building2, Heart, MessageSquare } from "lucide-react";
+import { User, PlusCircle, LogOut, LogIn, Wrench, Building2, Heart, MessageSquare } from "lucide-react";
 import { useAuth } from "../../lib/AuthContext";
 
 export default function Navbar() {
@@ -10,10 +10,13 @@ export default function Navbar() {
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:h-[72px]">
         
         {/* Logo (Clean & Compact) */}
-        <Link to="/" className="flex items-center gap-2 group shrink-0">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500 text-white shadow-xs transition-colors group-hover:bg-brand-600">
-            <Home className="w-5 h-5" strokeWidth={2} />
-            <KeyRound className="w-3 h-3 absolute bottom-1 right-1 bg-brand-500 text-white rounded-full" strokeWidth={2.5} />
+        <Link to="/" aria-label="لقطة - الرئيسية" className="flex items-center gap-2 group shrink-0">
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-brand-600 shadow-xs ring-1 ring-brand-700/10 transition-transform group-hover:scale-105">
+            <img
+              src="/images/logo-mark.png"
+              alt=""
+              className="h-full w-full object-contain"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold leading-none text-stone-900 md:text-2xl">لقطة</span>
@@ -80,8 +83,9 @@ export default function Navbar() {
           ) : (
             <Link 
               to="/login" 
-              className="min-h-11 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 transition-colors hover:bg-stone-50 hover:text-brand-700 md:text-sm"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-stone-300 px-3 text-xs font-bold text-stone-700 transition-colors hover:bg-stone-50 hover:text-brand-700 md:text-sm"
             >
+              <LogIn className="h-4 w-4" aria-hidden="true" />
               دخول
             </Link>
           )}
