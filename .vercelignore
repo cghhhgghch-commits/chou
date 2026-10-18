@@ -1,0 +1,10 @@
+.git
+.vercel
+node_modules
+android
+ios
+dist
+build
+coverage
+*.apk
+.env*
