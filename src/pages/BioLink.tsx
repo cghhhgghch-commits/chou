@@ -3,14 +3,19 @@ import {
   ArrowDownLeft,
   ArrowLeft,
   ArrowUpLeft,
+  Apple,
   BadgeCheck,
   Building2,
   Check,
   Copy,
+  Download,
+  ExternalLink,
   HeartHandshake,
   MapPin,
+  MapPinned,
   MessageCircle,
   Plus,
+  Play,
   Share2,
   Sparkles,
   Wrench,
@@ -41,6 +46,26 @@ const quickLinks = [
     className: "bio-card-light",
   },
 ];
+
+const appStores = [
+  {
+    name: "Google Play",
+    description: "حمّل التطبيق لأجهزة Android",
+    href: "https://play.google.com/store/apps/details?id=com.laqta.realestate",
+    icon: Play,
+    className: "bio-store-google",
+  },
+  {
+    name: "App Store",
+    description: "حمّل التطبيق لأجهزة iPhone",
+    href: "https://apps.apple.com/app/id6809512749",
+    icon: Apple,
+    className: "bio-store-apple",
+  },
+];
+
+const companyLocation =
+  "https://maps.app.goo.gl/4jcDqcAjMJB2ePVc6?g_st=ic";
 
 export default function BioLink() {
   const [copied, setCopied] = useState(false);
@@ -148,6 +173,39 @@ export default function BioLink() {
           </div>
         </section>
 
+        <section className="mt-7 sm:mt-9" aria-labelledby="bio-download-heading">
+          <div className="mb-4">
+            <p className="text-xs font-extrabold tracking-wide text-brand-700">لقطة على هاتفك</p>
+            <h2 id="bio-download-heading" className="mt-1 text-xl font-black sm:text-2xl">
+              حمّل التطبيق
+            </h2>
+            <p className="mt-1 text-xs leading-6 text-stone-500 sm:text-sm">
+              تصفّح العقارات والخدمات بسهولة، أينما كنت.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {appStores.map(({ name, description, href, icon: Icon, className }) => (
+              <a
+                key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`bio-store-card ${className} group`}
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+                  <Icon className="h-6 w-6" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-semibold opacity-75">{description}</span>
+                  <span className="mt-0.5 block text-lg font-black">{name}</span>
+                </span>
+                <Download className="h-5 w-5 shrink-0 opacity-75 transition group-hover:-translate-y-0.5 group-hover:opacity-100" />
+              </a>
+            ))}
+          </div>
+        </section>
+
         <section id="روابط-لقطة" className="mt-8 scroll-mt-6 sm:mt-10">
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
@@ -191,6 +249,24 @@ export default function BioLink() {
             <span className="mt-0.5 block text-xs text-white/75">نحن هنا لمساعدتك في خطوتك القادمة</span>
           </span>
           <ArrowUpLeft className="h-5 w-5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </a>
+
+        <a
+          href={companyLocation}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bio-location-card group mt-3 flex min-h-[76px] items-center gap-3 rounded-2xl border border-stone-200/90 px-4 py-3 transition hover:-translate-y-0.5 hover:border-brand-200 sm:px-5"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
+            <MapPinned className="h-6 w-6" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-black">موقع شركة لقطة</span>
+            <span className="mt-0.5 block text-xs text-stone-500">افتح موقعنا على خرائط Google</span>
+          </span>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-stone-500 transition group-hover:text-brand-700">
+            <ExternalLink className="h-4 w-4" />
+          </span>
         </a>
 
         <section className="mt-6 grid grid-cols-3 gap-2 rounded-2xl border border-white/80 bg-white/60 p-3 shadow-sm backdrop-blur sm:gap-3 sm:p-4">

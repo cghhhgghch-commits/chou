@@ -290,6 +290,36 @@
   background: linear-gradient(110deg, #087f5b 0%, #0b9b68 55%, #128c62 100%);
 }
 
+.bio-store-card {
+  display: flex;
+  min-height: 5.5rem;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: 1.25rem;
+  padding: 0.875rem 1rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgb(28 25 23 / 0.08);
+  transition: transform 175ms ease-out, box-shadow 175ms ease-out;
+}
+
+.bio-store-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgb(28 25 23 / 0.14);
+}
+
+.bio-store-google {
+  background: linear-gradient(115deg, #188038 0%, #0d6b36 100%);
+}
+
+.bio-store-apple {
+  background: linear-gradient(115deg, #292929 0%, #111 100%);
+}
+
+.bio-location-card {
+  background: rgb(255 255 255 / 0.84);
+  box-shadow: 0 6px 20px rgb(28 25 23 / 0.045);
+}
+
 @media (max-width: 639px) {
   .bio-hero {
     min-height: 0;
