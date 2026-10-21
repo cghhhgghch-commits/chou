@@ -203,3 +203,95 @@
 .ios-device nav.fixed {
   padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
 }
+
+.bio-page {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 88% 5%, rgb(255 228 230 / 0.8), transparent 34rem),
+    radial-gradient(ellipse at 8% 72%, rgb(254 226 226 / 0.48), transparent 32rem),
+    linear-gradient(145deg, #fffaf9 0%, #f8f7f5 55%, #fff 100%);
+}
+
+.bio-orb {
+  position: absolute;
+  z-index: -1;
+  width: 15rem;
+  height: 15rem;
+  border: 1px solid rgb(201 0 34 / 0.07);
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.bio-orb-one {
+  top: 15rem;
+  left: -11rem;
+  box-shadow: 0 0 0 2.25rem rgb(201 0 34 / 0.025), 0 0 0 4.5rem rgb(201 0 34 / 0.02);
+}
+
+.bio-orb-two {
+  right: -12rem;
+  bottom: 3rem;
+  width: 19rem;
+  height: 19rem;
+  box-shadow: 0 0 0 2rem rgb(201 0 34 / 0.025);
+}
+
+.bio-hero {
+  min-height: 20rem;
+}
+
+.bio-hero-glow {
+  position: absolute;
+  top: -12rem;
+  left: 22%;
+  width: 23rem;
+  height: 23rem;
+  border-radius: 9999px;
+  background: rgb(228 0 43 / 0.2);
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.bio-link-card {
+  display: flex;
+  min-height: 6.75rem;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgb(28 25 23 / 0.055);
+  transition: transform 175ms ease-out, box-shadow 175ms ease-out;
+}
+
+.bio-link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgb(28 25 23 / 0.1);
+}
+
+.bio-card-primary {
+  color: #fff;
+  background: linear-gradient(125deg, #e4002b 0%, #a9001b 100%);
+}
+
+.bio-card-light {
+  border: 1px solid rgb(231 229 228 / 0.9);
+  color: #292524;
+  background: rgb(255 255 255 / 0.86);
+}
+
+.bio-card-light > span:first-child {
+  color: #c90022;
+  background: #fff1f2;
+  box-shadow: inset 0 0 0 1px rgb(201 0 34 / 0.07);
+}
+
+.bio-whatsapp {
+  background: linear-gradient(110deg, #087f5b 0%, #0b9b68 55%, #128c62 100%);
+}
+
+@media (max-width: 639px) {
+  .bio-hero {
+    min-height: 0;
+  }
+}
