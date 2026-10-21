@@ -12,6 +12,7 @@ import IOSBackButton from "./components/layout/IOSBackButton";
 import { setupPushNotificationListeners } from "./lib/fcm";
 
 const Home = lazy(() => import("./pages/Home"));
+const BioLink = lazy(() => import("./pages/BioLink"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -90,6 +91,7 @@ export default function App() {
                   <Route path="/admin" element={<AdminDashboard2 />} />
                   <Route path="/admin/login" element={<Login />} />
                   <Route path="/admin/dashboard" element={<AdminDashboard2 />} />
+                  <Route path="/bio" element={<BioLink />} />
 
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
