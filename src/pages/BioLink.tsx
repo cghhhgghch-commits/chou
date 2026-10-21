@@ -4,7 +4,6 @@ import {
   Apple,
   Download,
   ExternalLink,
-  MapPin,
   MapPinned,
   MessageCircle,
   Play,
@@ -62,73 +61,57 @@ export default function BioLink() {
 
   return (
     <main dir="rtl" className="bio-page min-h-screen overflow-hidden text-stone-900">
-      <div aria-hidden="true" className="bio-orb bio-orb-one" />
-      <div aria-hidden="true" className="bio-orb bio-orb-two" />
-
-      <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 pb-8 pt-5 sm:px-7 sm:pt-8">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-brand-600 shadow-lg shadow-brand-600/20">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-xl flex-col px-5 pb-7 pt-6 sm:px-8 sm:pt-9">
+        <header className="flex items-center justify-center">
+          <div className="flex items-center gap-3">
+            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-brand-600 shadow-md shadow-brand-900/15">
               <img src="/images/logo-mark.png" alt="" className="h-full w-full object-contain" />
             </span>
-            <span>
-              <span className="block text-lg font-black leading-tight">لقطة</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-stone-500">LAQTA</span>
+            <span className="text-right">
+              <span className="block text-xl font-black leading-tight text-stone-900">لقطة</span>
+              <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.24em] text-stone-500">LAQTA</span>
             </span>
           </div>
-          <span className="hidden items-center gap-1.5 rounded-full border border-white/80 bg-white/70 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm sm:inline-flex">
-            <MapPin className="h-3.5 w-3.5 text-brand-600" />
-            سوريا
-          </span>
         </header>
 
-        <section className="bio-hero relative mt-7 overflow-hidden rounded-[2rem] bg-stone-950 text-white shadow-2xl shadow-stone-900/10 sm:mt-10">
+        <section className="bio-hero relative mt-7 overflow-hidden rounded-[1.75rem] bg-stone-950 text-white shadow-xl shadow-stone-900/10 sm:mt-9">
           <img
             src="/images/editorial/villa.jpg"
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover opacity-40"
+            className="absolute inset-0 h-full w-full object-cover opacity-25"
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-stone-950 via-stone-950/90 to-brand-950/55" />
+          <div className="absolute inset-0 bg-gradient-to-br from-stone-950/95 via-stone-950/85 to-brand-950/75" />
           <div aria-hidden="true" className="bio-hero-glow" />
 
-          <div className="relative grid gap-8 px-6 py-8 sm:px-10 sm:py-11 md:grid-cols-[1fr_auto] md:items-end md:px-14 md:py-14">
-            <div className="max-w-2xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-rose-100 backdrop-blur">
+          <div className="relative px-6 py-8 text-center sm:px-9 sm:py-10">
+            <div className="mx-auto max-w-sm">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-rose-100 backdrop-blur">
                 <Sparkles className="h-3.5 w-3.5 text-rose-300" />
-                بيتك وفرصتك… أقرب مما تتخيل
+                عقارات وخدمات في سوريا
               </div>
-              <h1 className="text-3xl font-black leading-[1.35] tracking-tight sm:text-4xl md:text-5xl">
-                كل ما تبحث عنه
-                <span className="block text-rose-300">يبدأ من لقطة.</span>
+              <h1 className="text-[1.8rem] font-black leading-[1.4] tracking-tight sm:text-4xl">
+                عقارك القادم
+                <span className="block text-rose-300">يبدأ من لقطة</span>
               </h1>
-              <p className="mt-4 max-w-xl text-sm leading-7 text-stone-200 sm:text-base sm:leading-8">
-                حمّل تطبيق لقطة، تواصل معنا مباشرة، أو اعثر على موقع شركتنا.
+              <p className="mx-auto mt-3 max-w-xs text-sm leading-7 text-stone-200">
+                حمّل التطبيق، تواصل معنا، أو تفضّل بزيارة شركتنا.
               </p>
-            </div>
-
-            <div className="hidden min-w-44 flex-col items-center justify-center rounded-3xl border border-white/15 bg-white/10 px-6 py-5 text-center backdrop-blur-md md:flex">
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 shadow-lg shadow-brand-500/30">
-                <img src="/images/logo-mark.png" alt="" className="h-11 w-11 object-contain" />
-              </span>
-              <span className="mt-3 text-sm font-black">لقطة للعقارات</span>
-              <span className="mt-1 text-xs text-stone-300">منصة واحدة… خيارات أكثر</span>
             </div>
           </div>
         </section>
 
-        <section className="mt-7 sm:mt-9" aria-labelledby="bio-download-heading">
-          <div className="mb-4">
-            <p className="text-xs font-extrabold tracking-wide text-brand-700">لقطة على هاتفك</p>
-            <h2 id="bio-download-heading" className="mt-1 text-xl font-black sm:text-2xl">
-              حمّل التطبيق
+        <section className="mt-7 sm:mt-8" aria-labelledby="bio-download-heading">
+          <div className="mb-3 text-center">
+            <h2 id="bio-download-heading" className="text-lg font-black text-stone-900 sm:text-xl">
+              حمّل تطبيق لقطة
             </h2>
-            <p className="mt-1 text-xs leading-6 text-stone-500 sm:text-sm">
-              تصفّح العقارات والخدمات بسهولة، أينما كنت.
+            <p className="mt-1 text-xs leading-6 text-stone-500">
+              اختر المتجر المناسب لجهازك
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3">
             {appStores.map(({ name, description, href, icon: Icon, className }) => (
               <a
                 key={name}
@@ -137,14 +120,16 @@ export default function BioLink() {
                 rel="noopener noreferrer"
                 className={`bio-store-card ${className} group`}
               >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                  <Icon className="h-6 w-6" aria-hidden="true" />
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/12 ring-1 ring-white/15">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[11px] font-semibold opacity-75">{description}</span>
-                  <span className="mt-0.5 block text-lg font-black">{name}</span>
+                  <span className="block text-[11px] font-semibold text-white/75">{description}</span>
+                  <span className="mt-0.5 block text-base font-black">{name}</span>
                 </span>
-                <Download className="h-5 w-5 shrink-0 opacity-75 transition group-hover:-translate-y-0.5 group-hover:opacity-100" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                  <Download className="h-4 w-4 opacity-90 transition group-hover:-translate-y-0.5" />
+                </span>
               </a>
             ))}
           </div>
@@ -154,10 +139,10 @@ export default function BioLink() {
           href={whatsappUrl}
           target="_blank"
           rel="noreferrer"
-          className="bio-whatsapp group mt-4 flex min-h-[76px] items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-lg shadow-emerald-900/10 transition hover:-translate-y-0.5 sm:px-5"
+          className="bio-whatsapp group mt-3 flex min-h-[68px] items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-md shadow-emerald-900/10 transition hover:-translate-y-0.5 sm:px-5"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-            <MessageCircle className="h-6 w-6" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+            <MessageCircle className="h-5 w-5" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-black">تواصل معنا على واتساب</span>
@@ -170,10 +155,10 @@ export default function BioLink() {
           href={companyLocation}
           target="_blank"
           rel="noopener noreferrer"
-          className="bio-location-card group mt-3 flex min-h-[76px] items-center gap-3 rounded-2xl border border-stone-200/90 px-4 py-3 transition hover:-translate-y-0.5 hover:border-brand-200 sm:px-5"
+          className="bio-location-card group mt-3 flex min-h-[68px] items-center gap-3 rounded-2xl border border-stone-200/90 px-4 py-3 transition hover:-translate-y-0.5 hover:border-brand-200 sm:px-5"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
-            <MapPinned className="h-6 w-6" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+            <MapPinned className="h-5 w-5" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-black">موقع شركة لقطة</span>
@@ -184,10 +169,10 @@ export default function BioLink() {
           </span>
         </a>
 
-        <footer className="mt-auto pt-8 text-center">
-          <div>
-            <p className="text-xs font-bold text-stone-700">© {new Date().getFullYear()} {APP_CONFIG.name}</p>
-          </div>
+        <footer className="mt-auto pt-7 text-center">
+          <p className="text-[11px] font-semibold tracking-wide text-stone-500">
+            © {new Date().getFullYear()} {APP_CONFIG.name} · جميع الحقوق محفوظة
+          </p>
         </footer>
       </div>
     </main>
