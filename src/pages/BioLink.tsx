@@ -1,51 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
-  ArrowDownLeft,
-  ArrowLeft,
   ArrowUpLeft,
   Apple,
-  BadgeCheck,
-  Building2,
-  Check,
-  Copy,
   Download,
   ExternalLink,
-  HeartHandshake,
   MapPin,
   MapPinned,
   MessageCircle,
-  Plus,
   Play,
-  Share2,
   Sparkles,
-  Wrench,
 } from "lucide-react";
-import { Link } from "react-router";
 import { APP_CONFIG, getWhatsAppUrl } from "../lib/constants";
-
-const quickLinks = [
-  {
-    title: "تصفّح العقارات",
-    description: "بيوت، أراضٍ، محلات وفرص في مختلف المحافظات",
-    to: "/properties",
-    icon: Building2,
-    className: "bio-card-primary",
-  },
-  {
-    title: "أضف إعلانك",
-    description: "اعرض عقارك وتواصل مباشرة مع المهتمين",
-    to: "/place-ad",
-    icon: Plus,
-    className: "bio-card-light",
-  },
-  {
-    title: "خدمات الصيانة",
-    description: "اطلب خدمات منزلية من مكان واحد",
-    to: "/services",
-    icon: Wrench,
-    className: "bio-card-light",
-  },
-];
 
 const appStores = [
   {
@@ -68,18 +33,16 @@ const companyLocation =
   "https://maps.app.goo.gl/4jcDqcAjMJB2ePVc6?g_st=ic";
 
 export default function BioLink() {
-  const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState(false);
   const whatsappUrl = getWhatsAppUrl("مرحباً، وصلت إليكم من رابط بايو لقطة.");
 
   useEffect(() => {
     const previousTitle = document.title;
     const metadata = [
-      { selector: 'meta[name="description"]', content: "اكتشف العقارات والخدمات في سوريا مع لقطة، أو أضف إعلانك وتواصل معنا مباشرة." },
-      { selector: 'meta[property="og:title"]', content: "لقطة | كل روابطنا في مكان واحد" },
-      { selector: 'meta[property="og:description"]', content: "تصفّح العقارات والخدمات، أضف إعلانك، وتواصل معنا مباشرة عبر لقطة." },
-      { selector: 'meta[name="twitter:title"]', content: "لقطة | كل روابطنا في مكان واحد" },
-      { selector: 'meta[name="twitter:description"]', content: "تصفّح العقارات والخدمات، أضف إعلانك، وتواصل معنا مباشرة عبر لقطة." },
+      { selector: 'meta[name="description"]', content: "حمّل تطبيق لقطة من Google Play أو App Store، تواصل معنا عبر واتساب، أو اعثر على موقع الشركة." },
+      { selector: 'meta[property="og:title"]', content: "لقطة | حمّل التطبيق وتواصل معنا" },
+      { selector: 'meta[property="og:description"]', content: "روابط تحميل تطبيق لقطة، واتساب، وموقع الشركة." },
+      { selector: 'meta[name="twitter:title"]', content: "لقطة | حمّل التطبيق وتواصل معنا" },
+      { selector: 'meta[name="twitter:description"]', content: "روابط تحميل تطبيق لقطة، واتساب، وموقع الشركة." },
     ].map(({ selector, content }) => {
       const element = document.querySelector<HTMLMetaElement>(selector);
       const previousContent = element?.getAttribute("content") ?? null;
@@ -87,7 +50,7 @@ export default function BioLink() {
       return { element, previousContent };
     });
 
-    document.title = "لقطة | كل روابطنا في مكان واحد";
+    document.title = "لقطة | حمّل التطبيق وتواصل معنا";
 
     return () => {
       document.title = previousTitle;
@@ -97,18 +60,6 @@ export default function BioLink() {
     };
   }, []);
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopyError(false);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2200);
-    } catch {
-      setCopied(false);
-      setCopyError(true);
-    }
-  };
-
   return (
     <main dir="rtl" className="bio-page min-h-screen overflow-hidden text-stone-900">
       <div aria-hidden="true" className="bio-orb bio-orb-one" />
@@ -116,7 +67,7 @@ export default function BioLink() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 pb-8 pt-5 sm:px-7 sm:pt-8">
         <header className="flex items-center justify-between">
-          <Link to="/" aria-label="لقطة - الصفحة الرئيسية" className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5">
             <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-brand-600 shadow-lg shadow-brand-600/20">
               <img src="/images/logo-mark.png" alt="" className="h-full w-full object-contain" />
             </span>
@@ -124,7 +75,7 @@ export default function BioLink() {
               <span className="block text-lg font-black leading-tight">لقطة</span>
               <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-stone-500">LAQTA</span>
             </span>
-          </Link>
+          </div>
           <span className="hidden items-center gap-1.5 rounded-full border border-white/80 bg-white/70 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm sm:inline-flex">
             <MapPin className="h-3.5 w-3.5 text-brand-600" />
             سوريا
@@ -152,15 +103,8 @@ export default function BioLink() {
                 <span className="block text-rose-300">يبدأ من لقطة.</span>
               </h1>
               <p className="mt-4 max-w-xl text-sm leading-7 text-stone-200 sm:text-base sm:leading-8">
-                منصتك للعقارات والخدمات في سوريا. اكتشف المكان المناسب، أضف إعلانك، أو تواصل معنا مباشرة.
+                حمّل تطبيق لقطة، تواصل معنا مباشرة، أو اعثر على موقع شركتنا.
               </p>
-              <a
-                href="#روابط-لقطة"
-                className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-white px-5 text-sm font-extrabold text-stone-900 shadow-lg transition hover:-translate-y-0.5 hover:bg-rose-50"
-              >
-                اكتشف روابطنا
-                <ArrowDownLeft className="h-4 w-4" />
-              </a>
             </div>
 
             <div className="hidden min-w-44 flex-col items-center justify-center rounded-3xl border border-white/15 bg-white/10 px-6 py-5 text-center backdrop-blur-md md:flex">
@@ -206,35 +150,6 @@ export default function BioLink() {
           </div>
         </section>
 
-        <section id="روابط-لقطة" className="mt-8 scroll-mt-6 sm:mt-10">
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-extrabold tracking-wide text-brand-700">ابدأ من هنا</p>
-              <h2 className="mt-1 text-xl font-black sm:text-2xl">روابط لقطة</h2>
-            </div>
-            <span className="pb-1 text-xs font-medium text-stone-500">كل ما تحتاجه، بلمسة</span>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-            {quickLinks.map(({ title, description, to, icon: Icon, className }, index) => (
-              <Link
-                key={to}
-                to={to}
-                className={`bio-link-card ${className} group ${index === 0 ? "sm:col-span-2 md:col-span-1" : ""}`}
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/15 transition group-hover:scale-105">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-base font-black">{title}</span>
-                  <span className="mt-1 block text-xs leading-6 opacity-75">{description}</span>
-                </span>
-                <ArrowLeft className="h-4 w-4 shrink-0 opacity-60 transition group-hover:-translate-x-1 group-hover:opacity-100" />
-              </Link>
-            ))}
-          </div>
-        </section>
-
         <a
           href={whatsappUrl}
           target="_blank"
@@ -269,37 +184,10 @@ export default function BioLink() {
           </span>
         </a>
 
-        <section className="mt-6 grid grid-cols-3 gap-2 rounded-2xl border border-white/80 bg-white/60 p-3 shadow-sm backdrop-blur sm:gap-3 sm:p-4">
-          <div className="flex flex-col items-center gap-1 text-center sm:flex-row sm:justify-center sm:gap-2">
-            <BadgeCheck className="h-4 w-4 text-brand-600" />
-            <span className="text-[10px] font-bold text-stone-700 sm:text-xs">تصفح سهل</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 border-x border-stone-200 text-center sm:flex-row sm:justify-center sm:gap-2">
-            <HeartHandshake className="h-4 w-4 text-brand-600" />
-            <span className="text-[10px] font-bold text-stone-700 sm:text-xs">تواصل مباشر</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-center sm:flex-row sm:justify-center sm:gap-2">
-            <MapPin className="h-4 w-4 text-brand-600" />
-            <span className="text-[10px] font-bold text-stone-700 sm:text-xs">في سوريا</span>
-          </div>
-        </section>
-
-        <footer className="mt-auto flex flex-col items-center justify-between gap-3 pt-8 text-center sm:flex-row sm:text-right">
-          <div aria-live="polite">
+        <footer className="mt-auto pt-8 text-center">
+          <div>
             <p className="text-xs font-bold text-stone-700">© {new Date().getFullYear()} {APP_CONFIG.name}</p>
-            <p className="mt-0.5 text-[11px] text-stone-500">
-              {copyError ? "تعذر نسخ الرابط تلقائياً؛ يمكنك نسخه من شريط العنوان." : "عقارات وخدمات… أقرب إليك"}
-            </p>
           </div>
-          <button
-            type="button"
-            onClick={() => void copyLink()}
-            className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-white/70 px-3 text-xs font-bold text-stone-600 transition hover:border-brand-200 hover:text-brand-700"
-          >
-            {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Share2 className="h-4 w-4" />}
-            {copied ? "تم نسخ الرابط" : "انسخ رابط الصفحة"}
-            {!copied && <Copy className="h-3.5 w-3.5 opacity-55" />}
-          </button>
         </footer>
       </div>
     </main>
