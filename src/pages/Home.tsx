@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Building2, Wrench, Sun, Droplets, Wind, Paintbrush, Search,
+  ArrowLeft, Building2, Wrench, Sun, Droplets, Wind, Paintbrush, Search, ClipboardList,
   Hammer, Zap, Home as HomeIcon, MapPin, Store, Factory, Landmark, Trees,
   LayoutGrid, MessageSquare
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Link, useNavigate } from "react-router";
 import PropertyCard from "../components/properties/PropertyCard";
 import { fetchVerifiedListings } from "../lib/listings";
@@ -47,6 +48,7 @@ const categoryPhotos: Record<string, { src: string; alt: string }> = {
 
 export default function Home() {
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
   const {
     data: recentProperties = [],
     isError: listingsError,
@@ -176,6 +178,94 @@ export default function Home() {
               </Link>
             </div>
           </div>
+          <motion.div
+            className="relative mt-5 isolate grid min-h-44 grid-cols-[1fr_0.9fr] overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm sm:min-h-52 sm:grid-cols-2"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut", delay: 0.08 }}
+          >
+            <div className="relative z-10 flex flex-col items-start justify-center p-4 sm:p-6">
+              <span className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-brand-700 sm:text-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />
+                عقارات تناسب مختلف الاحتياجات
+              </span>
+              <h2 className="text-base font-bold leading-snug text-stone-900 sm:text-xl">خياراتك العقارية تبدأ من هنا</h2>
+              <p className="mt-1.5 hidden max-w-sm text-xs leading-6 text-stone-600 sm:block">
+                بيوت وأراضٍ وعقارات متنوعة، تصفحها واختر ما يناسب خطوتك القادمة.
+              </p>
+              <Link
+                to="/properties"
+                className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-md bg-brand-600 px-3.5 text-xs font-bold text-white transition-colors hover:bg-brand-700 sm:mt-4 sm:min-h-10 sm:px-4 sm:text-sm"
+              >
+                اكتشف العقارات
+                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Link>
+            </div>
+
+            <div className="relative min-h-44 overflow-hidden bg-stone-100 sm:min-h-52" aria-hidden="true">
+              <motion.div
+                className="absolute inset-y-3 right-[5%] w-[57%] overflow-hidden rounded-lg shadow-md sm:inset-y-4"
+                animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                whileHover={reduceMotion ? undefined : { scale: 1.025 }}
+              >
+                <img src={categoryPhotos.other.src} alt="" className="h-full w-full object-cover" />
+              </motion.div>
+              <motion.div
+                className="absolute bottom-4 left-[5%] top-7 w-[34%] overflow-hidden rounded-lg border-2 border-white shadow-lg sm:bottom-5 sm:left-[8%] sm:top-9"
+                animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.35 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.04 }}
+              >
+                <img src={categoryPhotos.farms.src} alt="" className="h-full w-full object-cover" />
+              </motion.div>
+              <motion.div
+                className="absolute left-[30%] top-3 h-14 w-14 overflow-hidden rounded-lg border-2 border-white shadow-md sm:left-[31%] sm:top-4 sm:h-[4.5rem] sm:w-[4.5rem]"
+                animate={reduceMotion ? undefined : { rotate: [0, 3, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.08 }}
+              >
+                <img src={categoryPhotos.lands.src} alt="" className="h-full w-full object-cover" />
+              </motion.div>
+              <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-md border border-white/70 bg-white/90 px-2 py-1 text-[10px] font-bold text-stone-700 shadow-sm backdrop-blur-sm sm:bottom-4 sm:right-4 sm:text-xs">
+                <Building2 className="h-3 w-3 text-brand-600" />
+                بيوت · أراضٍ · استثمار
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.section
+            className="relative mt-4 overflow-hidden rounded-xl bg-gradient-to-bl from-stone-900 via-brand-950 to-stone-900 p-4 text-white shadow-md sm:mt-5 sm:p-5"
+            dir="rtl"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            aria-labelledby="client-request-promo-title"
+          >
+            <div className="pointer-events-none absolute -left-10 -top-16 h-44 w-44 rounded-full border border-white/10" aria-hidden="true" />
+            <div className="pointer-events-none absolute -left-2 -top-8 h-28 w-28 rounded-full border border-white/10" aria-hidden="true" />
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white ring-1 ring-white/15">
+                  <ClipboardList className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-[11px] font-bold text-rose-200 sm:text-xs">خدمة البحث من فريق لقطة</p>
+                  <h2 id="client-request-promo-title" className="mt-0.5 text-sm font-bold sm:text-base">لم تجد العقار المناسب؟ أرسل لنا طلبك</h2>
+                  <p className="mt-1 text-xs leading-5 text-stone-300">أخبرنا بما تبحث عنه، وفريقنا يتابع معك مباشرة.</p>
+                </div>
+              </div>
+              <Link
+                to="/client-requests"
+                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 self-start rounded-md bg-white px-4 text-sm font-bold text-stone-900 transition-colors hover:bg-rose-50 sm:self-auto"
+              >
+                أضف طلب البحث
+                <ArrowLeft className="h-4 w-4 text-brand-700" />
+              </Link>
+            </div>
+          </motion.section>
+
           <div className="mt-5 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-center sm:gap-4">
             <span className="shrink-0 text-xs font-bold text-stone-600">تصفح حسب المحافظة</span>
             <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">

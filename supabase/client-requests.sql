@@ -40,6 +40,13 @@ create policy "client_requests_admin_update"
   using (public.is_admin_user())
   with check (public.is_admin_user());
 
+drop policy if exists "client_requests_admin_delete" on public.client_requests;
+create policy "client_requests_admin_delete"
+  on public.client_requests
+  for delete
+  to authenticated
+  using (public.is_admin_user());
+
 create or replace view public.approved_client_requests
   with (security_barrier = true)
 as
@@ -52,5 +59,7 @@ grant select on public.client_requests to authenticated;
 grant select on public.approved_client_requests to anon, authenticated;
 grant insert on public.client_requests to anon, authenticated;
 grant update on public.client_requests to authenticated;
+revoke delete on public.client_requests from anon, public;
+grant delete on public.client_requests to authenticated;
 
 notify pgrst, 'reload schema';
