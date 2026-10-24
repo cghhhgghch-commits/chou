@@ -218,7 +218,7 @@ export default function Home() {
           </motion.div>
 
           <motion.section
-            className="relative mt-4 overflow-hidden rounded-xl bg-gradient-to-bl from-stone-900 via-brand-950 to-stone-900 p-4 text-white shadow-md sm:mt-5 sm:p-5"
+            className="relative mt-4 overflow-hidden rounded-xl bg-gradient-to-bl from-stone-950 via-stone-900 to-stone-800 p-4 text-white shadow-md sm:mt-5 sm:p-5"
             dir="rtl"
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -230,7 +230,7 @@ export default function Home() {
             <div className="pointer-events-none absolute -left-2 -top-8 h-28 w-28 rounded-full border border-white/10" aria-hidden="true" />
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white ring-1 ring-white/15">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow-sm shadow-black/15">
                   <ClipboardList className="h-5 w-5" />
                 </span>
                 <div>
@@ -241,7 +241,7 @@ export default function Home() {
               </div>
               <Link
                 to="/client-requests"
-                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 self-start rounded-md bg-white px-4 text-sm font-bold text-stone-900 transition-colors hover:bg-rose-50 sm:self-auto"
+                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-white px-4 text-sm font-bold text-stone-900 shadow-sm transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-rose-50 sm:self-auto"
               >
                 أضف طلب البحث
                 <ArrowLeft className="h-4 w-4 text-brand-700" />
