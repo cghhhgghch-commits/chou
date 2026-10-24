@@ -18,6 +18,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Properties = lazy(() => import("./pages/Properties"));
+const ClientRequests = lazy(() => import("./pages/ClientRequests"));
 const PropertyDetails = lazy(() => import("./pages/PropertyDetails"));
 const Favorites = lazy(() => import("./pages/Favorites"));
 const Messages = lazy(() => import("./pages/Messages"));
@@ -69,6 +70,7 @@ export default function App() {
                   <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path="properties" element={<Properties />} />
+                    <Route path="client-requests" element={<ClientRequests />} />
                     <Route path="property/:id" element={<PropertyDetails />} />
                     <Route path="services" element={<Services />} />
                     <Route path="favorites" element={<Favorites />} />

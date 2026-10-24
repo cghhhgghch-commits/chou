@@ -43,6 +43,7 @@ import Image from "../components/ui/Image";
 import { PROPERTY_IMAGE_FALLBACK } from "../config/images";
 import Skeleton from "../components/ui/Skeleton";
 import NumberTicker from "../components/ui/NumberTicker";
+import AdminClientRequests from "../components/requests/AdminClientRequests";
 
 interface PropertyListing {
   id: string;
@@ -124,7 +125,7 @@ export default function AdminDashboard2() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "active" | "rejected">("all");
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads" | "notifications">("overview");
+  const [activeSection, setActiveSection] = useState<"overview" | "listings" | "leads" | "clientRequests" | "notifications">("overview");
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -669,11 +670,12 @@ export default function AdminDashboard2() {
           </div>
         )}
 
-        <nav className="mb-6 grid grid-cols-2 gap-2 rounded-xl border border-stone-200 bg-white p-1.5 sm:grid-cols-4" aria-label="أقسام لوحة المدير">
+        <nav className="mb-6 grid grid-cols-2 gap-2 rounded-xl border border-stone-200 bg-white p-1.5 sm:grid-cols-5" aria-label="أقسام لوحة المدير">
           {[
             { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
             { id: "listings", label: "الإعلانات", icon: ClipboardList },
             { id: "leads", label: "طلبات المراجعة", icon: Clock3 },
+            { id: "clientRequests", label: "طلبات العملاء", icon: Search },
             { id: "notifications", label: "إرسال إشعار", icon: Bell },
           ].map((section) => {
             const Icon = section.icon;
@@ -691,6 +693,8 @@ export default function AdminDashboard2() {
             );
           })}
         </nav>
+
+        {activeSection === "clientRequests" && <AdminClientRequests />}
 
         {activeSection === "notifications" && (
           <section className="mb-8 max-w-3xl rounded-xl border border-stone-200 bg-white p-5 sm:p-7">

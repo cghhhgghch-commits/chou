@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { User, PlusCircle, LogOut, LogIn, Wrench, Building2, Heart, MessageSquare } from "lucide-react";
+import { User, PlusCircle, LogOut, LogIn, Wrench, Building2, Heart, MessageSquare, ClipboardList } from "lucide-react";
 import { useAuth } from "../../lib/AuthContext";
 
 export default function Navbar() {
@@ -30,6 +30,10 @@ export default function Navbar() {
           <Link to="/properties" className="flex min-h-11 items-center gap-1.5 hover:text-brand-600 transition-colors">
             <Building2 className="h-4 w-4 text-stone-500" />
             <span>العقارات</span>
+          </Link>
+          <Link to="/client-requests" className="flex min-h-11 items-center gap-1.5 hover:text-brand-600 transition-colors">
+            <ClipboardList className="h-4 w-4 text-stone-500" />
+            <span>طلبات العملاء</span>
           </Link>
           <Link to="/services" className="flex min-h-11 items-center gap-1.5 hover:text-brand-600 transition-colors">
             <Wrench className="h-4 w-4 text-stone-500" />
