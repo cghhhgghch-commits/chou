@@ -161,25 +161,8 @@ export default function Home() {
 
       <div className="mx-auto w-full max-w-7xl px-3 py-5 md:px-8 md:py-8">
         <section className="mb-10 border-b border-stone-200 pb-7 md:mb-12 md:pb-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="mb-2 text-xs font-bold text-brand-700">لقطة للعقارات والخدمات</p>
-              <h1 className="text-2xl font-bold leading-tight text-stone-900 md:text-3xl">عقارك القادم في سوريا</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-stone-600">
-                تصفّح إعلانات البيع والإيجار، أو أضف عقارك وتواصل مباشرة مع المهتمين.
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-wrap gap-2">
-              <Link to="/properties" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-brand-600 px-4 text-sm font-bold text-white transition-colors hover:bg-brand-700">
-                تصفح العقارات <ArrowLeft className="h-4 w-4" />
-              </Link>
-              <Link to="/place-ad" className="inline-flex min-h-11 items-center rounded-md border border-stone-300 bg-white px-4 text-sm font-bold text-stone-800 transition-colors hover:border-stone-500">
-                أضف إعلاناً
-              </Link>
-            </div>
-          </div>
           <motion.div
-            className="relative mt-5 isolate grid min-h-44 grid-cols-[1fr_0.9fr] overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm sm:min-h-52 sm:grid-cols-2"
+            className="relative isolate grid min-h-44 grid-cols-[1fr_0.9fr] overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm sm:min-h-52 sm:grid-cols-2"
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.08 }}
