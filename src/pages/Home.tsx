@@ -4,7 +4,6 @@ import {
   Hammer, Zap, Home as HomeIcon, MapPin, Store, Factory, Landmark, Trees,
   LayoutGrid, MessageSquare
 } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
 import { Link, useNavigate } from "react-router";
 import PropertyCard from "../components/properties/PropertyCard";
 import { fetchVerifiedListings } from "../lib/listings";
@@ -48,7 +47,6 @@ const categoryPhotos: Record<string, { src: string; alt: string }> = {
 
 export default function Home() {
   const navigate = useNavigate();
-  const reduceMotion = useReducedMotion();
   const {
     data: recentProperties = [],
     isError: listingsError,
@@ -178,61 +176,6 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <motion.div
-            className="relative mt-5 isolate grid min-h-44 grid-cols-[1fr_0.9fr] overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm sm:min-h-52 sm:grid-cols-2"
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: "easeOut", delay: 0.08 }}
-          >
-            <div className="relative z-10 flex flex-col items-start justify-center p-4 sm:p-6">
-              <span className="mb-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-brand-700 sm:text-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />
-                عقارات من مختلف أنحاء سوريا
-              </span>
-              <h2 className="text-base font-bold leading-snug text-stone-900 sm:text-xl">مكانك القادم أقرب مما تتخيل</h2>
-              <p className="mt-1.5 hidden max-w-sm text-xs leading-6 text-stone-600 sm:block">
-                تصفّح البيوت والفلل والأراضي، واختر ما يناسب خطوتك القادمة.
-              </p>
-              <Link
-                to="/properties"
-                className="mt-3 inline-flex min-h-9 items-center gap-1.5 rounded-md bg-brand-600 px-3.5 text-xs font-bold text-white transition-colors hover:bg-brand-700 sm:mt-4 sm:min-h-10 sm:px-4 sm:text-sm"
-              >
-                اكتشف العقارات
-                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Link>
-            </div>
-
-            <div className="relative min-h-44 overflow-hidden bg-stone-100 sm:min-h-52" aria-hidden="true">
-              <motion.div
-                className="absolute inset-y-3 right-[5%] w-[57%] overflow-hidden rounded-lg shadow-md sm:inset-y-4"
-                animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                whileHover={reduceMotion ? undefined : { scale: 1.025 }}
-              >
-                <img src={categoryPhotos.houses.src} alt="" className="h-full w-full object-cover" />
-              </motion.div>
-              <motion.div
-                className="absolute bottom-4 left-[5%] top-7 w-[34%] overflow-hidden rounded-lg border-2 border-white shadow-lg sm:bottom-5 sm:left-[8%] sm:top-9"
-                animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.35 }}
-                whileHover={reduceMotion ? undefined : { scale: 1.04 }}
-              >
-                <img src={categoryPhotos.villas.src} alt="" className="h-full w-full object-cover" />
-              </motion.div>
-              <motion.div
-                className="absolute left-[30%] top-3 h-14 w-14 overflow-hidden rounded-lg border-2 border-white shadow-md sm:left-[31%] sm:top-4 sm:h-[4.5rem] sm:w-[4.5rem]"
-                animate={reduceMotion ? undefined : { rotate: [0, 3, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-                whileHover={reduceMotion ? undefined : { scale: 1.08 }}
-              >
-                <img src={categoryPhotos.buildings.src} alt="" className="h-full w-full object-cover" />
-              </motion.div>
-              <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-md border border-white/70 bg-white/90 px-2 py-1 text-[10px] font-bold text-stone-700 shadow-sm backdrop-blur-sm sm:bottom-4 sm:right-4 sm:text-xs">
-                <MapPin className="h-3 w-3 text-brand-600" />
-                من دمشق إلى حلب
-              </div>
-            </div>
-          </motion.div>
           <div className="mt-5 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-center sm:gap-4">
             <span className="shrink-0 text-xs font-bold text-stone-600">تصفح حسب المحافظة</span>
             <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">
