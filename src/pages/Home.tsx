@@ -218,7 +218,7 @@ export default function Home() {
           </motion.div>
 
           <motion.section
-            className="relative mt-4 overflow-hidden rounded-xl bg-gradient-to-bl from-stone-950 via-stone-900 to-stone-800 p-4 text-white shadow-md sm:mt-5 sm:p-5"
+            className="relative mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 text-stone-900 shadow-sm sm:mt-5 sm:p-5"
             dir="rtl"
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -226,25 +226,24 @@ export default function Home() {
             transition={{ duration: 0.45, ease: "easeOut" }}
             aria-labelledby="client-request-promo-title"
           >
-            <div className="pointer-events-none absolute -left-10 -top-16 h-44 w-44 rounded-full border border-white/10" aria-hidden="true" />
-            <div className="pointer-events-none absolute -left-2 -top-8 h-28 w-28 rounded-full border border-white/10" aria-hidden="true" />
-            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow-sm shadow-black/15">
+            <span className="absolute inset-y-0 right-0 w-1 bg-stone-300" aria-hidden="true" />
+            <div className="relative flex flex-col gap-4 pe-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+              <div className="flex min-w-0 items-start gap-3 sm:items-center">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-700">
                   <ClipboardList className="h-5 w-5" />
                 </span>
-                <div>
-                  <p className="text-[11px] font-bold text-rose-200 sm:text-xs">خدمة البحث من فريق لقطة</p>
-                  <h2 id="client-request-promo-title" className="mt-0.5 text-sm font-bold sm:text-base">لم تجد العقار المناسب؟ أرسل لنا طلبك</h2>
-                  <p className="mt-1 text-xs leading-5 text-stone-300">أخبرنا بما تبحث عنه، وفريقنا يتابع معك مباشرة.</p>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-stone-600">خدمة البحث من فريق لقطة</p>
+                  <h2 id="client-request-promo-title" className="mt-0.5 text-sm font-bold leading-6 text-stone-900 sm:text-base">لم تجد العقار المناسب؟ أرسل لنا طلبك</h2>
+                  <p className="mt-1 text-xs leading-5 text-stone-600">أخبرنا بما تبحث عنه، وفريقنا يتابع معك مباشرة.</p>
                 </div>
               </div>
               <Link
                 to="/client-requests"
-                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-white px-4 text-sm font-bold text-stone-900 shadow-sm transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-rose-50 sm:self-auto"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-stretch rounded-xl bg-stone-900 px-5 text-sm font-bold text-white transition-[background-color,box-shadow,transform] hover:-translate-y-0.5 hover:bg-stone-800 hover:shadow-md sm:self-auto"
               >
                 أضف طلب البحث
-                <ArrowLeft className="h-4 w-4 text-brand-700" />
+                <ArrowLeft className="h-4 w-4 text-white" />
               </Link>
             </div>
           </motion.section>
